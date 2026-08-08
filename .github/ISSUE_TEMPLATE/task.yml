@@ -1,0 +1,85 @@
+name: Task
+description: A unit of work — the starting point for every branch and pull request.
+title: "<type>(<scope>): "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Every branch starts here. Conventions: [CONTRIBUTING.md](../blob/main/CONTRIBUTING.md).
+
+        Title this task like the commit that will close it —
+        `feat(web): render project cards`.
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      description: Decides the branch prefix and the commit prefix.
+      options:
+        - feat
+        - fix
+        - docs
+        - refactor
+        - test
+        - perf
+        - chore
+        - ci
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - core
+        - db
+        - web
+        - telemetry
+        - docs
+        - ci
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What is being delivered, in behaviour terms — not in file names.
+    validations:
+      required: true
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Expected outcome
+      description: What is true once this is done that is not true today.
+    validations:
+      required: true
+
+  - type: textarea
+    id: criteria
+    attributes:
+      label: Acceptance criteria
+      description: Checkable statements. If a criterion cannot fail, it is not a criterion.
+      value: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: What this task deliberately does not cover, and where it is tracked instead.
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: The documents under `docs/` this task derives from, and any related issues.
+      placeholder: |
+        - docs/domain/data-model.md
+        - docs/sprints/sprint-01.md — task 2

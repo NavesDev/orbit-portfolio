@@ -126,6 +126,7 @@ Environment variables are documented in [`.env.example`](.env.example).
 | [testing.md](docs/testing.md) | Test levels, tooling, CI |
 | [data-model.md](docs/domain/data-model.md) | Tables, enums, conventions |
 | [architecture/](docs/architecture/) | Layers, stack rationale, monorepo layout |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Branch, commit and pull request conventions |
 
 ## 📄 License
 
