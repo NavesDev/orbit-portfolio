@@ -1,0 +1,139 @@
+# Clean Architecture — Layer Map
+
+How the model in [../domain/data-model.md](../domain/data-model.md) is
+distributed across layers, and what each layer may know.
+
+## 1. The dependency rule
+
+Source dependencies point inward only:
+
+```
+Presentation  ──▶  Application  ──▶  Domain  ◀──  Infrastructure
+```
+
+- **Domain** imports nothing from the project. No ORM decorators, no HTTP types,
+  no framework imports.
+- **Application** imports Domain only.
+- **Infrastructure** imports Domain and Application, to implement their ports.
+- **Presentation** imports Application only. It never touches a repository or a
+  database type.
+
+Inversion happens at the port boundary: Application declares
+`ProjectRepository` as an interface, Infrastructure provides
+`PostgresProjectRepository`, and the composition root wires them.
+
+## 2. Directory layout
+
+```
+src/
+  domain/
+    entities/          Project, TimelineEntry, Skill, SocialLink
+    value-objects/     Slug, DateRange, Url, ProgressPercent, IconSvg,
+                       LocalizedText
+    enums/             SkillCategory, TimelineKind, Locale
+    errors/            DomainError and subclasses
+  application/
+    ports/             ProjectRepository, TimelineRepository,
+                       SkillRepository, SocialLinkRepository, Clock
+    use-cases/
+      projects/        ListFeaturedProjects, ListProjects, GetProjectBySlug
+      timeline/        GetTimeline
+      skills/          GetSkillGraph, GetSkillUsage
+      social/          ListSocialLinks
+    dto/               Use-case input/output shapes
+  infrastructure/
+    persistence/
+      migrations/      Schema, in the order given in the data model
+      repositories/    Postgres implementations of the ports
+      mappers/         Row ⇄ domain entity
+    providers/         SystemClock
+    config/            Environment loading
+  presentation/
+    web/               Pages, components, view models
+    api/               Route handlers
+  composition/         Dependency wiring — the only place that knows every layer
+```
+
+## 3. What belongs where
+
+| Concern | Layer | Why |
+| --- | --- | --- |
+| `ended_on >= started_on` | Domain (`DateRange`) | True about the concept, regardless of storage. The `CHECK` constraint is a second line of defense, not the definition. |
+| `progress_percent` in 0–100 | Domain (`ProgressPercent`) | Same. |
+| SVG sanitization | Domain (`IconSvg`) | An icon that can execute script is not a valid icon. Validating on construction means no unsanitized value can exist in memory. |
+| Localized text: length, allowed locales, required default | Domain (`LocalizedText`) | `jsonb` has no length limit, so the guarantee `varchar(n)` used to give must be restored somewhere. The domain is where it belongs; the `CHECK` is the second line. |
+| Resolving which locale to render | Application (`Locale` passed into every use case) | Which language a visitor gets is a request-scoped decision, not a property of a project. |
+| Negotiating `Accept-Language` | Presentation (middleware) | An HTTP concern. The domain never sees a header. |
+| "Only published items are public" | Application | A use-case policy. The domain allows unpublished entities to exist. |
+| Default ordering | Application specifies, Infrastructure executes | The contract is a use-case concern; the `ORDER BY` is a detail. |
+| Skill usage union across two tables | Application (read model) | A projection across aggregates, driven by what the UI shows. |
+| `uuid`, `varchar(160)`, native enums | Infrastructure | Types the domain never names. |
+| Orbit colors, ring radii, icon rendering | Presentation | Visual decisions keyed off `category`. |
+| Hero copy, "years coding" | Presentation | Static content, not data. |
+
+## 4. Aggregates
+
+| Aggregate root | Contains | Boundary rule |
+| --- | --- | --- |
+| `Project` | its skill associations | Skills are referenced **by id**, never loaded as full entities inside `Project`. |
+| `TimelineEntry` | its skill associations | Same. |
+| `Skill` | — | Referenced by both of the above. |
+| `SocialLink` | — | Standalone. |
+
+Four repositories, not six: the join tables are persisted by the owning root's
+repository and never get one of their own.
+
+`TimelineEntry` is a single entity with a `kind`, mirroring the table. If
+per-kind invariants appear later, it becomes an abstract root with
+`ProfessionalEntry` / `AcademicEntry` / `CertificationEntry` subtypes and the
+mapper dispatches on `kind` — the single table stays a persistence detail either
+way.
+
+## 5. Ports
+
+| Port | Operations |
+| --- | --- |
+| `ProjectRepository` | `findBySlug`, `listPublished`, `listFeatured(limit)`, `save`, `delete` |
+| `TimelineRepository` | `listPublished(kind?)`, `listFeatured`, `save`, `delete` |
+| `SkillRepository` | `listAll`, `findUsage(skillId)`, `save`, `delete` |
+| `SocialLinkRepository` | `listPublished`, `save`, `delete` |
+| `Clock` | `today()` — makes "ongoing" and "expired" testable |
+
+`findUsage` returns a `SkillUsage[]` read model, not entities. Reads and writes
+have different shapes; forcing both through one interface is what turns a
+repository into a leaky query builder.
+
+Every read use case takes a `Locale`. Repositories do **not** — they return
+entities holding a full `LocalizedText`, and the use case resolves the language
+when building its output DTO. Pushing locale into SQL would spread the fallback
+rule across every query; resolving it once in the application layer keeps it in
+one place.
+
+## 6. Mapping rules
+
+- Row ⇄ entity conversion lives in `infrastructure/persistence/mappers`, one per
+  aggregate.
+- The shared column groups (`created_at`/`updated_at`,
+  `is_published`/`sort_order`, `started_on`/`ended_on`) map through reusable
+  mixins. Because the columns are standardized, each mixin is written once and
+  reused by all four mappers.
+- `ended_on IS NULL` becomes an open `DateRange` in the domain. The concepts
+  "ongoing", "current" and "never expires" are the same absence, interpreted by
+  the presentation layer according to `kind`.
+- `jsonb` columns map to `LocalizedText`, validated on construction. A row that
+  violates the invariant fails loudly at load, not silently downstream.
+- `tags` maps to a `LocalizedText`-of-arrays. No entity.
+- Output DTOs carry resolved `string`s. Nothing holding a `LocalizedText` ever
+  crosses into the presentation layer (NFR-13).
+
+## 7. Testing
+
+| Layer | Style | Dependencies |
+| --- | --- | --- |
+| Domain | Pure unit tests | None |
+| Application | Unit tests against in-memory port fakes | Fakes only |
+| Infrastructure | Integration tests against a real PostgreSQL | Database |
+| Presentation | Component and route tests with stubbed use cases | Stubs |
+
+The in-memory fakes are the check that the ports are genuinely abstract: a fake
+that is hard to write means the port has leaked a storage concern.

@@ -1,0 +1,422 @@
+# Data Model
+
+PostgreSQL. 6 tables, 2 enums, bilingual content.
+
+| Table | Purpose |
+| --- | --- |
+| [`social_links`](#1-social_links) | Footer contacts, including e-mail |
+| [`skills`](#2-skills) | Technology taxonomy |
+| [`projects`](#3-projects) | Portfolio work |
+| [`timeline_entries`](#4-timeline_entries) | Professional, academic and certification track |
+| [`project_skill`](#5-project_skill) | Project ↔ skill, with usage note |
+| [`timeline_entry_skill`](#6-timeline_entry_skill) | Timeline entry ↔ skill, with usage note |
+
+---
+
+## Conventions
+
+Applied to every table, so the shape of one predicts the shape of the rest.
+
+| Rule | Detail |
+| --- | --- |
+| Table names | `snake_case`, plural. Join tables: `singular_singular`. |
+| Column names | `snake_case`, singular, **English**. |
+| Primary key | `id uuid`, default `gen_random_uuid()`. Join tables use a composite PK and have no `id`. |
+| Foreign key | `<referenced_table_singular>_id`. |
+| Audit | `created_at` / `updated_at timestamptz not null default now()` on every table except join tables. No soft delete — a removed row is deleted. |
+| Listing | `is_published boolean not null` + `sort_order integer not null default 0` on anything rendered as a list. |
+| Periods | `started_on` / `ended_on date`. `ended_on IS NULL` means open — ongoing, current, or never expires. No separate `is_current` flag. |
+| Booleans | Prefixed `is_`. |
+| Enumerations | Native database enums. A new value is a migration, never free text. |
+| URLs | `varchar(2048)`, absolute `https` (or `mailto:`), validated in the domain layer. |
+| Untranslated text | `varchar(n)` with an explicit limit. |
+| **Translated text** | `jsonb`, keyed by locale. See [Localization](#localization). |
+
+Default ordering for any collection:
+
+```sql
+ORDER BY sort_order ASC, started_on DESC NULLS LAST
+```
+
+---
+
+## Localization
+
+Locales: **`pt-BR`** (default and fallback) and **`en`**.
+
+### What is translated
+
+Only text the visitor reads and that has a meaningful translation.
+
+| Translated | Not translated |
+| --- | --- |
+| `projects.title`, `.category`, `.description`, `.tags` | `skills.name` — "Next.js", "PostgreSQL" |
+| `timeline_entries.title`, `.description` | `timeline_entries.organization` — "UNIP", "Liferay" |
+| `usage_note` on both join tables | `social_links.platform` — "GitHub" |
+| | `slug`, URLs, dates, booleans, enums |
+
+Proper nouns are not translated. A `skills` row is one row in any language,
+which is what keeps the skill graph and its usage lookups language-agnostic.
+
+`slug` stays single and untranslated: one project, one canonical URL across
+locales. Translating slugs would give the same project two addresses and require
+redirects between them.
+
+### Storage
+
+A translated column is `jsonb`, an object keyed by locale:
+
+```json
+{ "pt-BR": "Sistema de agendamento", "en": "Scheduling system" }
+```
+
+Chosen over per-entity translation tables. Those would take the schema from 6
+tables to 10 — two of them existing solely to carry a `usage_note`, keyed on
+four columns — and put a `JOIN` in every read. With one author and two locales,
+the row stays the unit of editing and a new locale is a key, not a migration.
+
+### Validation
+
+`jsonb` has no length limit of its own, so the constraint that `varchar(n)` gave
+for free has to be restored explicitly.
+
+**Primary enforcement is in the domain**, in a `LocalizedText` value object that
+rejects on construction. The database constraint is the second line of defense
+(NFR-08), for anything written outside the application — seeds, migrations,
+manual fixes.
+
+One immutable function serves every localized column:
+
+```sql
+CREATE FUNCTION is_localized(value jsonb, max_length int)
+RETURNS boolean
+LANGUAGE sql IMMUTABLE STRICT
+AS $$
+  SELECT jsonb_typeof(value) = 'object'
+     AND value ? 'pt-BR'
+     AND NOT EXISTS (
+       SELECT 1
+         FROM jsonb_each(value) AS entry(locale, text)
+        WHERE entry.locale NOT IN ('pt-BR', 'en')
+           OR jsonb_typeof(entry.text) <> 'string'
+           OR length(entry.text #>> '{}') > max_length
+     )
+$$;
+```
+
+It enforces four things at once:
+
+1. The value is an object, not a string, number or array.
+2. The default locale is present — no row is unreadable in `pt-BR`.
+3. Every key is a known locale — a typo like `en-US` is rejected instead of
+   silently producing content nobody will ever see.
+4. Every value is a string within the column's length budget.
+
+A sibling `is_localized_array` covers `projects.tags`, adding a cap on the
+number of items.
+
+Adding a locale means editing this function — one migration. That is deliberate:
+a new language should be a decision, not a side effect of an `INSERT`.
+
+### Length budgets
+
+| Column | Max per locale |
+| --- | --- |
+| `projects.title`, `timeline_entries.title` | 160 |
+| `projects.category` | 40 |
+| `projects.tags` — each item | 60, up to 8 items |
+| `usage_note` | 240 |
+| `description` | 8000 |
+
+`description` had no limit when it was `text`. It gets one now: an unbounded
+column is a column that eventually holds something absurd.
+
+### Querying
+
+Reading one locale, with fallback:
+
+```sql
+SELECT coalesce(title ->> 'en', title ->> 'pt-BR') AS title FROM projects;
+```
+
+Finding what still needs translating — the question that actually gets asked
+while a site is being localized:
+
+```sql
+SELECT slug FROM projects WHERE NOT description ? 'en';
+```
+
+Fallback is resolved in the application layer, not in SQL, so the rule lives in
+one place. The query above is for inspection.
+
+---
+
+## Enums
+
+| Enum | Values |
+| --- | --- |
+| `skill_category` | `frontend`, `backend`, `tooling`, `data` |
+| `timeline_kind` | `professional`, `academic`, `certification` |
+
+`social_links.platform` is deliberately **not** an enum — see §1.
+
+---
+
+## 1. `social_links`
+
+| Column | Type | Null | Notes |
+| --- | --- | --- | --- |
+| `id` | `uuid` | no | PK |
+| `platform` | `varchar(40)` | no | Metadata and accessible name: `github`, `linkedin`, `instagram`, `email`. Feeds the link's `aria-label`. |
+| `url` | `varchar(2048)` | no | Absolute; `mailto:` when the link is an e-mail address. |
+| `icon_svg` | `text` | no | Inline SVG markup. Must use `stroke="currentColor"` so it inherits the link's hover color. |
+| `is_published` | `boolean` | no | Default `true` |
+| `sort_order` | `integer` | no | Default `0`. Footer order. |
+| `created_at` / `updated_at` | `timestamptz` | no | |
+
+Indexes: `ix_social_links__published_sort` on `(is_published, sort_order)`.
+
+Nothing here is translated. `platform` is a proper noun and doubles as the
+accessible name.
+
+**Why `platform` is a plain varchar.** As an enum it would force a migration for
+every new network, defeating the point of storing links as data. The icon is
+carried by `icon_svg`, so nothing in the front end needs to switch on
+`platform` — it exists to describe the link and to give screen readers a name
+for an otherwise icon-only anchor.
+
+**Why the icon is inline SVG rather than a URL.** Footer links change color on
+hover through the CSS `color` property. An `<img>` cannot inherit
+`currentColor`; inline SVG can. A URL would also add an external request and a
+hosting dependency.
+
+**Security constraint.** `icon_svg` is executable content. It must be sanitized
+on write — tag whitelist (`svg`, `g`, `path`, `circle`, `rect`, `line`,
+`polyline`, `polygon`), attribute whitelist, and rejection of any `on*` handler
+or `<script>`. This is a domain invariant, enforced by an `IconSvg` value
+object, not a front-end concern.
+
+---
+
+## 2. `skills`
+
+| Column | Type | Null | Notes |
+| --- | --- | --- | --- |
+| `id` | `uuid` | no | PK |
+| `name` | `varchar(60)` | no | Unique. Proper noun — not translated. |
+| `category` | `skill_category` | no | Groups the orbit rings |
+| `sort_order` | `integer` | no | Default `0` |
+| `created_at` / `updated_at` | `timestamptz` | no | |
+
+Indexes: `ux_skills__name`, `ix_skills__category`.
+
+No `is_published`: a skill is only visible through a project or timeline entry
+that references it. An orphan skill renders nowhere on its own.
+
+Colors and ring radii are not stored — they are visual decisions belonging to
+the front end, keyed off `category`.
+
+---
+
+## 3. `projects`
+
+| Column | Type | Null | Notes |
+| --- | --- | --- | --- |
+| `id` | `uuid` | no | PK |
+| `slug` | `varchar(120)` | no | Unique, untranslated. URL and deep-link target. |
+| `title` | `jsonb` | no | Localized, ≤ 160 per locale |
+| `category` | `jsonb` | yes | Localized, ≤ 40. Card eyebrow. |
+| `description` | `jsonb` | yes | Localized, ≤ 8000. Markdown. |
+| `tags` | `jsonb` | yes | Localized array of strings, ≤ 8 items of ≤ 60 |
+| `repo_url` | `varchar(2048)` | yes | |
+| `live_url` | `varchar(2048)` | yes | |
+| `progress_percent` | `smallint` | yes | 0–100. Card progress bar. |
+| `started_on` | `date` | yes | |
+| `ended_on` | `date` | yes | Null = in progress |
+| `is_featured` | `boolean` | no | Shown on the home page |
+| `is_published` | `boolean` | no | Default `false` |
+| `sort_order` | `integer` | no | Default `0` |
+| `created_at` / `updated_at` | `timestamptz` | no | |
+
+Indexes and constraints:
+
+- `ux_projects__slug`
+- `ix_projects__published_featured_sort` on `(is_published, is_featured, sort_order)`
+- `ck_projects__progress_range`: `progress_percent BETWEEN 0 AND 100`
+- `ck_projects__date_order`: `ended_on IS NULL OR ended_on >= started_on`
+- `ck_projects__title`: `is_localized(title, 160)`
+- `ck_projects__category`: `category IS NULL OR is_localized(category, 40)`
+- `ck_projects__description`: `description IS NULL OR is_localized(description, 8000)`
+- `ck_projects__tags`: `tags IS NULL OR is_localized_array(tags, 60, 8)`
+
+`tags` holds one array per locale — `{"pt-BR": ["Calendário em tempo real"],
+"en": ["Real-time calendar"]}`. They are free labels rendered as chips and never
+queried on their own; normalized tag tables would add two tables, now doubled by
+translation, to serve a display detail.
+
+---
+
+## 4. `timeline_entries`
+
+Professional experience, academic background and certifications in one table,
+discriminated by `kind`. They share a title, an organization and a period —
+which is the whole of what the timeline renders.
+
+| Column | Type | Null | Notes |
+| --- | --- | --- | --- |
+| `id` | `uuid` | no | PK |
+| `kind` | `timeline_kind` | no | `professional` \| `academic` \| `certification` |
+| `title` | `jsonb` | no | Localized, ≤ 160. Role / degree / certification name |
+| `organization` | `varchar(160)` | no | Employer / institution / issuer. Proper noun — not translated. |
+| `description` | `jsonb` | yes | Localized, ≤ 8000 |
+| `credential_url` | `varchar(2048)` | yes | Verification link. Only meaningful when `kind = 'certification'`. |
+| `started_on` | `date` | no | Start date, or issue date for certifications |
+| `ended_on` | `date` | yes | End date, or expiry. Null = current / never expires. |
+| `is_featured` | `boolean` | no | Shown before "ver trajetória completa" |
+| `is_published` | `boolean` | no | Default `false` |
+| `sort_order` | `integer` | no | Default `0` |
+| `created_at` / `updated_at` | `timestamptz` | no | |
+
+Indexes and constraints:
+
+- `ix_timeline_entries__published_started` on `(is_published, started_on DESC)`
+- `ix_timeline_entries__kind` on `(kind)`
+- `ck_timeline_entries__date_order`: `ended_on IS NULL OR ended_on >= started_on`
+- `ck_timeline_entries__title`: `is_localized(title, 160)`
+- `ck_timeline_entries__description`: `description IS NULL OR is_localized(description, 8000)`
+
+**Trade-off, recorded deliberately.** Three separate tables would let the
+database enforce per-type requirements (`field_of_study` mandatory for a degree,
+`credential_id` for a certification). One table gives up that enforcement in
+exchange for a timeline that needs no `UNION`, one repository instead of three,
+and one skill join instead of three. At this scale — dozens of rows — the
+simpler read path is worth more than the stricter schema. `credential_url` is
+the only column that applies to a single kind; isolating it was not worth a
+second table.
+
+---
+
+## 5. `project_skill`
+
+| Column | Type | Null | Notes |
+| --- | --- | --- | --- |
+| `project_id` | `uuid` | no | PK part. FK → `projects.id`, `ON DELETE CASCADE`. |
+| `skill_id` | `uuid` | no | PK part. FK → `skills.id`, `ON DELETE RESTRICT`. |
+| `usage_note` | `jsonb` | yes | Localized, ≤ 240. How the skill was applied here. |
+
+PK `(project_id, skill_id)`. Index `ix_project_skill__skill` for reverse lookup.
+Constraint `ck_project_skill__usage_note`:
+`usage_note IS NULL OR is_localized(usage_note, 240)`.
+
+---
+
+## 6. `timeline_entry_skill`
+
+| Column | Type | Null | Notes |
+| --- | --- | --- | --- |
+| `timeline_entry_id` | `uuid` | no | PK part. FK → `timeline_entries.id`, `ON DELETE CASCADE`. |
+| `skill_id` | `uuid` | no | PK part. FK → `skills.id`, `ON DELETE RESTRICT`. |
+| `usage_note` | `jsonb` | yes | Localized, ≤ 240 |
+
+PK `(timeline_entry_id, skill_id)`. Index `ix_timeline_entry_skill__skill`.
+Same check constraint as above.
+
+**`usage_note` is what makes the skills section work.** Clicking a technology
+opens a modal listing where it was used and what it did there. That text has no
+other home: it belongs to the pairing, not to the skill and not to the project.
+Without it the interaction has nothing to show.
+
+Query behind the modal — the only place two tables are unioned:
+
+```sql
+SELECT 'project' AS source, p.title, p.slug, ps.usage_note
+  FROM project_skill ps
+  JOIN projects p ON p.id = ps.project_id
+ WHERE ps.skill_id = $1 AND p.is_published
+UNION ALL
+SELECT t.kind::text, t.title, NULL, ts.usage_note
+  FROM timeline_entry_skill ts
+  JOIN timeline_entries t ON t.id = ts.timeline_entry_id
+ WHERE ts.skill_id = $1 AND t.is_published;
+```
+
+Localized columns come back as `jsonb`; the mapper turns them into
+`LocalizedText` and the use case resolves the locale.
+
+---
+
+## Relationships
+
+| From | Cardinality | To | On delete |
+| --- | --- | --- | --- |
+| `projects` | N ↔ N | `skills` | via `project_skill`; cascade from project, restrict from skill |
+| `timeline_entries` | N ↔ N | `skills` | via `timeline_entry_skill`; same rule |
+
+`social_links` and `skills` have no incoming foreign keys of their own.
+`projects` and `timeline_entries` are independent — a project is not linked to
+the job it was built in, which the current site never displays.
+
+---
+
+## Seed data from the prototype
+
+> **The prototype's content is illustrative placeholder.** Its skills, projects,
+> timeline entries, organizations, dates and usage notes are stand-ins written
+> to make the prototype render — not the author's real history. The seed exists
+> to exercise the schema; its values are replaced later from the author's own
+> CV and project history. **No row count is a criterion for anything**, here or
+> in [roadmap.md](../roadmap.md).
+
+The prototype is Portuguese-only, so seed rows carry `pt-BR` and, where a
+translation is written, `en`. A missing `en` key is valid — it falls back.
+
+| Prototype source | Target |
+| --- | --- |
+| `skillData` keys | `skills` |
+| `skillData[*].cat` | `skills.category`, mapped to the enum: `ferramentas` → `tooling`, `dados` → `data` |
+| `skillData[*].uses[].detail` | `usage_note` on the matching join row, under `pt-BR` |
+| `projectData` | `projects` |
+| `.proj-tags span` | `projects.tags`, under `pt-BR` |
+| `.tl-item` cards | `timeline_entries`, `kind` per the card's own label |
+| `.foot-links a` | `social_links` |
+
+Three things the prototype does not supply:
+
+- **`icon_svg`.** The prototype's footer uses two-letter text labels as
+  placeholders. The icons are authored in the project and must satisfy the
+  `IconSvg` invariant in §1 — they are not a copy of anything.
+- **A single project ⇄ skill truth.** The prototype states the association
+  twice, from `skillData[*].uses` and from `projectData[*].skills`, and the two
+  disagree. `project_skill` is one table; which set is authoritative is decided
+  when the real content is written, not inferred from the placeholder.
+- **A row behind every usage note.** Some notes are filed under an aggregate
+  title that matches no project (`Todos os projetos`). A join row needs a real
+  `project_id`, so those notes are rewritten or dropped — a skill with no
+  surviving association renders nowhere, by the rule in §2.
+
+No certification exists in the prototype; nothing forces `timeline_entries` to
+ship a `kind = 'certification'` row.
+
+---
+
+## Migration order
+
+Enums → `is_localized` / `is_localized_array` functions → `social_links` →
+`skills` → `projects` → `timeline_entries` → `project_skill` →
+`timeline_entry_skill`.
+
+The validation functions come before any table that references them in a
+`CHECK`.
+
+---
+
+## Extension points
+
+Deferred, each additive — none forces a remodel:
+
+- **Stats** (`stats` table) when the GitHub numbers stop being placeholders.
+- **Type-specific timeline fields** (`degree_level`, `workload_hours`,
+  `employment_type`) as nullable columns guarded by `CHECK` on `kind`.
+- **A third locale** — add the key to `is_localized`, add the route segment, and
+  translate. No schema change.
+- **Media library** replacing any future `*_image_url` column.
