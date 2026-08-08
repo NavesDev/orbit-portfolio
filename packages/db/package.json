@@ -1,0 +1,17 @@
+{
+  "name": "@portfolio/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "migrate": "node --experimental-strip-types src/migrate.ts",
+    "seed": "node --experimental-strip-types src/seed/run.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@portfolio/core": "workspace:*"
+  }
+}
