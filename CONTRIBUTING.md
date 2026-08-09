@@ -240,7 +240,7 @@ docker compose up -d postgres && pnpm test:integration
 
 ## 6. Setting up
 
-Node 20+, pnpm 9, Docker.
+Node 24, pnpm 9, Docker. `.nvmrc` pins the version — run `nvm use`.
 
 ```bash
 pnpm install && cp .env.example .env && docker compose up -d postgres

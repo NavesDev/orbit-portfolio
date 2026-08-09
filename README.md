@@ -102,7 +102,7 @@ what lands next: [docs/roadmap.md](docs/roadmap.md).
 
 ## 🏁 Running locally
 
-Requires Node 20+, pnpm 9 and Docker.
+Requires Node 24, pnpm 9 and Docker. The version is pinned in `.nvmrc` — `nvm use` picks it up.
 
 ```bash
 pnpm install && cp .env.example .env && docker compose up -d postgres
