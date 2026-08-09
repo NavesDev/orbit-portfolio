@@ -181,9 +181,9 @@ this file outrank every one of them.
 | `web-design-guidelines` | Reviewing UI code for accessibility and interface quality | **Active.** See the rules below — it runs before a UI PR. |
 | `writing-guidelines` | Reviewing prose in `docs/`, `README.md`, static copy | **Active.** Same. |
 | `next-dev-loop` | Confirming a change actually behaves in a running app, not just that it type-checks | **Active**, needs `pnpm dev` up. |
-| `next-cache-components-adoption` | Enabling Cache Components, the `cacheComponents` flag | **Dormant** — needs Next 16. |
-| `next-cache-components-optimizer` | Driving a route to instant navigation under Cache Components / PPR | **Dormant** — needs Next 16.3+. |
-| `next-partial-prefetching-adoption` | Enabling Partial Prefetching, `prefetch = 'partial'` | **Dormant** — needs Next 16. |
+| `next-cache-components-adoption` | Enabling Cache Components, the `cacheComponents` flag | **Available** on Next 16.3 — not adopted yet. |
+| `next-cache-components-optimizer` | Driving a route to instant navigation under Cache Components / PPR | **Available**, once Cache Components is on and a route exists to optimize. |
+| `next-partial-prefetching-adoption` | Enabling Partial Prefetching, `prefetch = 'partial'` | **Available** on Next 16.3 — not adopted yet. |
 | `vercel-optimize` | Cutting Vercel cost or fixing an expensive route, from real metrics | **Dormant** — needs a deployed project with traffic. |
 | `deploy-to-vercel` | Deploying an app to Vercel | **Restricted.** See rules. |
 | `vercel-cli-with-tokens` | Driving the Vercel CLI with an access token | **Restricted.** See rules. |
@@ -198,10 +198,10 @@ this file outrank every one of them.
 - **Say which skill shaped the work.** If a skill decided an approach, name it in
   the PR's **Decisions** section. A reviewer should never have to guess where a
   pattern came from.
-- **Dormant means dormant.** Do not flip `cacheComponents` or
-  `partialPrefetching` on Next 15 to make a skill applicable. Upgrading Next is
-  its own task issue with its own PR; a framework upgrade never rides along with
-  feature work.
+- **Available is not adopted.** Next 16.3 makes the Cache Components and Partial
+  Prefetching skills usable, but neither flag is on and neither is a decision an
+  agent makes in passing. Turning one on is its own task issue with its own PR,
+  argued on what it buys this site — never a step inside unrelated feature work.
 - **Not applicable means skip it.** `vercel-react-native-skills` has no target in
   this repository. Do not generalize its advice to the web app.
 - **Agents do not deploy.** Production and previews come from Git through the
