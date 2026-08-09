@@ -159,3 +159,68 @@ covered by E2E. `docs/testing.md` also records what is deliberately *not* tested
 `<type>/<issue-number>-<slug>`, commits are Conventional Commits scoped by
 package (`feat(db): …`), and **`main` is never committed to directly** — always
 branch and open a PR using `.github/PULL_REQUEST_TEMPLATE.md`.
+
+## Agent skills
+
+Thirteen skills are vendored into this repository under `.claude/skills/`, each
+pinned to its upstream source and content hash by `skills-lock.json`. They are a
+dependency like any other: versioned, reviewed, upgraded on purpose. The four
+`next-*` entries are symlinks into `.agents/skills/`, so agents reading either
+path get the same single copy.
+
+They are **reference material, not authority.** `docs/`, `CONTRIBUTING.md` and
+this file outrank every one of them.
+
+### What is available, and when it applies
+
+| Skill | Reach for it when | Status here |
+| --- | --- | --- |
+| `vercel-react-best-practices` | Writing or reviewing any React/Next.js code — Server/Client split, data fetching, bundle size | **Active.** The default reference for `apps/web`. |
+| `vercel-composition-patterns` | A component grows boolean props, or a reusable API is being designed | **Active.** Relevant once components exist. |
+| `vercel-react-view-transitions` | Page transitions, shared-element or enter/exit animation | **Active** for the animated sections the design calls for. |
+| `web-design-guidelines` | Reviewing UI code for accessibility and interface quality | **Active.** See the rules below — it runs before a UI PR. |
+| `writing-guidelines` | Reviewing prose in `docs/`, `README.md`, static copy | **Active.** Same. |
+| `next-dev-loop` | Confirming a change actually behaves in a running app, not just that it type-checks | **Active**, needs `pnpm dev` up. |
+| `next-cache-components-adoption` | Enabling Cache Components, the `cacheComponents` flag | **Dormant** — needs Next 16. |
+| `next-cache-components-optimizer` | Driving a route to instant navigation under Cache Components / PPR | **Dormant** — needs Next 16.3+. |
+| `next-partial-prefetching-adoption` | Enabling Partial Prefetching, `prefetch = 'partial'` | **Dormant** — needs Next 16. |
+| `vercel-optimize` | Cutting Vercel cost or fixing an expensive route, from real metrics | **Dormant** — needs a deployed project with traffic. |
+| `deploy-to-vercel` | Deploying an app to Vercel | **Restricted.** See rules. |
+| `vercel-cli-with-tokens` | Driving the Vercel CLI with an access token | **Restricted.** See rules. |
+| `vercel-react-native-skills` | React Native and Expo work | **Not applicable.** There is no mobile target. |
+
+### Rules of use
+
+- **The documents win.** Where a skill contradicts `docs/architecture/`,
+  `docs/domain/data-model.md` or `docs/testing.md`, follow the document. If the
+  skill is right and the document is wrong, change the document in the same PR —
+  that is the process, not a workaround for it.
+- **Say which skill shaped the work.** If a skill decided an approach, name it in
+  the PR's **Decisions** section. A reviewer should never have to guess where a
+  pattern came from.
+- **Dormant means dormant.** Do not flip `cacheComponents` or
+  `partialPrefetching` on Next 15 to make a skill applicable. Upgrading Next is
+  its own task issue with its own PR; a framework upgrade never rides along with
+  feature work.
+- **Not applicable means skip it.** `vercel-react-native-skills` has no target in
+  this repository. Do not generalize its advice to the web app.
+- **Agents do not deploy.** Production and previews come from Git through the
+  Vercel integration. `deploy-to-vercel` and `vercel-cli-with-tokens` are for a
+  human running the CLI deliberately — an agent session must not deploy, create
+  projects, or set environment variables. **Never write a token into a file, a
+  commit or a command that gets logged.**
+- **Review skills produce review, not commits.** `web-design-guidelines` and
+  `writing-guidelines` return findings. Read them, decide, apply what is right.
+  Applying a batch of suggestions wholesale is how unrelated churn lands in a
+  diff — and "nothing unrelated is in this diff" is a checklist item.
+  Run `web-design-guidelines` before opening a PR that touches components, and
+  `writing-guidelines` before one that touches `docs/`, `README.md` or
+  `apps/web/src/content/`.
+- **Verify behaviour, don't assume it.** `pnpm typecheck` passing is not evidence
+  a page works. For a change with runtime behaviour, use `next-dev-loop` against
+  a running app, then write down in the PR what was actually checked.
+- **Never hand-edit a vendored skill.** `skills-lock.json` pins each one by
+  content hash; editing the files in place makes the hash lie. Upgrade from
+  upstream and commit the new bodies and the new lock together.
+- **Adding, removing or upgrading a skill is a `chore` task** with its own issue
+  and PR, never smuggled in alongside a feature.
