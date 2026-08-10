@@ -358,44 +358,62 @@ the job it was built in, which the current site never displays.
 
 ---
 
-## Seed data from the prototype
+## Seed data
 
-> **The prototype's content is illustrative placeholder.** Its skills, projects,
-> timeline entries, organizations, dates and usage notes are stand-ins written
-> to make the prototype render — not the author's real history. The seed exists
-> to exercise the schema; its values are replaced later from the author's own
-> CV and project history. **No row count is a criterion for anything**, here or
-> in [roadmap.md](../roadmap.md).
+> **No row count is a criterion for anything**, here or in
+> [roadmap.md](../roadmap.md). The seed's job is to make the site render from
+> the database and to exercise the schema; its content is edited as the author's
+> history changes, and no test asserts on it.
 
-The prototype is Portuguese-only, so seed rows carry `pt-BR` and, where a
-translation is written, `en`. A missing `en` key is valid — it falls back.
+The seed now carries the author's real content in place of the prototype's
+illustrative placeholder. `packages/db/src/seed/` splits it in two, so the
+content can be read without the mechanics in the way:
 
-| Prototype source | Target |
+| File | Holds |
 | --- | --- |
-| `skillData` keys | `skills` |
-| `skillData[*].cat` | `skills.category`, mapped to the enum: `ferramentas` → `tooling`, `dados` → `data` |
-| `skillData[*].uses[].detail` | `usage_note` on the matching join row, under `pt-BR` |
-| `projectData` | `projects` |
-| `.proj-tags span` | `projects.tags`, under `pt-BR` |
-| `.tl-item` cards | `timeline_entries`, `kind` per the card's own label |
-| `.foot-links a` | `social_links` |
+| `data.ts` | The content, typed. No SQL, no I/O. |
+| `run.ts` | The executor: one transaction, upserts, CLI entrypoint. |
 
-Three things the prototype does not supply:
+Every localized column carries **both** `pt-BR` and `en`. A `pt-BR`-only value
+would still be valid — it falls back — but an English visitor gets an English
+page rather than a demonstration of the fallback.
 
-- **`icon_svg`.** The prototype's footer uses two-letter text labels as
-  placeholders. The icons are authored in the project and must satisfy the
-  `IconSvg` invariant in §1 — they are not a copy of anything.
-- **A single project ⇄ skill truth.** The prototype states the association
-  twice, from `skillData[*].uses` and from `projectData[*].skills`, and the two
-  disagree. `project_skill` is one table; which set is authoritative is decided
-  when the real content is written, not inferred from the placeholder.
-- **A row behind every usage note.** Some notes are filed under an aggregate
-  title that matches no project (`Todos os projetos`). A join row needs a real
-  `project_id`, so those notes are rewritten or dropped — a skill with no
-  surviving association renders nowhere, by the rule in §2.
+### Identity and re-runnability
 
-No certification exists in the prototype; nothing forces `timeline_entries` to
-ship a `kind = 'certification'` row.
+Each row's `id` is a UUIDv5 over a pinned namespace and the row's natural key:
+
+| Table | Natural key |
+| --- | --- |
+| `skills` | `name` |
+| `projects` | `slug` |
+| `social_links` | `platform` |
+| `timeline_entries` | `kind` + `organization` + `started_on` |
+
+Ids are therefore the same on every machine and on every run, which is what lets
+the join rows be written from natural keys. Every table is written with
+`INSERT … ON CONFLICT DO UPDATE`, so `pnpm db:seed` converges the database on
+the file without changing ids and without deleting a row an author added by
+hand. **The seed is a statement of what these rows are, not a reset button.**
+
+A `usage_note` naming a skill that does not exist throws before any SQL runs.
+Silently dropping the association would leave a skill that renders nowhere, by
+the rule in §2.
+
+### Icons
+
+`icon_svg` is authored in this project, not copied: the prototype's footer uses
+two-letter text labels as placeholders. Each icon is a 24 × 24 stroke drawing
+using only the tags whitelisted in §1, with `stroke="currentColor"` so a footer
+link's hover colour reaches it, and no `<script>` and no `on*` attribute.
+
+### Migration runner
+
+`pnpm db:migrate` applies every file in `src/migrations/` not yet recorded in a
+`schema_migrations (filename, applied_at)` ledger, in filename order, each file
+in one transaction together with its own ledger row. Idempotence is the runner's
+job, not the SQL's. That is what keeps each migration readable as the definition
+of its table. Forward-only: there is no `down`, and a file that has run is never
+edited.
 
 ---
 

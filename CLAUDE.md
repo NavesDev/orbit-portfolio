@@ -22,15 +22,16 @@ pnpm db:migrate && pnpm db:seed && pnpm dev
 
 | Command | Scope |
 | --- | --- |
-| `pnpm test` | Unit (`core`) + component (`web`). No database — safe on every save. |
-| `pnpm test:integration` | `packages/db` against a real PostgreSQL. Needs Docker up and `TEST_DATABASE_URL` set. |
+| `pnpm test` | Unit (`core`, `db-unit`) + component (`web`). No database — safe on every save. |
+| `pnpm test:integration` | `packages/db/tests/integration` against a real PostgreSQL. Needs Docker up and `TEST_DATABASE_URL` set. |
 | `pnpm test:e2e` | Playwright in `apps/web/e2e`. Needs a running app. |
 | `pnpm typecheck` | `tsc --noEmit` across every package. |
 | `pnpm build` | `next build` plus package builds. |
 
 `pnpm test` is deliberately the fast one; keep it dependency-free.
 
-**A single test or file** — Vitest projects are named `core`, `db` and `web`:
+**A single test or file** — Vitest projects are `core`, `db-unit`, `db` and
+`web`:
 
 ```bash
 pnpm vitest run --project core -t "rejects an end date before the start date"
@@ -38,12 +39,23 @@ pnpm vitest run packages/core/src/domain/value-objects/date-range.test.ts
 pnpm --filter @portfolio/web test src/components/hero
 ```
 
-The root `vitest.workspace.ts` lists all three; `pnpm test` runs only `core` and
-`web`, and `pnpm test:integration` runs `db` alone. Running `vitest` from inside
-a package uses that package's config directly.
+The root `vitest.workspace.ts` lists all four; `pnpm test` runs `core`, `web`
+and `db-unit`, and `pnpm test:integration` runs `db` alone.
 
-`packages/db` runs with `fileParallelism: false` — integration tests share one
-database and would race on schema.
+**`packages/db` is split by dependency, not by proximity.** Production code is
+`src/`; tests are `tests/`, mirroring the `src/` tree inside each level:
+
+| Path | Project | Needs |
+| --- | --- | --- |
+| `tests/unit/**` | `db-unit` | Nothing. Runs in the fast suite. |
+| `tests/integration/**` | `db` | A real PostgreSQL. |
+| `tests/helpers/**` | — | Shared harness, imported by both. |
+
+Two config files carry that split: `vitest.unit.config.ts` and
+`vitest.config.ts`. The integration project runs with `fileParallelism: false` —
+its files share one server and would race on schema. Test code never lives in
+`src/`: the package's `main` points there, and a harness exported from a
+published entry point is a harness that ships.
 
 CI (`.github/workflows/ci.yml`) runs, in order: `install --frozen-lockfile`,
 `typecheck`, `test`, `test:integration`, `build`. E2E runs against the Vercel

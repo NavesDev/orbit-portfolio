@@ -81,9 +81,9 @@ content.
 - Running it twice changes nothing.
 - `pnpm db:seed` runs clean against the migrated schema, populates all six
   tables including the `usage_note` rows on both join tables, and is
-  re-runnable. **No row count is an exit criterion** — the prototype's content
-  is illustrative placeholder and the real content replaces it later. See
-  [Seed data](domain/data-model.md#seed-data-from-the-prototype).
+  re-runnable. **No row count is an exit criterion** — the seed's content is
+  edited as the author's history changes and no test asserts on it. See
+  [Seed data](domain/data-model.md#seed-data).
 - Integration tests pass against a real PostgreSQL: every repository method,
   plus the constraints that should reject bad data (`progress_percent = 150`,
   `ended_on` before `started_on`, a `title` over its length budget, an unknown
