@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import type { Pool } from 'pg';
 import { afterAll, beforeAll } from 'vitest';
-import { createPool, requireConnectionString } from '../client.ts';
-import { migrate } from '../migrate.ts';
+import { createPool, requireConnectionString } from '../../src/client.ts';
+import { migrate } from '../../src/migrate.ts';
 
 /**
  * Each integration file gets a database of its own, migrated on entry and

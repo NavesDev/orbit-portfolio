@@ -3,7 +3,7 @@ import {
   seedContent,
   type Localized,
   type SkillUsage,
-} from './data.ts';
+} from '../../../src/seed/data.ts';
 
 /**
  * The database would reject a violation anyway — that is what the CHECK

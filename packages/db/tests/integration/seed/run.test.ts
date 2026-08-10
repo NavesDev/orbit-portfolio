@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { withScratchDatabase } from '../testing/scratch-database.ts';
-import { seed } from './run.ts';
+import { withScratchDatabase } from '../../helpers/scratch-database.ts';
+import { seed } from '../../../src/seed/run.ts';
 
 const db = withScratchDatabase();
 

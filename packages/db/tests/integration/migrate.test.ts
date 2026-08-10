@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { migrate } from './migrate.ts';
-import { withScratchDatabase } from './testing/scratch-database.ts';
+import { migrate } from '../../src/migrate.ts';
+import { withScratchDatabase } from '../helpers/scratch-database.ts';
 
 const db = withScratchDatabase();
 

@@ -9,8 +9,8 @@ victory on unverified code.
 
 | Level | What it covers | Where | Runtime | Dependencies |
 | --- | --- | --- | --- | --- |
-| Unit | Domain invariants, use cases | `packages/core` | < 1 ms per test | None |
-| Integration | Repositories, migrations, constraints | `packages/db` | Seconds | Real PostgreSQL |
+| Unit | Domain invariants, use cases | `packages/core`, `packages/db/tests/unit` | < 1 ms per test | None |
+| Integration | Repositories, migrations, constraints | `packages/db/tests/integration` | Seconds | Real PostgreSQL |
 | Component | Rendering, interaction, accessibility | `apps/web` | Fast | Stubbed use cases |
 | End-to-end | Full journeys through a real browser | `apps/web/e2e` | Slow | Running app + database |
 
@@ -52,9 +52,16 @@ Domain invariants and use-case behaviour, against in-memory port fakes.
 The in-memory fakes double as a design check: a fake that is awkward to write
 means the port has leaked a storage concern.
 
-### Integration — `packages/db`
+### Integration — `packages/db/tests/integration`
 
 The parts that only fail against a real database.
+
+`packages/db` keeps production code in `src/` and tests in `tests/`, split by
+what they depend on: `tests/unit/` needs nothing and runs in the fast suite as
+the `db-unit` project, `tests/integration/` needs PostgreSQL and runs as `db`,
+and `tests/helpers/` holds the harness both import. Inside each level the
+folders mirror `src/`. A test that needs no database does not belong behind
+Docker, and a harness does not belong in the package's published entry point.
 
 - Migrations run on an empty database and produce the expected schema.
 - Running them twice changes nothing.

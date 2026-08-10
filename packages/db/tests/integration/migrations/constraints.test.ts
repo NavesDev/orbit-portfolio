@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { withScratchDatabase } from './testing/scratch-database.ts';
+import { withScratchDatabase } from '../../helpers/scratch-database.ts';
 
 /**
  * The constraints are the second line of defence behind the domain's value

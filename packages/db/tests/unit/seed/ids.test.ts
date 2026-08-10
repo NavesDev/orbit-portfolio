@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { seedId, uuidV5 } from './ids.ts';
+import { seedId, uuidV5 } from '../../../src/seed/ids.ts';
 
 describe('uuidV5', () => {
   it('matches the canonical RFC 4122 vector', () => {

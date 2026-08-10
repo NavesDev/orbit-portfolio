@@ -1,5 +1,7 @@
 export default [
   'packages/core',
-  'packages/db',
+  // Two projects: `db-unit` needs nothing, `db` needs a real PostgreSQL.
+  'packages/db/vitest.unit.config.ts',
+  'packages/db/vitest.config.ts',
   'apps/web',
 ];
