@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import type { Pool } from 'pg';
 import { afterAll, beforeAll } from 'vitest';
 import { createPool, requireConnectionString } from '../../src/client.ts';
+import { TEST_DATABASE_URL } from '../../src/constants/env-keys.ts';
 import { migrate } from '../../src/migrate.ts';
 
 /**
@@ -40,7 +41,7 @@ export function withScratchDatabase(): { pool: () => Pool } {
 
 /** The maintenance URL with its database swapped for the scratch one. */
 function scratchUrl(name: string): string {
-  const url = new URL(requireConnectionString('TEST_DATABASE_URL'));
+  const url = new URL(requireConnectionString(TEST_DATABASE_URL));
   url.pathname = `/${name}`;
   return url.toString();
 }
@@ -52,7 +53,7 @@ function scratchUrl(name: string): string {
 async function onMaintenanceConnection(
   run: (admin: Pool) => Promise<unknown>,
 ): Promise<void> {
-  const admin = createPool(requireConnectionString('TEST_DATABASE_URL'));
+  const admin = createPool(requireConnectionString(TEST_DATABASE_URL));
   try {
     await run(admin);
   } finally {

@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Pool } from 'pg';
 import { createPool, requireConnectionString } from './client.ts';
+import { DATABASE_URL } from './constants/env-keys.ts';
 
 const MIGRATIONS_DIR = join(dirname(fileURLToPath(import.meta.url)), 'migrations');
 
@@ -59,7 +60,7 @@ export async function migrate(pool: Pool): Promise<string[]> {
 }
 
 async function main(): Promise<void> {
-  const pool = createPool(requireConnectionString('DATABASE_URL'));
+  const pool = createPool(requireConnectionString(DATABASE_URL));
   try {
     const applied = await migrate(pool);
     console.log(

@@ -1,4 +1,5 @@
 import { Pool } from 'pg';
+import { DATABASE_URL } from './constants/env-keys.ts';
 
 /**
  * One pool per process, reused across requests (roadmap 1.7). Next.js keeps the
@@ -8,7 +9,7 @@ import { Pool } from 'pg';
 let sharedPool: Pool | null = null;
 
 export function getPool(): Pool {
-  sharedPool ??= createPool(requireConnectionString('DATABASE_URL'));
+  sharedPool ??= createPool(requireConnectionString(DATABASE_URL));
   return sharedPool;
 }
 
