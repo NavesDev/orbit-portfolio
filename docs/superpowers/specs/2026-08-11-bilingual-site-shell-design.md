@@ -315,14 +315,26 @@ environment; it gains the React plugin and the setup file.
 [testing.md](../../testing.md) lists journey 6 — a request to `/` with an
 English `Accept-Language` lands on `/en`, an unsupported language lands on
 `/pt-BR`, and the switcher's choice then outranks the header on the next visit.
-**That journey is this task's acceptance criteria, and it is not automated
-here.**
+It restates this task's acceptance criteria almost word for word, and **it is
+not automated here.**
 
-It is deferred because Playwright is not installed, and scaffolding a browser
-harness is its own decision with its own CI question — [CLAUDE.md](../../../CLAUDE.md)
-is explicit that infrastructure choices do not ride along inside feature work.
-The negotiation logic itself is covered end to end by the unit tests above,
-which exercise the same pure function the middleware calls.
+Two reasons, and they are not the same reason. `testing.md`'s per-phase table
+closes Phase 3 on "component per section; locale negotiation and fallback;
+accessibility checks" and assigns the six E2E journeys to Phase 4 — this task
+is roadmap 3.1–3.2, so the journey is not what closes it. Separately,
+Playwright is not installed, and scaffolding a browser harness is its own
+decision with its own CI question, which [CLAUDE.md](../../../CLAUDE.md)
+forbids riding along inside feature work.
+
+**Where that leaves each criterion.** The negotiation criteria (FR-30, FR-31)
+are pure-function behaviour, exercised by the unit tests above against the same
+function the middleware calls. NFR-12 is a response header, asserted directly.
+NFR-14 is an absence, verified by inspection. The one criterion the unit tests
+genuinely cannot reach is **"the switcher's choice survives closing the tab"**:
+the tests prove `Max-Age` is set to a year, but only a real browser proves the
+cookie jar honours it across a restart. That single criterion rests on hand
+verification until the deferred issue lands, and the pull request says so
+rather than implying the suite covers it.
 
 **A `test` issue is opened alongside this one**, carrying journey 6 verbatim:
 the Playwright harness, and a test proving the middleware detects the browser's
