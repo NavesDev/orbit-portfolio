@@ -1,0 +1,25 @@
+.switcher {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.link {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  opacity: 0.6;
+  transition: opacity 0.25s var(--ease);
+}
+
+.link:hover {
+  opacity: 1;
+}
+
+.link[aria-current='true'] {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

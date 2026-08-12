@@ -1,5 +1,13 @@
 import '@testing-library/jest-dom/vitest';
-import { vi } from 'vitest';
+import { cleanup } from '@testing-library/react';
+import { afterEach, vi } from 'vitest';
+
+/**
+ * Testing Library auto-cleans only when Vitest runs with `globals: true`. It
+ * does not here, so without this every `render` in a file stacks into the same
+ * document and the second query finds two of everything.
+ */
+afterEach(cleanup);
 
 /**
  * `next/font/google` is a build-time transform the Next compiler performs, not

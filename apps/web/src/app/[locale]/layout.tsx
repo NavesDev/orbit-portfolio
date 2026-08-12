@@ -2,6 +2,8 @@ import { isLocale, LOCALES } from '@portfolio/core';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 
+import { ScrollProgress } from '../../components/ui/scroll-progress';
+import { SiteNav } from '../../components/ui/site-nav';
 import '../../styles/tokens.css';
 import '../../styles/globals.css';
 import { interTight, newsreader } from '../fonts';
@@ -43,7 +45,11 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
 
   return (
     <html lang={locale} className={`${interTight.variable} ${newsreader.variable}`}>
-      <body>{children}</body>
+      <body>
+        <ScrollProgress />
+        <SiteNav locale={locale} />
+        {children}
+      </body>
     </html>
   );
 }

@@ -1,0 +1,51 @@
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 90;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--nav-pad-y) var(--pad-x);
+  mix-blend-mode: difference;
+}
+
+.mark {
+  font-weight: 600;
+  font-size: 14px;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+  display: inline-block;
+  margin-right: 8px;
+  mix-blend-mode: normal;
+  vertical-align: 1px;
+}
+
+.skipLink {
+  position: absolute;
+  left: -9999px;
+}
+
+.skipLink:focus-visible {
+  left: var(--pad-x);
+  top: var(--nav-pad-y);
+  background: var(--bg);
+  color: var(--ink);
+  padding: 8px 14px;
+  border-radius: 20px;
+  mix-blend-mode: normal;
+}
+
+@media (max-width: 760px) {
+  .mark {
+    font-size: 13px;
+  }
+}
