@@ -1,5 +1,11 @@
 # Bilingual Site Shell Implementation Plan
 
+> **Executed on 2026-08-11.** Two things changed during execution and the
+> commits are the record, not this file: the locale set moved to `en-US` /
+> `pt-BR` with `en-US` as the required key and the fallback, which added a
+> migration and a documentation pass; and imports use `.ts` extensions, which
+> is the convention `packages/db` already established.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** `/pt-BR` and `/en` render the site shell, `/` redirects to the
@@ -32,8 +38,8 @@ Issue [#3](https://github.com/NavesDev/orbit-portfolio/issues/3). Branch
   `foo.ts`) and in `packages/core`.
 - **Component queries go through role and accessible name**, never CSS class
   (`docs/testing.md`).
-- **Locales are exactly `pt-BR` and `en`**; `pt-BR` is the fallback for an
-  untranslated field, never the default UI language.
+- **Locales are exactly `en-US` and `pt-BR`**; `en-US` is the required locale
+  and the fallback for an untranslated field, never the default UI language.
 - **Every commit passes `pnpm typecheck`.** Conventional Commits, scoped
   (`feat(core):`, `feat(web):`), `Refs #3` in the footer.
 - **The `/` redirect carries `Cache-Control: no-store`** (NFR-12) and

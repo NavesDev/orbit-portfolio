@@ -123,9 +123,9 @@ each needs a decision before it earns an ID.
 
 | # | What the prototype does | Question |
 | --- | --- | --- |
-| OQ-01 | A fixed nav carrying a mark and a section index (`01 / 06`) that tracks the scrolled section. | Does it ship in v1, and does the index survive sections being added or removed? |
-| OQ-02 | A scroll progress bar pinned to the top of the viewport. | Ships, or dropped as decoration? |
-| OQ-03 | A marquee strip below the hero, translated by scroll position rather than autoplaying, carrying four fixed phrases. | Ships? If so, its copy is static content and needs a `pt-BR` translation. |
+| OQ-01 | A fixed nav carrying a mark and a section index (`01 / 06`) that tracks the scrolled section. | Does it ship in v1, and does the index survive sections being added or removed? **Answered in #3:** ships. The index derives its position and its total from a section registry, so it cannot disagree with the page, and it renders nothing while the registry is empty. |
+| OQ-02 | A scroll progress bar pinned to the top of the viewport. | Ships, or dropped as decoration? **Answered in #3:** ships, `aria-hidden`, scaled rather than resized. |
+| OQ-03 | A marquee strip below the hero, translated by scroll position rather than autoplaying, carrying four fixed phrases. | Ships? If so, its copy is static content and needs a `pt-BR` translation. **Answered in #3:** ships, copy in `content/`, and it honours `prefers-reduced-motion`. |
 | OQ-04 | A closing CTA section — headline plus a call to action — which is also what physically contains the social links of FR-23. | FR-23 and FR-24 specify the links but nothing specifies the section around them. Its copy needs a home in `content/` and a `pt-BR` translation. |
 | OQ-05 | Each project card and project modal carries a bespoke decorative SVG. | No column holds it and it cannot be derived from `category`. Presentation keyed by `slug`, or a new column? See the extension points in [domain/data-model.md](domain/data-model.md#extension-points). |
 | OQ-06 | The card eyebrow embeds an ordinal — `01 — agendamento`. | FR-06 renders `projects.category` there. Is the ordinal derived from `sort_order` at render time, or genuinely part of the category text? Storing it duplicates the ordering in translatable copy. |
