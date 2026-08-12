@@ -430,6 +430,15 @@ Enums → `is_localized` / `is_localized_array` functions → `social_links` →
 The validation functions come before any table that references them in a
 `CHECK`.
 
+`009` replaces both validation functions to move the locale set to
+`('en-US', 'pt-BR')` and the required key to `en-US`. It is a replacement
+rather than an edit to `002`, which has already run — migrations are
+forward-only. `CREATE OR REPLACE` keeps the function identity, so the `CHECK`
+constraints referencing it need no change. A `CHECK` is not re-validated on
+replace, so rows written under the old rule survive until something updates
+them; `pnpm db:seed` rewrites every row and is how an existing database is
+brought forward.
+
 ---
 
 ## Extension points
