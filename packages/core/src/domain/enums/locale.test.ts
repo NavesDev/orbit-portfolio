@@ -4,11 +4,11 @@ import { DEFAULT_LOCALE, isLocale, LOCALES } from './locale.ts';
 
 describe('LOCALES', () => {
   it('lists exactly the two supported locales', () => {
-    expect(LOCALES).toEqual(['pt-BR', 'en']);
+    expect(LOCALES).toEqual(['en-US', 'pt-BR']);
   });
 
-  it('makes pt-BR the fallback', () => {
-    expect(DEFAULT_LOCALE).toBe('pt-BR');
+  it('makes en-US the fallback, since every field is required to carry it', () => {
+    expect(DEFAULT_LOCALE).toBe('en-US');
   });
 });
 
@@ -17,7 +17,7 @@ describe('isLocale', () => {
     expect(isLocale(locale)).toBe(true);
   });
 
-  it.each(['en-US', 'pt', 'fr', '', 'PT-BR'])('rejects %s', (value) => {
+  it.each(['en', 'en_US', 'pt', 'fr', '', 'EN-US'])('rejects %s', (value) => {
     expect(isLocale(value)).toBe(false);
   });
 });
