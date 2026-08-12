@@ -280,7 +280,14 @@ section.
 
 ## Testing
 
-Following the levels in [testing.md](../../testing.md).
+Following the levels in [testing.md](../../testing.md) — **which this task
+amends**. That document's table assumed `apps/web` held React components and
+nothing else, so it had no row for the middleware and the `lib/locale` modules
+this task introduces. Calling them component tests would have been a lie about
+what they do, and calling them integration tests would have contradicted the
+axis that makes `pnpm test` fast. The amendment lands in the same pull request,
+as [CLAUDE.md](../../../CLAUDE.md) requires when the document is the thing that
+is wrong.
 
 **Unit — `packages/core`.** `LocalizedText` rejects a non-object, a missing
 `pt-BR`, an unknown locale key, a non-string value and an over-budget value —
@@ -289,15 +296,18 @@ holding only `pt-BR` returns the Portuguese text (FR-34); `resolve` on a field
 holding both returns the requested one. `isLocale` accepts both locales and
 rejects `en-US`.
 
-**Unit — `apps/web`.** `negotiateLocale` against an English header, a
-Portuguese header, `en-GB`, an unsupported language, a q-value list whose
-preferred entry is not first, an empty header and an absent one. The cookie
-module's attributes, including `Secure` following the environment.
+**Unit — `apps/web/src/lib` and `apps/web/src/middleware.ts`.** The level
+[testing.md](../../testing.md) gains in this task, for request-level logic that
+is neither domain nor component. Two files.
 
-**Middleware — `apps/web/src/middleware.test.ts`.** `middleware.ts` exports an
-ordinary function, so the acceptance criteria phrased as "a request to `/`" are
-tested by calling it with a `NextRequest` and reading the response — no browser,
-no running server, in the fast suite:
+`lib/locale/negotiate-locale.test.ts` covers an English header, a Portuguese
+header, `en-GB`, an unsupported language, a q-value list whose preferred entry
+is not first, an empty header and an absent one; plus the cookie module's
+attributes, including `Secure` following the environment.
+
+`middleware.test.ts` covers the acceptance criteria phrased as "a request to
+`/`" by calling the handler with a `NextRequest` and reading the response — no
+browser, no running server, in the fast suite:
 
 | Request to `/` | Expected |
 | --- | --- |
@@ -318,8 +328,8 @@ fails a test instead of surviving to the browser.
 `@vitest-environment node` while the rest of the `web` project stays on
 `jsdom`.
 
-**Component — `apps/web`.** Through Testing Library, by role and accessible
-name, never by class:
+**Component — `apps/web/src/components`.** Through Testing Library, by role and
+accessible name, never by class:
 
 - the switcher renders a link per locale and marks the current with
   `aria-current`;
