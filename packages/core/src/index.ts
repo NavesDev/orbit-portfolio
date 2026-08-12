@@ -10,4 +10,9 @@
  * re-exported here as they land.
  */
 
-export {};
+export {
+  DEFAULT_LOCALE,
+  isLocale,
+  LOCALES,
+  type Locale,
+} from './domain/enums/locale.ts';
