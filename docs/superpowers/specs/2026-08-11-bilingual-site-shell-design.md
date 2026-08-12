@@ -19,7 +19,7 @@ redesigned; the two places this document departs from it are named in
 
 ## Goal
 
-`/pt-BR` and `/en` both render the site shell. A visitor landing on `/` is sent
+`/en-US` and `/pt-BR` both render the site shell. A visitor landing on `/` is sent
 to the language their browser asks for, can change it, and that choice outranks
 the browser on every later visit.
 
@@ -30,8 +30,8 @@ footer — arrives in sprint tasks 3 to 6. This task delivers what surrounds the
 
 **In:** the `Locale` enum and the `LocalizedText` value object in
 `packages/core`; the `[locale]` route segment and its layout; locale negotiation
-in `middleware.ts`; the `locale` cookie; the language switcher; `content/pt-BR/`
-and `content/en/`; `tokens.css` and global styles; and the site chrome — the
+in `middleware.ts`; the `locale` cookie; the language switcher; `content/en-US/`
+and `content/pt-BR/`; `tokens.css` and global styles; and the site chrome — the
 fixed nav with its section index, the scroll progress bar and the scroll-driven
 marquee strip.
 
@@ -47,7 +47,7 @@ unresolved are answered by this document. They are decisions, not discoveries.
 
 | Gap | Decision |
 | --- | --- |
-| **U-2** — the nav, progress bar and strip are covered by no `FR` | All three ship, driven by a section registry rather than by the prototype's hardcoded list. Their `en` copy is authored here and listed below. |
+| **U-2** — the nav, progress bar and strip are covered by no `FR` | All three ship, driven by a section registry rather than by the prototype's hardcoded list. Their `pt-BR` copy is authored here and listed below. |
 | **U-4** — `locale` cookie attributes | `Max-Age` one year, `SameSite=Lax`, `Path=/`, `Secure` outside development, readable by the client. |
 | Unknown locale segment | `/fr` returns 404. Nothing renders a shell with a `lang` the site does not have. |
 
@@ -56,9 +56,9 @@ unresolved are answered by this document. They are decisions, not discoveries.
 ### 1. `Locale` — `packages/core/src/domain/enums/locale.ts`
 
 ```ts
-export const LOCALES = ['pt-BR', 'en'] as const;
+export const LOCALES = ['en-US', 'pt-BR'] as const;
 export type Locale = (typeof LOCALES)[number];
-export const DEFAULT_LOCALE: Locale = 'pt-BR';
+export const DEFAULT_LOCALE: Locale = 'en-US';
 export function isLocale(value: string): value is Locale;
 ```
 
@@ -70,6 +70,7 @@ third locale (`WN-06` keeps that out of v1) is one edit plus one migration to
 `DEFAULT_LOCALE` is the **fallback** of [stack.md](../../architecture/stack.md)
 § "Two different meanings of default" — what renders when a field lacks a
 translation. It is not the default UI language, which is the visitor's browser.
+`en-US` is the locale every localized field must carry; `pt-BR` may lag behind.
 
 ### 2. Length budgets — `packages/core/src/domain/constants/text-budgets.ts`
 
@@ -99,13 +100,13 @@ localizedText.resolve(locale: Locale): string
 ```
 
 `create` throws `InvalidLocalizedTextError` when the value is not a plain
-object, when `pt-BR` is absent, when any key is outside `LOCALES`, when any
+object, when `en-US` is absent, when any key is outside `LOCALES`, when any
 value is not a string, or when any value exceeds `maxLength` (NFR-10, NFR-11).
 The error carries a reason code so a caller can distinguish the five without
 parsing a message.
 
 `resolve` returns `values[locale] ?? values[DEFAULT_LOCALE]`. Because `create`
-guarantees `pt-BR`, it always returns a non-empty string — FR-34 holds by
+guarantees `en-US`, it always returns a non-empty string — FR-34 holds by
 construction rather than by a null check at every call site.
 
 **The budget is an argument, not a subclass.** One value object serves every
@@ -153,9 +154,9 @@ limiting arrive, they widen the matcher and live in their own function.
 Resolution order (FR-30, FR-31, FR-33), highest first:
 
 1. the `locale` cookie, if its value is a known locale;
-2. `Accept-Language`, best match by q-value, matching `en-GB` → `en` and
+2. `Accept-Language`, best match by q-value, matching `en-GB` → `en-US` and
    `pt` → `pt-BR` by primary subtag;
-3. `DEFAULT_LOCALE`.
+3. `DEFAULT_LOCALE` (`en-US`).
 
 The response is a `307` carrying `Cache-Control: no-store` — NFR-12 is the
 whole reason this is middleware and not a page. The header is read to pick a
@@ -187,8 +188,8 @@ the two cannot drift apart.
 
 ### 8. Static content — `apps/web/src/content/`
 
-`content/pt-BR/index.ts` is authored first and **defines the shape**;
-`content/en/index.ts` is annotated with that shape, so a missing key is a
+`content/en-US/index.ts` is authored first and **defines the shape**;
+`content/pt-BR/index.ts` is annotated with that shape, so a missing key is a
 compile error rather than a blank space — the property
 [monorepo.md](../../architecture/monorepo.md) asks of this folder.
 `content/index.ts` exposes `getContent(locale)` over a `Record<Locale,
@@ -197,13 +198,13 @@ SiteContent>`, which is exhaustive over `LOCALES` by type.
 This task's copy is the chrome's: the nav mark, the skip link, the switcher's
 labels and accessible names, and the strip's four phrases.
 
-**New `en` copy authored here** (U-2 records that no requirement owns it).
+**New `en-US` copy authored here** (U-2 records that no requirement owns it).
 Proper nouns are not translated (FR-35), so the strip is nearly unchanged:
 
 | `pt-BR` | `en` |
 | --- | --- |
-| `Claude Code · automação` | `Claude Code · automation` |
-| `PostgreSQL · APIs REST` | `PostgreSQL · REST APIs` |
+| `Claude Code · automation` | `Claude Code · automação` |
+| `PostgreSQL · REST APIs` | `PostgreSQL · APIs REST` |
 | `Next.js · React · Node` | unchanged |
 | `UNIP · ADS · Brasília` | unchanged |
 
@@ -291,10 +292,10 @@ is wrong.
 
 **Unit — `packages/core`.** `LocalizedText` rejects a non-object, a missing
 `pt-BR`, an unknown locale key, a non-string value and an over-budget value —
-one test each, because each is a separate rule. `resolve('en')` on a field
-holding only `pt-BR` returns the Portuguese text (FR-34); `resolve` on a field
+one test each, because each is a separate rule. `resolve('pt-BR')` on a field
+holding only `en-US` returns the English text (FR-34); `resolve` on a field
 holding both returns the requested one. `isLocale` accepts both locales and
-rejects `en-US`.
+rejects `en` and `en_US`.
 
 **Unit — `apps/web/src/lib` and `apps/web/src/middleware.ts`.** The level
 [testing.md](../../testing.md) gains in this task, for request-level logic that
@@ -311,12 +312,12 @@ browser, no running server, in the fast suite:
 
 | Request to `/` | Expected |
 | --- | --- |
-| `Accept-Language: en-GB,en;q=0.9` | `307` to `/en` (FR-30) |
+| `Accept-Language: en-GB,en;q=0.9` | `307` to `/en-US` (FR-30) |
 | `Accept-Language: pt-BR,pt;q=0.9` | `307` to `/pt-BR` (FR-30) |
-| `Accept-Language: fr` | `307` to `/pt-BR` (FR-31) |
-| no `Accept-Language` | `307` to `/pt-BR` (FR-31) |
-| cookie `locale=en` plus a Portuguese header | `307` to `/en` (FR-33) |
-| cookie `locale=xx` plus an English header | `307` to `/en` — a corrupt cookie is ignored, not trusted |
+| `Accept-Language: fr` | `307` to `/en-US` (FR-31) |
+| no `Accept-Language` | `307` to `/en-US` (FR-31) |
+| cookie `locale=pt-BR` plus an English header | `307` to `/pt-BR` (FR-33) |
+| cookie `locale=xx` plus an English header | `307` to `/en-US` — a corrupt cookie is ignored, not trusted |
 | any of the above | `Cache-Control: no-store` (NFR-12) |
 
 This is the layer that actually closes those criteria. It exercises the real
@@ -347,8 +348,8 @@ environment; it gains the React plugin and the setup file.
 ### Deferred: the E2E journey
 
 [testing.md](../../testing.md) lists journey 6 — a request to `/` with an
-English `Accept-Language` lands on `/en`, an unsupported language lands on
-`/pt-BR`, and the switcher's choice then outranks the header on the next visit.
+English `Accept-Language` lands on `/en-US`, an unsupported language lands on
+`/en-US`, and the switcher's choice then outranks the header on the next visit.
 It restates this task's acceptance criteria almost word for word — but **it is
 not the level those criteria need.** "A request to `/`" is an HTTP request, and
 `middleware.ts` is a directly callable function, so the middleware tests above
