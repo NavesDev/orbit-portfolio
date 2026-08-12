@@ -32,8 +32,8 @@ describe('getContent', () => {
     expect(leads('pt-BR')).toEqual(leads('en-US'));
   });
 
-  it("names every locale in the reader's own language", () => {
-    expect(getContent('en-US').languageSwitcher.localeNames['pt-BR']).toBe('Portuguese');
-    expect(getContent('pt-BR').languageSwitcher.localeNames['pt-BR']).toBe('Português');
+  it("names every locale in the reader's own language, including its visible label", () => {
+    expect(getContent('en-US').languageSwitcher.localeNames['pt-BR']).toBe('Portuguese (PT)');
+    expect(getContent('pt-BR').languageSwitcher.localeNames['pt-BR']).toBe('Português (PT)');
   });
 });

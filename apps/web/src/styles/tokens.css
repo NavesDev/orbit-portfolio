@@ -19,6 +19,8 @@
 
   --pad-x: 48px;
   --nav-pad-y: 22px;
+  --nav-mark-line: 20px;
+  --nav-height: calc(var(--nav-pad-y) * 2 + var(--nav-mark-line));
 }
 
 /* The prototype's mobile breakpoint. NFR-04's 380px sits inside it. */

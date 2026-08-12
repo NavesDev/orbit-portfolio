@@ -13,7 +13,7 @@ export const ptBR: SiteContent = {
   languageSwitcher: {
     label: 'Idioma',
     localeLabels: { 'en-US': 'EN', 'pt-BR': 'PT' },
-    localeNames: { 'en-US': 'Inglês', 'pt-BR': 'Português' },
+    localeNames: { 'en-US': 'Inglês (EN)', 'pt-BR': 'Português (PT)' },
   },
   strip: {
     phrases: [

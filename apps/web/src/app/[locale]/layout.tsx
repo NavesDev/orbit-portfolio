@@ -1,4 +1,5 @@
 import { isLocale, LOCALES } from '@portfolio/core';
+import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 
@@ -20,6 +21,21 @@ export const revalidate = 3600;
 
 /** A segment outside `LOCALES` is a 404, not a locale to guess at. */
 export const dynamicParams = false;
+
+/**
+ * The design is light-only, and saying so is not decoration: without
+ * `colorScheme` a visitor whose OS is dark gets dark native scrollbars and form
+ * controls against a `#FAFAF8` page. `themeColor` matches `--bg` so the browser
+ * chrome does not band against it on mobile.
+ */
+export const viewport: Viewport = {
+  colorScheme: 'light',
+  themeColor: '#fafaf8',
+};
+
+export const metadata: Metadata = {
+  title: 'Davi Naves',
+};
 
 export function generateStaticParams(): { locale: string }[] {
   return LOCALES.map((locale) => ({ locale }));

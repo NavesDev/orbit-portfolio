@@ -1,3 +1,15 @@
+/*
+ * The nav is fixed and floats over the page, which in the prototype is always
+ * a 100vh hero. Until that hero exists, the strip is the first thing on the
+ * page and would sit under the nav.
+ *
+ * `:first-child` makes the offset disappear on its own the moment a section is
+ * rendered above it, so the task that adds the hero has nothing to undo here.
+ */
+.strip:first-child {
+  margin-top: var(--nav-height);
+}
+
 .strip {
   padding: 26px 0;
   border-top: 0.5px solid var(--line);
@@ -33,5 +45,16 @@
 
   .phrase {
     font-size: 12px;
+  }
+}
+
+/*
+ * The track's transform is an inline style driven by scroll position, so only
+ * `!important` can override it from here. A visitor who asked for less motion
+ * gets the strip as a static row rather than one that slides under them.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    transform: none !important;
   }
 }

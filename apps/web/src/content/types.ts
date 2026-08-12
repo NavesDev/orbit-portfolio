@@ -25,7 +25,13 @@ export interface SiteContent {
     readonly label: string;
     /** What is shown — "EN", "PT". */
     readonly localeLabels: Readonly<Record<Locale, string>>;
-    /** The accessible name of each link, spelled out in the reader's language. */
+    /**
+     * The accessible name of each link, spelled out in the reader's language.
+     *
+     * It must contain the visible label from `localeLabels` — WCAG 2.5.3
+     * "Label in Name". A name of "Português" on a link reading "PT" leaves a
+     * voice-control user with no way to activate it.
+     */
     readonly localeNames: Readonly<Record<Locale, string>>;
   };
   readonly strip: {

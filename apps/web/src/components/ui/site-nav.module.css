@@ -7,7 +7,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--nav-pad-y) var(--pad-x);
+  padding: calc(var(--nav-pad-y) + env(safe-area-inset-top)) var(--pad-x)
+    var(--nav-pad-y);
   mix-blend-mode: difference;
 }
 

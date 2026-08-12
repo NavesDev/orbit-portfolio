@@ -15,7 +15,7 @@ export const enUS: SiteContent = {
   languageSwitcher: {
     label: 'Language',
     localeLabels: { 'en-US': 'EN', 'pt-BR': 'PT' },
-    localeNames: { 'en-US': 'English', 'pt-BR': 'Portuguese' },
+    localeNames: { 'en-US': 'English (EN)', 'pt-BR': 'Portuguese (PT)' },
   },
   strip: {
     phrases: [

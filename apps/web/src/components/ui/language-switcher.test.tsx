@@ -26,18 +26,18 @@ describe('LanguageSwitcher', () => {
   it('offers a link per locale, named in the reader’s language', () => {
     render(<LanguageSwitcher locale="pt-BR" content={ptBR} />);
 
-    expect(screen.getByRole('link', { name: 'Português' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Inglês' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Português (PT)' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Inglês (EN)' })).toBeInTheDocument();
   });
 
   it('marks the current locale for assistive technology', () => {
     render(<LanguageSwitcher locale="pt-BR" content={ptBR} />);
 
-    expect(screen.getByRole('link', { name: 'Português' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Português (PT)' })).toHaveAttribute(
       'aria-current',
       'true',
     );
-    expect(screen.getByRole('link', { name: 'Inglês' })).not.toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Inglês (EN)' })).not.toHaveAttribute(
       'aria-current',
     );
   });
@@ -45,7 +45,7 @@ describe('LanguageSwitcher', () => {
   it('links to the same page under the other locale (FR-32)', () => {
     render(<LanguageSwitcher locale="pt-BR" content={ptBR} />);
 
-    expect(screen.getByRole('link', { name: 'Inglês' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Inglês (EN)' })).toHaveAttribute(
       'href',
       '/en-US/projetos',
     );
@@ -60,7 +60,7 @@ describe('LanguageSwitcher', () => {
   it('writes the choice to a cookie so it outranks the browser next time (FR-33)', async () => {
     render(<LanguageSwitcher locale="pt-BR" content={ptBR} />);
 
-    await userEvent.click(screen.getByRole('link', { name: 'Inglês' }));
+    await userEvent.click(screen.getByRole('link', { name: 'Inglês (EN)' }));
 
     expect(document.cookie).toContain('locale=en-US');
   });
