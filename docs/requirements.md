@@ -15,12 +15,12 @@ requirement wins; see [Open against the prototype](#open-against-the-prototype).
 
 | ID | Requirement |
 | --- | --- |
-| FR-29 | The site MUST be available in `pt-BR` and `en`. |
+| FR-29 | The site MUST be available in `en-US` and `pt-BR`. |
 | FR-30 | A visitor who expresses no preference MUST get the language their browser asks for, negotiated from `Accept-Language`. |
-| FR-31 | An unsupported browser language MUST fall back to `pt-BR`. |
-| FR-32 | Every page MUST be addressable per locale — `/pt-BR/projetos`, `/en/projetos`. |
+| FR-31 | An unsupported browser language MUST fall back to `en-US`. |
+| FR-32 | Every page MUST be addressable per locale — `/en-US/projetos`, `/pt-BR/projetos`. |
 | FR-33 | A language switcher MUST persist the choice across visits, and that choice MUST outrank the browser's language. |
-| FR-34 | A field with no translation in the requested locale MUST render its `pt-BR` value, never an empty space. |
+| FR-34 | A field with no translation in the requested locale MUST render its `en-US` value, never an empty space. |
 | FR-35 | Proper nouns — skill names, organizations, platforms — MUST NOT be translated. |
 | FR-36 | `slug` MUST be identical across locales; a project has one canonical address. |
 
@@ -125,8 +125,8 @@ each needs a decision before it earns an ID.
 | --- | --- | --- |
 | OQ-01 | A fixed nav carrying a mark and a section index (`01 / 06`) that tracks the scrolled section. | Does it ship in v1, and does the index survive sections being added or removed? |
 | OQ-02 | A scroll progress bar pinned to the top of the viewport. | Ships, or dropped as decoration? |
-| OQ-03 | A marquee strip below the hero, translated by scroll position rather than autoplaying, carrying four fixed phrases. | Ships? If so, its copy is static content and needs an `en` translation. |
-| OQ-04 | A closing CTA section — headline plus a call to action — which is also what physically contains the social links of FR-23. | FR-23 and FR-24 specify the links but nothing specifies the section around them. Its copy needs a home in `content/` and an `en` translation. |
+| OQ-03 | A marquee strip below the hero, translated by scroll position rather than autoplaying, carrying four fixed phrases. | Ships? If so, its copy is static content and needs a `pt-BR` translation. |
+| OQ-04 | A closing CTA section — headline plus a call to action — which is also what physically contains the social links of FR-23. | FR-23 and FR-24 specify the links but nothing specifies the section around them. Its copy needs a home in `content/` and a `pt-BR` translation. |
 | OQ-05 | Each project card and project modal carries a bespoke decorative SVG. | No column holds it and it cannot be derived from `category`. Presentation keyed by `slug`, or a new column? See the extension points in [domain/data-model.md](domain/data-model.md#extension-points). |
 | OQ-06 | The card eyebrow embeds an ordinal — `01 — agendamento`. | FR-06 renders `projects.category` there. Is the ordinal derived from `sort_order` at render time, or genuinely part of the category text? Storing it duplicates the ordering in translatable copy. |
 | OQ-07 | The availability badge (FR-02) is fixed text. | FR-02 requires it to reflect a boolean. Where does that boolean live — a `content/` constant, or something else? |
@@ -140,8 +140,8 @@ Two places where the prototype is wrong and the requirement stands:
 - **Animation lifetime.** Neither canvas in the prototype cancels its
   `requestAnimationFrame` loop. FR-04 exists to correct that.
 
-One place where the prototype already answers a requirement: the `pt-BR` copy
-FR-22 asks for exists in its stat band. Only the `en` translation is new.
+One place where the prototype already answers a requirement: the stat-band copy
+FR-22 asks for exists in its `pt-BR` form. Only the `en-US` translation is new.
 
 ## Traceability
 

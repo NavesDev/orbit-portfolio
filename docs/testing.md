@@ -49,8 +49,8 @@ Domain invariants and use-case behaviour, against in-memory port fakes.
   one test per rejection, because this one is a security boundary
   (NFR-07).
 - `LocalizedText` rejects text over the field's budget, unknown locale keys, and
-  a missing `pt-BR` entry. Asking for a locale that a field lacks returns the
-  `pt-BR` value (FR-34).
+  a missing `en-US` entry. Asking for a locale that a field lacks returns the
+  `en-US` value (FR-34).
 - Use cases apply their policies: unpublished content is never returned,
   ordering follows the documented contract, `GetProjectBySlug` returns not-found
   rather than throwing.
@@ -75,7 +75,7 @@ const response = await middleware(
     headers: { 'accept-language': 'en-GB,en;q=0.9' },
   }),
 );
-expect(response.headers.get('location')).toBe('/en');
+expect(response.headers.get('location')).toBe('/en-US');
 ```
 
 That covers what a redirect requirement actually says — a request in, a
@@ -109,7 +109,7 @@ Docker, and a harness does not belong in the package's published entry point.
 - **Constraints reject what they should**: `progress_percent = 150`,
   `ended_on < started_on`, duplicate `slug`, deleting a `skill` still
   referenced by a project (`ON DELETE RESTRICT`), a localized value over its
-  length budget, an unknown locale key, a localized column missing `pt-BR`.
+  length budget, an unknown locale key, a localized column missing `en-US`.
 - Mappers round-trip: entity → row → entity is identity.
 
 The last two matter most. A constraint nobody tested is a constraint nobody
@@ -126,7 +126,7 @@ Behaviour a user can observe, with use cases stubbed.
 - A project without `repo_url` omits the control rather than rendering a dead
   link (FR-09).
 - Icon-only links expose an accessible name (FR-24).
-- A field with no `en` translation renders its `pt-BR` text, not an empty node.
+- A field with no `pt-BR` translation renders its `en-US` text, not an empty node.
 
 Queries go through role and accessible name. A test that finds a button by CSS
 class passes while the button is unreachable by keyboard.
@@ -140,9 +140,9 @@ A handful of journeys, not a second suite.
 3. "Ver todos os projetos" → `/[locale]/projetos` → a project page.
 4. An unknown slug returns 404.
 5. Clicking a skill lists where it was used.
-6. A request to `/` with an English `Accept-Language` lands on `/en`; with an
-   unsupported language, on `/pt-BR`. The switcher's choice then outranks the
-   header on the next visit.
+6. A request to `/` with a Portuguese `Accept-Language` lands on `/pt-BR`; with
+   an unsupported language, on `/en-US`. The switcher's choice then outranks
+   the header on the next visit.
 
 ## What is not tested
 

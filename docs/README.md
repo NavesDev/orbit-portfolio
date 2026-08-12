@@ -37,8 +37,8 @@ The home page, every backend feature behind it, and its subpages.
 3. **Skills** — the taxonomy shared by projects and timeline entries.
 4. **Social links** — footer contacts, including e-mail.
 
-**Bilingual** — `pt-BR` and `en`. The visitor's browser language decides which
-they get; `pt-BR` is the fallback for any field not yet translated.
+**Bilingual** — `en-US` and `pt-BR`. The visitor's browser language decides which
+they get; `en-US` is the fallback for any field not yet translated.
 
 **6 tables, 2 enums.** The model is deliberately minimal: anything that only
 changes when the page is redesigned is static content in the front end, not a
