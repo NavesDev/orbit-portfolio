@@ -294,6 +294,30 @@ Portuguese header, `en-GB`, an unsupported language, a q-value list whose
 preferred entry is not first, an empty header and an absent one. The cookie
 module's attributes, including `Secure` following the environment.
 
+**Middleware — `apps/web/src/middleware.test.ts`.** `middleware.ts` exports an
+ordinary function, so the acceptance criteria phrased as "a request to `/`" are
+tested by calling it with a `NextRequest` and reading the response — no browser,
+no running server, in the fast suite:
+
+| Request to `/` | Expected |
+| --- | --- |
+| `Accept-Language: en-GB,en;q=0.9` | `307` to `/en` (FR-30) |
+| `Accept-Language: pt-BR,pt;q=0.9` | `307` to `/pt-BR` (FR-30) |
+| `Accept-Language: fr` | `307` to `/pt-BR` (FR-31) |
+| no `Accept-Language` | `307` to `/pt-BR` (FR-31) |
+| cookie `locale=en` plus a Portuguese header | `307` to `/en` (FR-33) |
+| cookie `locale=xx` plus an English header | `307` to `/en` — a corrupt cookie is ignored, not trusted |
+| any of the above | `Cache-Control: no-store` (NFR-12) |
+
+This is the layer that actually closes those criteria. It exercises the real
+middleware rather than only the pure function underneath it, so a wiring
+mistake — reading the cookie after the header, forgetting the cache header —
+fails a test instead of surviving to the browser.
+
+`NextRequest` needs Web APIs rather than a DOM, so this file declares
+`@vitest-environment node` while the rest of the `web` project stays on
+`jsdom`.
+
 **Component — `apps/web`.** Through Testing Library, by role and accessible
 name, never by class:
 
@@ -315,42 +339,44 @@ environment; it gains the React plugin and the setup file.
 [testing.md](../../testing.md) lists journey 6 — a request to `/` with an
 English `Accept-Language` lands on `/en`, an unsupported language lands on
 `/pt-BR`, and the switcher's choice then outranks the header on the next visit.
-It restates this task's acceptance criteria almost word for word, and **it is
-not automated here.**
+It restates this task's acceptance criteria almost word for word — but **it is
+not the level those criteria need.** "A request to `/`" is an HTTP request, and
+`middleware.ts` is a directly callable function, so the middleware tests above
+close FR-30, FR-31, NFR-12 and the cookie's precedence in the fast suite. What
+E2E adds over them is a real browser, not a real request.
 
-Two reasons, and they are not the same reason. `testing.md`'s per-phase table
-closes Phase 3 on "component per section; locale negotiation and fallback;
-accessibility checks" and assigns the six E2E journeys to Phase 4 — this task
-is roadmap 3.1–3.2, so the journey is not what closes it. Separately,
-Playwright is not installed, and scaffolding a browser harness is its own
-decision with its own CI question, which [CLAUDE.md](../../../CLAUDE.md)
-forbids riding along inside feature work.
+The journey is still deferred, for a reason that is now much narrower.
+`testing.md`'s per-phase table closes Phase 3 on "component per section; locale
+negotiation and fallback; accessibility checks" and assigns the six E2E
+journeys to Phase 4 — this task is roadmap 3.1–3.2. And Playwright is not
+installed; scaffolding a browser harness is its own decision with its own CI
+question, which [CLAUDE.md](../../../CLAUDE.md) forbids riding along inside
+feature work.
 
-**Where that leaves each criterion.** The negotiation criteria (FR-30, FR-31)
-are pure-function behaviour, exercised by the unit tests above against the same
-function the middleware calls. NFR-12 is a response header, asserted directly.
-NFR-14 is an absence, verified by inspection. The one criterion the unit tests
-genuinely cannot reach is **"the switcher's choice survives closing the tab"**:
-the tests prove `Max-Age` is set to a year, but only a real browser proves the
-cookie jar honours it across a restart. That single criterion rests on hand
-verification until the deferred issue lands, and the pull request says so
-rather than implying the suite covers it.
+**What a browser would add that this task's tests do not.** One round trip: the
+switcher writing the cookie through a real cookie jar, that jar persisting it
+across a restart, and the next request to `/` carrying it back. The middleware
+tests prove the middleware honours a cookie that is present; the component
+tests prove the switcher asks for one with a year's `Max-Age`. Nothing here
+proves a browser then does what it was asked. That is the gap, it is one
+criterion wide (FR-33's "survives closing the tab"), and it is verified by hand
+against a running app until the deferred issue lands.
 
-**A `test` issue is opened alongside this one**, carrying journey 6 verbatim:
-the Playwright harness, and a test proving the middleware detects the browser's
-language, falls back to `pt-BR`, and lets the cookie outrank the header. Until
-it lands, the behaviour is verified by hand against a running app and what was
+**A `test` issue is opened alongside this one**: the Playwright harness, and
+journey 6 as the browser round trip the middleware tests cannot reach — switch
+language, restart the browser, request `/`, land on the chosen locale. Until it
+lands, that round trip is verified by hand against a running app and what was
 checked is written down in the pull request.
 
 ## Verification before the pull request
 
-- `pnpm typecheck`, `pnpm test`, `pnpm build` green.
-- Against `pnpm dev`, by hand: `/` with an English header lands on `/en`; with
-  a Portuguese header on `/pt-BR`; with `Accept-Language: fr` on `/pt-BR`;
-  `/fr` returns 404; the switcher's choice survives a browser restart and then
-  outranks an English header on `/`.
+- `pnpm typecheck`, `pnpm test`, `pnpm build` green. `pnpm test` now includes
+  the middleware tests, which is where FR-30, FR-31, NFR-12 and the cookie's
+  precedence are proven.
+- Against `pnpm dev`, by hand — only what the suite cannot reach: the switcher
+  writes the cookie, the choice survives a browser restart, and the next visit
+  to `/` honours it over an English header (FR-33). Plus `/fr` returning 404.
 - Layout at 380 px, 760 px and desktop (NFR-04).
-- The `/` response carries `Cache-Control: no-store` (NFR-12).
 - `web-design-guidelines` run before the pull request opens, as
   [CLAUDE.md](../../../CLAUDE.md) requires of any PR touching components.
 
