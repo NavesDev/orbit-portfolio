@@ -82,7 +82,7 @@ order, highest priority first:
 | 3 | `Accept-Language` | The browser's stated preference |
 | 4 | `en-US` | Fallback when the header names no supported language |
 
-Only a request to `/` needs resolving — `middleware.ts` negotiates
+Only a request to `/` needs resolving — `proxy.ts` negotiates
 `Accept-Language` against the supported list and redirects to the matching
 prefix. Requests that already carry a locale pass straight through to the static
 page.

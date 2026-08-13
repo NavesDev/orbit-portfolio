@@ -9,7 +9,7 @@ victory on unverified code.
 
 | Level | What it covers | Where | Runtime | Dependencies |
 | --- | --- | --- | --- | --- |
-| Unit | Domain invariants, use cases, request-level logic | `packages/core`, `packages/db/tests/unit`, `apps/web/src/lib`, `apps/web/src/middleware.ts` | < 1 ms per test | None |
+| Unit | Domain invariants, use cases, request-level logic | `packages/core`, `packages/db/tests/unit`, `apps/web/src/lib`, `apps/web/src/proxy.ts` | < 1 ms per test | None |
 | Integration | Repositories, migrations, constraints | `packages/db/tests/integration` | Seconds | Real PostgreSQL |
 | Component | Rendering, interaction, accessibility | `apps/web/src/components`, `apps/web/src/app` | Fast | Stubbed use cases |
 | End-to-end | Full journeys through a real browser | `apps/web/e2e` | Slow | Running app + database |
@@ -58,19 +58,19 @@ Domain invariants and use-case behaviour, against in-memory port fakes.
 The in-memory fakes double as a design check: a fake that is awkward to write
 means the port has leaked a storage concern.
 
-### Unit — `apps/web/src/lib` and `apps/web/src/middleware.ts`
+### Unit — `apps/web/src/lib` and `apps/web/src/proxy.ts`
 
 Not everything in `apps/web` is a component. Logic that belongs to the request
 rather than to the domain lives here — locale negotiation from
-`Accept-Language`, the cookie's attributes, the middleware that wires them —
+`Accept-Language`, the cookie's attributes, the proxy that wires them —
 because it is an HTTP concern and `packages/core` must not know how a request
 reaches it.
 
-It is tested as a unit, not through a browser. A middleware handler is an
-ordinary function: build a `NextRequest`, call it, assert on the response.
+It is tested as a unit, not through a browser. A proxy handler is an ordinary
+function: build a `NextRequest`, call it, assert on the response.
 
 ```ts
-const response = await middleware(
+const response = await proxy(
   new NextRequest('http://localhost/', {
     headers: { 'accept-language': 'en-GB,en;q=0.9' },
   }),

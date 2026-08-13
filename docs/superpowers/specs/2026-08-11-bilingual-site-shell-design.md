@@ -30,7 +30,7 @@ footer — arrives in sprint tasks 3 to 6. This task delivers what surrounds the
 
 **In:** the `Locale` enum and the `LocalizedText` value object in
 `packages/core`; the `[locale]` route segment and its layout; locale negotiation
-in `middleware.ts`; the `locale` cookie; the language switcher; `content/en-US/`
+in `proxy.ts`; the `locale` cookie; the language switcher; `content/en-US/`
 and `content/pt-BR/`; `tokens.css` and global styles; and the site chrome — the
 fixed nav with its section index, the scroll progress bar and the scroll-driven
 marquee strip.
@@ -132,7 +132,7 @@ whether it is valid.
 | `app/layout.tsx` | Becomes a pass-through returning `children`. |
 | `app/[locale]/layout.tsx` | New. Renders `<html lang>`, `<body>`, the chrome and `children`. |
 | `app/[locale]/page.tsx` | New. The home page, empty of sections until task 3. |
-| `app/page.tsx` | Deleted — `middleware.ts` owns `/`. |
+| `app/page.tsx` | Deleted — `proxy.ts` owns `/`. |
 
 `<html>` and `<body>` belong to the `[locale]` layout, because `lang` must be
 the resolved locale and only that layout knows it. The root layout stays as a
@@ -143,10 +143,10 @@ The segment exports `generateStaticParams` over `LOCALES` and
 `revalidate = 3600` (NFR-01), and calls `notFound()` when the segment is not a
 known locale — an unrecognized prefix is an error, not a locale to guess at.
 
-### 6. Negotiation — `middleware.ts` and `src/lib/locale/`
+### 6. Negotiation — `proxy.ts` and `src/lib/locale/`
 
 The matcher is `['/']`. Only `/` needs resolving, so `/api`, `/_next` and the
-static pages never enter the middleware at all — a narrower matcher than an
+static pages never enter the proxy at all — a narrower matcher than an
 exclusion pattern, and one that cannot accidentally start matching something
 new. When [monorepo.md](../../architecture/monorepo.md)'s Phase 6 CORS and rate
 limiting arrive, they widen the matcher and live in their own function.
@@ -159,10 +159,10 @@ Resolution order (FR-30, FR-31, FR-33), highest first:
 3. `DEFAULT_LOCALE` (`en-US`).
 
 The response is a `307` carrying `Cache-Control: no-store` — NFR-12 is the
-whole reason this is middleware and not a page. The header is read to pick a
+whole reason this is proxy and not a page. The header is read to pick a
 prefix and written nowhere (NFR-14).
 
-Two pure modules do the work, and the middleware only wires them:
+Two pure modules do the work, and the proxy only wires them:
 
 - `src/lib/locale/negotiate-locale.ts` — parses the header. No framework
   import, so its tests call it directly with a string.
@@ -183,7 +183,7 @@ a request reaches them.
 | `Secure` | outside development | It travels on every request; there is no reason for it to travel in clear. |
 | `HttpOnly` | no | The switcher is a Client Component and writes it. Nothing secret is in it. |
 
-One module holds them, read by the middleware and written by the switcher, so
+One module holds them, read by the proxy and written by the switcher, so
 the two cannot drift apart.
 
 ### 8. Static content — `apps/web/src/content/`
@@ -283,7 +283,7 @@ section.
 
 Following the levels in [testing.md](../../testing.md) — **which this task
 amends**. That document's table assumed `apps/web` held React components and
-nothing else, so it had no row for the middleware and the `lib/locale` modules
+nothing else, so it had no row for the proxy and the `lib/locale` modules
 this task introduces. Calling them component tests would have been a lie about
 what they do, and calling them integration tests would have contradicted the
 axis that makes `pnpm test` fast. The amendment lands in the same pull request,
@@ -297,7 +297,7 @@ holding only `en-US` returns the English text (FR-34); `resolve` on a field
 holding both returns the requested one. `isLocale` accepts both locales and
 rejects `en` and `en_US`.
 
-**Unit — `apps/web/src/lib` and `apps/web/src/middleware.ts`.** The level
+**Unit — `apps/web/src/lib` and `apps/web/src/proxy.ts`.** The level
 [testing.md](../../testing.md) gains in this task, for request-level logic that
 is neither domain nor component. Two files.
 
@@ -306,7 +306,7 @@ header, `en-GB`, an unsupported language, a q-value list whose preferred entry
 is not first, an empty header and an absent one; plus the cookie module's
 attributes, including `Secure` following the environment.
 
-`middleware.test.ts` covers the acceptance criteria phrased as "a request to
+`proxy.test.ts` covers the acceptance criteria phrased as "a request to
 `/`" by calling the handler with a `NextRequest` and reading the response — no
 browser, no running server, in the fast suite:
 
@@ -321,7 +321,7 @@ browser, no running server, in the fast suite:
 | any of the above | `Cache-Control: no-store` (NFR-12) |
 
 This is the layer that actually closes those criteria. It exercises the real
-middleware rather than only the pure function underneath it, so a wiring
+proxy rather than only the pure function underneath it, so a wiring
 mistake — reading the cookie after the header, forgetting the cache header —
 fails a test instead of surviving to the browser.
 
@@ -352,7 +352,7 @@ English `Accept-Language` lands on `/en-US`, an unsupported language lands on
 `/en-US`, and the switcher's choice then outranks the header on the next visit.
 It restates this task's acceptance criteria almost word for word — but **it is
 not the level those criteria need.** "A request to `/`" is an HTTP request, and
-`middleware.ts` is a directly callable function, so the middleware tests above
+`proxy.ts` is a directly callable function, so the proxy tests above
 close FR-30, FR-31, NFR-12 and the cookie's precedence in the fast suite. What
 E2E adds over them is a real browser, not a real request.
 
@@ -366,15 +366,15 @@ feature work.
 
 **What a browser would add that this task's tests do not.** One round trip: the
 switcher writing the cookie through a real cookie jar, that jar persisting it
-across a restart, and the next request to `/` carrying it back. The middleware
-tests prove the middleware honours a cookie that is present; the component
+across a restart, and the next request to `/` carrying it back. The proxy
+tests prove the proxy honours a cookie that is present; the component
 tests prove the switcher asks for one with a year's `Max-Age`. Nothing here
 proves a browser then does what it was asked. That is the gap, it is one
 criterion wide (FR-33's "survives closing the tab"), and it is verified by hand
 against a running app until the deferred issue lands.
 
 **A `test` issue is opened alongside this one**: the Playwright harness, and
-journey 6 as the browser round trip the middleware tests cannot reach — switch
+journey 6 as the browser round trip the proxy tests cannot reach — switch
 language, restart the browser, request `/`, land on the chosen locale. Until it
 lands, that round trip is verified by hand against a running app and what was
 checked is written down in the pull request.
@@ -382,7 +382,7 @@ checked is written down in the pull request.
 ## Verification before the pull request
 
 - `pnpm typecheck`, `pnpm test`, `pnpm build` green. `pnpm test` now includes
-  the middleware tests, which is where FR-30, FR-31, NFR-12 and the cookie's
+  the proxy tests, which is where FR-30, FR-31, NFR-12 and the cookie's
   precedence are proven.
 - Against `pnpm dev`, by hand — only what the suite cannot reach: the switcher
   writes the cookie, the choice survives a browser restart, and the next visit

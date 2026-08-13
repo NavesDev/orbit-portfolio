@@ -70,7 +70,7 @@ no value until the project data behind them renders.
 ### 2. Bilingual site shell — locale routing, negotiation and switcher
 
 - **Description:** Make every page addressable per locale under the `[locale]`
-  segment and make the language a visitor's own choice. `middleware.ts`
+  segment and make the language a visitor's own choice. `proxy.ts`
   negotiates `Accept-Language` on `/` only and redirects to the matching prefix,
   falling back to `en-US` for an unsupported language; a `locale` cookie written
   by the language switcher outranks the header. Includes the `LocalizedText`

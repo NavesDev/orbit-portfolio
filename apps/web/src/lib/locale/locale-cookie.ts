@@ -3,7 +3,7 @@ import { isLocale, type Locale } from '@portfolio/core';
 /**
  * The visitor's own choice, outranking their browser's language (FR-33).
  *
- * One module holds the name and every attribute, read by `middleware.ts` and
+ * One module holds the name and every attribute, read by `proxy.ts` and
  * written by the language switcher, so the two cannot drift apart. Sprint 1
  * task 2 records the values as U-4, which no document had fixed.
  */

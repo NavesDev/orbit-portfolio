@@ -48,7 +48,7 @@ row in the database.
 
 **Telemetry** — access counting and audit endpoints for this and other projects.
 Scaffolding exists (`packages/telemetry/`, `apps/web/src/app/api/v1/`,
-`middleware.ts`) but holds no code. It needs its own requirements and design
+`proxy.ts`) but holds no code. It needs its own requirements and design
 pass before implementation; see [roadmap.md](roadmap.md#phase-6--telemetry-deferred).
 
 ## Not persisted, by decision

@@ -14,7 +14,7 @@ every later visit.
 
 **Architecture:** `packages/core` gains the `Locale` enum and the
 `LocalizedText` value object — the only domain work here. Everything else is
-`apps/web`: two pure modules in `src/lib/locale/` that `middleware.ts` wires
+`apps/web`: two pure modules in `src/lib/locale/` that `proxy.ts` wires
 together on `/` alone, a `[locale]` route segment that owns `<html lang>`, typed
 static copy in `src/content/`, and the prototype's chrome — nav, scroll progress
 bar, marquee strip — driven by one scroll store instead of the prototype's
@@ -72,7 +72,7 @@ Issue [#3](https://github.com/NavesDev/orbit-portfolio/issues/3). Branch
 | `lib/locale/negotiate-locale.ts` | `Accept-Language` → `Locale` |
 | `lib/locale/locale-cookie.ts` | Cookie name, attributes, read and serialize |
 | `lib/locale/swap-locale.ts` | Replace the locale segment of a pathname |
-| `middleware.ts` | Wires the three on `/` alone |
+| `proxy.ts` | Wires the three on `/` alone |
 | `app/layout.tsx` | Pass-through root |
 | `app/[locale]/layout.tsx` | `<html lang>`, chrome, `generateStaticParams` |
 | `app/[locale]/page.tsx` | Home page, empty of sections until task 3 of the sprint |
@@ -865,7 +865,7 @@ import { isLocale, type Locale } from '@portfolio/core';
 /**
  * The visitor's own choice, outranking their browser's language (FR-33).
  *
- * One module holds the name and every attribute, read by `middleware.ts` and
+ * One module holds the name and every attribute, read by `proxy.ts` and
  * written by the language switcher, so the two cannot drift apart. Sprint 1
  * task 2 records the values as U-4, which no document had fixed.
  */
@@ -942,21 +942,21 @@ EOF
 
 ---
 
-## Task 5: `middleware.ts` — the `/` redirect
+## Task 5: `proxy.ts` — the `/` redirect
 
 **Files:**
-- Create: `apps/web/src/middleware.ts`
-- Test: `apps/web/src/middleware.test.ts`
+- Create: `apps/web/src/proxy.ts`
+- Test: `apps/web/src/proxy.test.ts`
 - Delete: `apps/web/src/app/page.tsx`
 
 **Interfaces:**
 - Consumes: `negotiateLocale`, `readLocaleCookie`, `LOCALE_COOKIE_NAME`, the
   header constants.
-- Produces: `middleware(request: NextRequest): NextResponse`, `config.matcher`.
+- Produces: `proxy(request: NextRequest): NextResponse`, `config.matcher`.
 
 - [ ] **Step 1: Write the failing test**
 
-Create `apps/web/src/middleware.test.ts`. The first line is load-bearing —
+Create `apps/web/src/proxy.test.ts`. The first line is load-bearing —
 `NextRequest` needs Web APIs rather than a DOM, and the `web` project defaults
 to `jsdom`:
 
@@ -964,7 +964,7 @@ to `jsdom`:
 // @vitest-environment node
 import { NextRequest } from 'next/server';
 import { describe, expect, it } from 'vitest';
-import { middleware } from './middleware';
+import { proxy } from './proxy';
 
 const HOME_URL = 'http://localhost:3000/';
 
@@ -989,9 +989,9 @@ function redirectPathOf(response: Response): string {
   return new URL(location as string).pathname;
 }
 
-describe('middleware on /', () => {
+describe('proxy on /', () => {
   it('sends an English browser to /en (FR-30)', () => {
-    const response = middleware(
+    const response = proxy(
       requestTo({ 'accept-language': 'en-GB,en;q=0.9' }),
     );
 
@@ -999,7 +999,7 @@ describe('middleware on /', () => {
   });
 
   it('sends a Portuguese browser to /pt-BR (FR-30)', () => {
-    const response = middleware(
+    const response = proxy(
       requestTo({ 'accept-language': 'pt-BR,pt;q=0.9' }),
     );
 
@@ -1007,19 +1007,19 @@ describe('middleware on /', () => {
   });
 
   it('sends an unsupported language to /pt-BR (FR-31)', () => {
-    const response = middleware(requestTo({ 'accept-language': 'fr' }));
+    const response = proxy(requestTo({ 'accept-language': 'fr' }));
 
     expect(redirectPathOf(response)).toBe('/pt-BR');
   });
 
   it('sends a request with no Accept-Language to /pt-BR (FR-31)', () => {
-    const response = middleware(requestTo({}));
+    const response = proxy(requestTo({}));
 
     expect(redirectPathOf(response)).toBe('/pt-BR');
   });
 
   it('lets the cookie outrank the browser (FR-33)', () => {
-    const response = middleware(
+    const response = proxy(
       requestTo({ 'accept-language': 'pt-BR,pt;q=0.9' }, 'en'),
     );
 
@@ -1027,7 +1027,7 @@ describe('middleware on /', () => {
   });
 
   it('ignores a cookie holding an unsupported locale', () => {
-    const response = middleware(
+    const response = proxy(
       requestTo({ 'accept-language': 'en-GB,en;q=0.9' }, 'xx'),
     );
 
@@ -1035,11 +1035,11 @@ describe('middleware on /', () => {
   });
 
   it('redirects temporarily, never permanently', () => {
-    expect(middleware(requestTo({})).status).toBe(307);
+    expect(proxy(requestTo({})).status).toBe(307);
   });
 
   it('is never cached across visitors (NFR-12)', () => {
-    const response = middleware(
+    const response = proxy(
       requestTo({ 'accept-language': 'en-GB,en;q=0.9' }),
     );
 
@@ -1050,12 +1050,12 @@ describe('middleware on /', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `pnpm --filter @portfolio/web test src/middleware.test.ts`
-Expected: FAIL — cannot resolve `./middleware`.
+Run: `pnpm --filter @portfolio/web test src/proxy.test.ts`
+Expected: FAIL — cannot resolve `./proxy`.
 
-- [ ] **Step 3: Write the middleware**
+- [ ] **Step 3: Write the proxy**
 
-Create `apps/web/src/middleware.ts`:
+Create `apps/web/src/proxy.ts`:
 
 ```ts
 import { NextResponse, type NextRequest } from 'next/server';
@@ -1080,7 +1080,7 @@ import { negotiateLocale } from './lib/locale/negotiate-locale';
  * The response must not be cached (NFR-12): a stored `/` → `/pt-BR` would send
  * every later visitor to the first visitor's language.
  */
-export function middleware(request: NextRequest): NextResponse {
+export function proxy(request: NextRequest): NextResponse {
   const chosen = readLocaleCookie(request.cookies.get(LOCALE_COOKIE_NAME)?.value);
   const locale =
     chosen ?? negotiateLocale(request.headers.get(ACCEPT_LANGUAGE_HEADER));
@@ -1101,7 +1101,7 @@ export const config = {
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `pnpm --filter @portfolio/web test src/middleware.test.ts`
+Run: `pnpm --filter @portfolio/web test src/proxy.test.ts`
 Expected: PASS — 8 tests.
 
 - [ ] **Step 5: Delete the placeholder route**
@@ -1117,7 +1117,7 @@ rm apps/web/src/app/page.tsx
 
 ```bash
 pnpm typecheck
-git add apps/web/src/middleware.ts apps/web/src/middleware.test.ts apps/web/src/app/page.tsx
+git add apps/web/src/proxy.ts apps/web/src/proxy.test.ts apps/web/src/app/page.tsx
 git commit -m "$(cat <<'EOF'
 feat(web): redirect / to the visitor's locale, uncached
 
@@ -1187,7 +1187,7 @@ export default defineConfig({
 });
 ```
 
-The `jsdom` default stays; `middleware.test.ts` opts out per file with its
+The `jsdom` default stays; `proxy.test.ts` opts out per file with its
 `@vitest-environment node` docblock.
 
 - [ ] **Step 3: Write the failing test**
@@ -1443,7 +1443,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 - [ ] **Step 9: Run tests to verify they pass**
 
 Run: `pnpm --filter @portfolio/web test`
-Expected: PASS — the negotiator, the cookie, the middleware and 3 layout tests.
+Expected: PASS — the negotiator, the cookie, the proxy and 3 layout tests.
 
 - [ ] **Step 10: Verify the build produces both locales**
 
@@ -2860,7 +2860,7 @@ web
 Scaffold Playwright in `apps/web/e2e` and cover the one part of the locale
 journey that unit tests cannot reach: the round trip through a real cookie jar.
 
-`middleware.test.ts` (shipped in #3) already proves the redirect honours
+`proxy.test.ts` (shipped in #3) already proves the redirect honours
 `Accept-Language`, falls back to `pt-BR`, and lets a cookie outrank the header.
 What it cannot prove is that a browser, told to keep the cookie for a year,
 actually keeps it — which is the criterion FR-33 states.
@@ -2897,7 +2897,7 @@ EOF
 ## Self-Review
 
 **Spec coverage.** Locale enum → Task 1. `LocalizedText`, budgets, errors →
-Task 2. Negotiation → Task 3. Cookie → Task 4. Middleware and the `/` redirect
+Task 2. Negotiation → Task 3. Cookie → Task 4. Proxy and the `/` redirect
 → Task 5. Route segment, `generateStaticParams`, `revalidate`, unknown-locale
 404, tokens, globals, fonts → Task 6. Content modules → Task 7. Switcher and nav
 → Task 8. Scroll store and progress bar → Task 9. Marquee → Task 10. Section

@@ -146,7 +146,7 @@ chosen so that something is visible early and the hardest piece is not last:
 | # | Section | Notes |
 | --- | --- | --- |
 | 3.1 | Layout, tokens, global styles, `[locale]` segment | `tokens.css` from the prototype's `:root` |
-| 3.2 | Locale negotiation in `middleware.ts` + language switcher | `Accept-Language`, cookie, `en-US` fallback |
+| 3.2 | Locale negotiation in `proxy.ts` + language switcher | `Accept-Language`, cookie, `en-US` fallback |
 | 3.3 | Hero (server) + canvas field (client) | First `'use client'` boundary |
 | 3.4 | Footer, social links | Smallest end-to-end slice: database → page |
 | 3.5 | Projects section + cards | Data-driven, with modal |
@@ -224,7 +224,7 @@ Open questions, from [architecture/monorepo.md](architecture/monorepo.md):
   fail loudly at the boundary.
 
 Scaffolding that exists but is empty: `packages/telemetry/`,
-`apps/web/src/app/api/v1/`, `apps/web/src/middleware.ts`. `@portfolio/telemetry`
+`apps/web/src/app/api/v1/`, `apps/web/src/proxy.ts`. `@portfolio/telemetry`
 is deliberately **not** a dependency of `apps/web` until Phase 6 — an empty
 package in the dependency graph breaks the build for no benefit.
 
