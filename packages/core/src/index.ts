@@ -10,4 +10,24 @@
  * re-exported here as they land.
  */
 
-export {};
+export {
+  DEFAULT_LOCALE,
+  isLocale,
+  LOCALES,
+  type Locale,
+} from './domain/enums/locale.ts';
+export {
+  CATEGORY_MAX_LENGTH,
+  DESCRIPTION_MAX_LENGTH,
+  TAG_MAX_LENGTH,
+  TAGS_MAX_ITEMS,
+  TITLE_MAX_LENGTH,
+  USAGE_NOTE_MAX_LENGTH,
+} from './domain/constants/text-budgets.ts';
+export { DomainError } from './domain/errors/domain-error.ts';
+export {
+  InvalidLocalizedTextError,
+  LOCALIZED_TEXT_VIOLATIONS,
+  type LocalizedTextViolation,
+} from './domain/errors/invalid-localized-text-error.ts';
+export { LocalizedText } from './domain/value-objects/localized-text.ts';

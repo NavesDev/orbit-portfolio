@@ -19,7 +19,7 @@ ordinary React. What it adds is what this project needs:
 
 | Need | Provided by |
 | --- | --- |
-| Routes `/pt-BR`, `/en/projetos` | File-system routing with a `[locale]` segment |
+| Routes `/en-US`, `/pt-BR/projetos` | File-system routing with a `[locale]` segment |
 | Detecting the visitor's language | Middleware, before the page renders |
 | Reading Postgres without exposing an API | Server Components |
 | Public endpoints for other projects (Phase 6) | Route Handlers under `src/app/api/` |
@@ -59,11 +59,11 @@ all become Client Components fed by a Server Component above them.
 
 ## Localization and routing
 
-Locales are `pt-BR` and `en`. Every page lives under a `[locale]` segment:
+Locales are `en-US` and `pt-BR`. Every page lives under a `[locale]` segment:
 
 ```
-src/app/[locale]/page.tsx              /pt-BR          /en
-src/app/[locale]/projetos/page.tsx     /pt-BR/projetos /en/projetos
+src/app/[locale]/page.tsx              /en-US          /pt-BR
+src/app/[locale]/projetos/page.tsx     /en-US/projetos /pt-BR/projetos
 src/app/[locale]/projetos/[slug]/page.tsx
 ```
 
@@ -80,21 +80,21 @@ order, highest priority first:
 | 1 | The URL's `[locale]` segment | An explicit address, and what a shared link carries |
 | 2 | A `locale` cookie | The visitor used the language switcher; that choice must outlast one page |
 | 3 | `Accept-Language` | The browser's stated preference |
-| 4 | `pt-BR` | Fallback when the header names no supported language |
+| 4 | `en-US` | Fallback when the header names no supported language |
 
-Only a request to `/` needs resolving — `middleware.ts` negotiates
+Only a request to `/` needs resolving — `proxy.ts` negotiates
 `Accept-Language` against the supported list and redirects to the matching
 prefix. Requests that already carry a locale pass straight through to the static
 page.
 
 Two consequences worth stating:
 
-- **The redirect must not be cached across visitors.** A cached `/` → `/pt-BR`
-  would send every later visitor to Portuguese regardless of their browser.
+- **The redirect must not be cached across visitors.** A cached `/` → `/en-US`
+  would send every later visitor to English regardless of their browser.
   The redirect is per-request; only the destination pages are static.
 - **The switcher writes a cookie.** Without it, a Brazilian visitor who picks
-  English is sent back to `/pt-BR` on the next visit to `/`, and the switcher
-  appears broken.
+  Portuguese is sent back to `/en-US` on the next visit to `/`, and the
+  switcher appears broken.
 
 `Accept-Language` is a hint, never an identity. It is read to pick a language
 and not stored.
@@ -106,13 +106,14 @@ They are easy to conflate and mean different things:
 - **Default UI language** — what a visitor gets when they express no preference.
   That is their browser's language.
 - **Fallback locale** — what is rendered when a specific field has no
-  translation in the requested language. That is always `pt-BR`, guaranteed by
+  translation in the requested language. That is always `en-US`, guaranteed by
   the `is_localized` constraint in
   [../domain/data-model.md](../domain/data-model.md).
 
-So an English visitor sees an English page with Portuguese text in any field
-that has not been translated yet — not a missing section, and not a Portuguese
-page.
+So a Brazilian visitor sees a Portuguese page with English text in any field
+that has not been translated yet — not a missing section, and not an English
+page. `en-US` is the language every field is required to carry; `pt-BR` is the
+one that may lag behind.
 
 ## Data access
 

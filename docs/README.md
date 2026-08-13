@@ -37,8 +37,8 @@ The home page, every backend feature behind it, and its subpages.
 3. **Skills** — the taxonomy shared by projects and timeline entries.
 4. **Social links** — footer contacts, including e-mail.
 
-**Bilingual** — `pt-BR` and `en`. The visitor's browser language decides which
-they get; `pt-BR` is the fallback for any field not yet translated.
+**Bilingual** — `en-US` and `pt-BR`. The visitor's browser language decides which
+they get; `en-US` is the fallback for any field not yet translated.
 
 **6 tables, 2 enums.** The model is deliberately minimal: anything that only
 changes when the page is redesigned is static content in the front end, not a
@@ -48,7 +48,7 @@ row in the database.
 
 **Telemetry** — access counting and audit endpoints for this and other projects.
 Scaffolding exists (`packages/telemetry/`, `apps/web/src/app/api/v1/`,
-`middleware.ts`) but holds no code. It needs its own requirements and design
+`proxy.ts`) but holds no code. It needs its own requirements and design
 pass before implementation; see [roadmap.md](roadmap.md#phase-6--telemetry-deferred).
 
 ## Not persisted, by decision

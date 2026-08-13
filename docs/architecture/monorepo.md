@@ -55,7 +55,7 @@ apps/web/
 ├── next.config.mjs
 ├── public/
 └── src/
-    ├── middleware.ts           Locale negotiation (v1) + CORS and rate limit (Phase 6)
+    ├── proxy.ts                Locale negotiation (v1) + CORS and rate limit (Phase 6)
     ├── app/
     │   ├── [locale]/
     │   │   ├── layout.tsx
@@ -101,12 +101,12 @@ Three rules for `src/app/api/`:
    in Server Components via `@portfolio/db`. Exposing an HTTP endpoint for the
    site to call itself adds a network hop and a cache layer to solve nothing.
    `/api/*` exists for *other* projects.
-3. **Cross-cutting concerns live in `middleware.ts`, not in routes.** CORS
+3. **Cross-cutting concerns live in `proxy.ts`, not in routes.** CORS
    preflight, origin allowlisting and rate limiting run once, before any handler.
-   The middleware itself stays thin: the rules come from
+   The proxy itself stays thin: the rules come from
    `@portfolio/telemetry/infrastructure/http`.
 
-   Note that `middleware.ts` already has a v1 job — negotiating the visitor's
+   Note that `proxy.ts` already has a v1 job — negotiating the visitor's
    locale on `/` — so its matcher covers both the pages and `/api`, with the two
    concerns kept in separate functions.
 

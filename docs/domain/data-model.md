@@ -42,7 +42,11 @@ ORDER BY sort_order ASC, started_on DESC NULLS LAST
 
 ## Localization
 
-Locales: **`pt-BR`** (default and fallback) and **`en`**.
+Locales: **`en-US`** (required and fallback) and **`pt-BR`**.
+
+`en-US` is the locale every localized field must carry; `pt-BR` is optional and
+may lag behind. A field with no `pt-BR` translation renders its `en-US` text
+(FR-34).
 
 ### What is translated
 
@@ -67,7 +71,7 @@ redirects between them.
 A translated column is `jsonb`, an object keyed by locale:
 
 ```json
-{ "pt-BR": "Sistema de agendamento", "en": "Scheduling system" }
+{ "en-US": "Scheduling system", "pt-BR": "Sistema de agendamento" }
 ```
 
 Chosen over per-entity translation tables. Those would take the schema from 6
@@ -93,11 +97,11 @@ RETURNS boolean
 LANGUAGE sql IMMUTABLE STRICT
 AS $$
   SELECT jsonb_typeof(value) = 'object'
-     AND value ? 'pt-BR'
+     AND value ? 'en-US'
      AND NOT EXISTS (
        SELECT 1
          FROM jsonb_each(value) AS entry(locale, text)
-        WHERE entry.locale NOT IN ('pt-BR', 'en')
+        WHERE entry.locale NOT IN ('en-US', 'pt-BR')
            OR jsonb_typeof(entry.text) <> 'string'
            OR length(entry.text #>> '{}') > max_length
      )
@@ -107,9 +111,9 @@ $$;
 It enforces four things at once:
 
 1. The value is an object, not a string, number or array.
-2. The default locale is present — no row is unreadable in `pt-BR`.
-3. Every key is a known locale — a typo like `en-US` is rejected instead of
-   silently producing content nobody will ever see.
+2. The required locale is present — no row is unreadable in `en-US`.
+3. Every key is a known locale — a typo like `en_US` or `pt` is rejected
+   instead of silently producing content nobody will ever see.
 4. Every value is a string within the column's length budget.
 
 A sibling `is_localized_array` covers `projects.tags`, adding a cap on the
@@ -136,14 +140,14 @@ column is a column that eventually holds something absurd.
 Reading one locale, with fallback:
 
 ```sql
-SELECT coalesce(title ->> 'en', title ->> 'pt-BR') AS title FROM projects;
+SELECT coalesce(title ->> 'pt-BR', title ->> 'en-US') AS title FROM projects;
 ```
 
 Finding what still needs translating — the question that actually gets asked
 while a site is being localized:
 
 ```sql
-SELECT slug FROM projects WHERE NOT description ? 'en';
+SELECT slug FROM projects WHERE NOT description ? 'pt-BR';
 ```
 
 Fallback is resolved in the application layer, not in SQL, so the rule lives in
@@ -249,8 +253,8 @@ Indexes and constraints:
 - `ck_projects__description`: `description IS NULL OR is_localized(description, 8000)`
 - `ck_projects__tags`: `tags IS NULL OR is_localized_array(tags, 60, 8)`
 
-`tags` holds one array per locale — `{"pt-BR": ["Calendário em tempo real"],
-"en": ["Real-time calendar"]}`. They are free labels rendered as chips and never
+`tags` holds one array per locale — `{"en-US": ["Real-time calendar"],
+"pt-BR": ["Calendário em tempo real"]}`. They are free labels rendered as chips and never
 queried on their own; normalized tag tables would add two tables, now doubled by
 translation, to serve a display detail.
 
@@ -374,9 +378,9 @@ content can be read without the mechanics in the way:
 | `data.ts` | The content, typed. No SQL, no I/O. |
 | `run.ts` | The executor: one transaction, upserts, CLI entrypoint. |
 
-Every localized column carries **both** `pt-BR` and `en`. A `pt-BR`-only value
-would still be valid — it falls back — but an English visitor gets an English
-page rather than a demonstration of the fallback.
+Every localized column carries **both** `en-US` and `pt-BR`. An `en-US`-only
+value would still be valid — it falls back — but a Brazilian visitor gets a
+Portuguese page rather than a demonstration of the fallback.
 
 ### Identity and re-runnability
 
@@ -425,6 +429,15 @@ Enums → `is_localized` / `is_localized_array` functions → `social_links` →
 
 The validation functions come before any table that references them in a
 `CHECK`.
+
+`009` replaces both validation functions to move the locale set to
+`('en-US', 'pt-BR')` and the required key to `en-US`. It is a replacement
+rather than an edit to `002`, which has already run — migrations are
+forward-only. `CREATE OR REPLACE` keeps the function identity, so the `CHECK`
+constraints referencing it need no change. A `CHECK` is not re-validated on
+replace, so rows written under the old rule survive until something updates
+them; `pnpm db:seed` rewrites every row and is how an existing database is
+brought forward.
 
 ---
 

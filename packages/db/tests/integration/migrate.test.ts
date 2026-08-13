@@ -1,6 +1,19 @@
+import { readdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { migrate } from '../../src/migrate.ts';
 import { withScratchDatabase } from '../helpers/scratch-database.ts';
+
+/**
+ * Read from disk rather than hardcoded: the ledger must match the migrations
+ * that exist, and a count written into the test only means the test has to be
+ * edited every time one is added.
+ */
+const MIGRATION_FILES = readdirSync(
+  fileURLToPath(new URL('../../src/migrations', import.meta.url)),
+)
+  .filter((file) => file.endsWith('.sql'))
+  .sort();
 
 const db = withScratchDatabase();
 
@@ -101,8 +114,7 @@ describe('migrate', () => {
     const ledger = await names(
       `SELECT filename AS name FROM schema_migrations ORDER BY filename`,
     );
-    expect(ledger).toHaveLength(8);
+    expect(ledger).toEqual(MIGRATION_FILES);
     expect(ledger[0]).toBe('001_enums.sql');
-    expect(ledger.at(-1)).toBe('008_timeline_entry_skill.sql');
   });
 });

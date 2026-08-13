@@ -113,7 +113,7 @@ composition root in `apps/web/src/lib/`. Same map, split across packages.
   every later visitor to the first visitor's language.
 - Route files stay thin: parse, call a use case, serialize. No portfolio content
   endpoints — `/api/*` exists for *other* projects, not for the site to call
-  itself. Cross-cutting concerns (CORS, rate limit) go in `middleware.ts`, which
+  itself. Cross-cutting concerns (CORS, rate limit) go in `proxy.ts`, which
   already owns locale negotiation.
 
 ### Localization

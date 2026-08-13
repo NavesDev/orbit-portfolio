@@ -13,7 +13,7 @@ import {
  * Nothing here asserts a row count or a specific piece of content (U-1).
  */
 
-const LOCALES = ['pt-BR', 'en'] as const;
+const LOCALES = ['en-US', 'pt-BR'] as const;
 
 function budget(label: string, value: Localized, max: number): void {
   for (const locale of LOCALES) {

@@ -1,0 +1,39 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans), -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--blue);
+  color: #fff;
+}
+
+/*
+ * Not in the prototype, which leaves a keyboard visitor with no visible focus
+ * at all. NFR-06 asks for a Lighthouse accessibility score of 95 or better and
+ * NFR-05 assumes a focus path that can be followed.
+ */
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

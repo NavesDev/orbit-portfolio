@@ -23,7 +23,7 @@ and Phase 6 (telemetry) are out of this sprint.
 
 ## Sprint Objective
 
-At the end of the sprint, `pnpm dev` serves a home page at `/pt-BR` and `/en`
+At the end of the sprint, `pnpm dev` serves a home page at `/en-US` and `/pt-BR`
 whose hero, project cards, timeline and footer are rendered from PostgreSQL
 rows, not from literals. A visitor landing on `/` is sent to the language their
 browser asks for, can switch language, and that choice survives closing the tab.
@@ -44,7 +44,7 @@ no value until the project data behind them renders.
   constraint listed there, created in the documented migration order. Includes a
   forward-only idempotent migration runner (`pnpm db:migrate`), a single reused
   connection pool, and a seed (`pnpm db:seed`) carrying the prototype's content
-  with `pt-BR` keys populated. Also wires the CI pipeline
+  with `en-US` keys populated. Also wires the CI pipeline
   (`.github/workflows/ci.yml`) to run typecheck, unit, integration and build, as
   [testing.md](../testing.md) specifies. Roadmap deliverables 1.1–1.8, 1.11.
 - **Expected outcome:** An empty PostgreSQL can be brought to the full schema and
@@ -61,7 +61,7 @@ no value until the project data behind them renders.
   - Integration tests prove the constraints reject what they should:
     `progress_percent = 150`, `ended_on` before `started_on`, duplicate `slug`,
     deleting a skill still referenced by a project, a localized value over its
-    length budget, an unknown locale key, a localized column missing `pt-BR`
+    length budget, an unknown locale key, a localized column missing `en-US`
     (NFR-10, NFR-11).
   - Every localized column is `jsonb` guarded by `is_localized` with the
     documented length budget; `projects.tags` by `is_localized_array`.
@@ -70,23 +70,23 @@ no value until the project data behind them renders.
 ### 2. Bilingual site shell — locale routing, negotiation and switcher
 
 - **Description:** Make every page addressable per locale under the `[locale]`
-  segment and make the language a visitor's own choice. `middleware.ts`
+  segment and make the language a visitor's own choice. `proxy.ts`
   negotiates `Accept-Language` on `/` only and redirects to the matching prefix,
-  falling back to `pt-BR` for an unsupported language; a `locale` cookie written
+  falling back to `en-US` for an unsupported language; a `locale` cookie written
   by the language switcher outranks the header. Includes the `LocalizedText`
   value object with its fallback rule and the `Locale` enum in
   `packages/core`, the layout, `tokens.css` and global styles (roadmap 3.1–3.2),
-  and the `content/pt-BR/` + `content/en/` folders with the same module shape so
+  and the `content/en-US/` + `content/pt-BR/` folders with the same module shape so
   a missing translation is a type error. Also carries the site chrome the
   prototype has around every section — the fixed nav with its section index, the
   scroll progress bar and the scroll-driven marquee strip — which no `FR` names
   but which the prototype, as the functional specification, does (see U-2).
   Covers FR-29–FR-34, NFR-12, NFR-14.
-- **Expected outcome:** `/pt-BR` and `/en` both render the layout shell, `/`
+- **Expected outcome:** `/en-US` and `/pt-BR` both render the layout shell, `/`
   resolves per visitor, and the switcher's choice persists across visits.
 - **Acceptance criteria:**
-  - A request to `/` with an English `Accept-Language` lands on `/en`; with a
-    Portuguese one, on `/pt-BR`; with an unsupported language, on `/pt-BR`
+  - A request to `/` with an English `Accept-Language` lands on `/en-US`; with a
+    Portuguese one, on `/pt-BR`; with an unsupported language, on `/en-US`
     (FR-30, FR-31).
   - The switcher's choice survives closing the tab and outranks the header on
     the next visit to `/` (FR-33).
@@ -94,8 +94,8 @@ no value until the project data behind them renders.
     pages are static with `revalidate = 3600` (NFR-01).
   - `Accept-Language` is read to pick a language and never stored (NFR-14).
   - Unit tests: `LocalizedText` rejects over-budget text, unknown locale keys and
-    a missing `pt-BR` entry, and resolving `en` on a field that has only `pt-BR`
-    returns the Portuguese text (FR-34).
+    a missing `en-US` entry, and resolving `pt-BR` on a field that has only
+    `en-US` returns the English text (FR-34).
   - Layout works at 380 px, 760 px and desktop (NFR-04).
 
 ### 3. Hero and stat band from static content
@@ -110,7 +110,7 @@ no value until the project data behind them renders.
   `'use client'` component whose `requestAnimationFrame` loop is cancelled on
   unmount — the prototype never cancels its own, which is precisely what FR-04
   corrects. The pt-BR copy for the illustrative label already exists in the
-  prototype's stat band; only its `en` translation is new. Roadmap 3.3 and 3.8;
+  prototype's stat band; only its `en-US` translation is new. Roadmap 3.3 and 3.8;
   covers FR-01, FR-02, FR-03, FR-04, FR-21, FR-22.
 - **Expected outcome:** The top of the home page is visibly complete in both
   locales — the first thing a visitor sees renders correctly before any
@@ -173,7 +173,7 @@ no value until the project data behind them renders.
   - The modal closes on `Escape` and returns focus to the trigger (NFR-05).
   - Client Components receive resolved `string`s, never `LocalizedText` or raw
     `jsonb` (NFR-13).
-  - A field with no `en` translation renders its `pt-BR` text, not an empty node.
+  - A field with no `pt-BR` translation renders its `en-US` text, not an empty node.
   - Unit tests run the use case against in-memory fakes with no database.
 
 ### 6. Timeline section with featured/full toggle
@@ -226,7 +226,7 @@ Applying the roadmap's own definition of done, at sprint scope:
    `@portfolio/db` and neither the driver nor the connection string appears in
    the client bundle (NFR-02, NFR-03).
 5. Both locales render every shipped section, and untranslated fields fall back
-   to `pt-BR` rather than to blank space (FR-34).
+   to `en-US` rather than to blank space (FR-34).
 6. Responsive at 380 px, 760 px and desktop; modals close on `Escape` and return
    focus to the trigger; Lighthouse accessibility ≥ 95 on the home page
    (NFR-04, NFR-05, NFR-06).
@@ -243,8 +243,8 @@ on it starts.
 | # | Gap | Blocks | Why it is not resolvable yet |
 | --- | --- | --- | --- |
 | U-1 | **The prototype's content is illustrative placeholder — every row of it.** Skills, projects, timeline entries, organizations, dates and usage notes are stand-ins, not the author's real history. | Task 1 | The seed can be written against the schema, but its values are not the deliverable and must not be asserted on. Real content comes from the author's own CV and project history in a later pass. This is why task 1 fixes no row counts: the prototype's 20 `skillData` keys, its 3 projects and its 5 timeline entries carry no authority, and neither do the counts in [roadmap.md](../roadmap.md) and [data-model.md](../domain/data-model.md), which were derived from them. |
-| U-2 | **Four elements of the prototype are covered by no `FR`**: the fixed nav with its section index, the scroll progress bar, the scroll-driven marquee strip, and the closing CTA section that contains the social links. | Tasks 2, 4 | [requirements.md](../requirements.md) enumerates hero, projects, timeline, skills, stat band and footer — the nav, progress bar, strip and CTA copy appear in none of them, while the README treats the prototype as the specification. They are scheduled into tasks 2 and 4 on that basis, but their requirement rows do not exist and their `en` copy has never been written. |
+| U-2 | **Four elements of the prototype are covered by no `FR`**: the fixed nav with its section index, the scroll progress bar, the scroll-driven marquee strip, and the closing CTA section that contains the social links. | Tasks 2, 4 | [requirements.md](../requirements.md) enumerates hero, projects, timeline, skills, stat band and footer — the nav, progress bar, strip and CTA copy appear in none of them, while the README treats the prototype as the specification. They are scheduled into tasks 2 and 4 on that basis, but their requirement rows do not exist and their `en-US` copy has never been written. **Resolved in #3:** all three ship, driven by a section registry each later task appends to; the index renders nothing while that registry is empty. Their copy is authored in `content/`. |
 | U-3 | Source of the availability boolean in FR-02. | Task 3 | The prototype has it as fixed text ("Disponível para novos projetos"), so it offers no boolean. FR-02 requires the text to reflect one, but no column in [data-model.md](../domain/data-model.md) and no `content/` item in [monorepo.md](../architecture/monorepo.md) holds it. |
-| U-4 | `locale` cookie attributes — lifetime, `SameSite`, `Path`. | Task 2 | [stack.md](../architecture/stack.md) requires only that the choice "outlast one page" and survive closing the tab; the concrete values are unspecified. |
+| U-4 | `locale` cookie attributes — lifetime, `SameSite`, `Path`. | Task 2 | [stack.md](../architecture/stack.md) requires only that the choice "outlast one page" and survive closing the tab; the concrete values are unspecified. **Resolved in #3:** one year, `Lax`, `Path=/`, `Secure` outside development, not `HttpOnly`. See `apps/web/src/lib/locale/locale-cookie.ts`. |
 | U-5 | **The per-project decorative visual has no home in the model.** Every card and every project modal in the prototype carries a bespoke SVG — a node grid, concentric rings, a line chart. | Task 5 | No column holds it; [data-model.md](../domain/data-model.md) only acknowledges the absence by listing a media library as a future extension. Because the artwork differs per project, it cannot be derived from `category` the way the orbit's colours are. Either it becomes presentation keyed by `slug`, or it needs a column — a modelling decision no document has taken. |
 | U-6 | The card eyebrow embeds an ordinal — `01 — agendamento`, `02 — automação`. | Task 5 | FR-06 renders `projects.category` as the eyebrow. Storing the number inside it would duplicate `sort_order` in translatable text, so reordering projects would mean editing copy in two locales. Whether the ordinal is derived at render time or is genuinely part of the category is unstated. |

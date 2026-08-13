@@ -11,7 +11,7 @@ implementation **and** verification before the next begins — no phase is
 - The home page and every backend feature behind it.
 - Its subpages — `/projetos` (full project list) and project deep links.
 - The content database: schema, repositories, seed.
-- **Bilingual content** — `pt-BR` and `en`, with the visitor's browser language
+- **Bilingual content** — `en-US` and `pt-BR`, with the visitor's browser language
   choosing between them.
 
 **Out of scope for v1:** telemetry (`/api/v1/events`), an admin interface, and
@@ -70,7 +70,7 @@ content.
 | 1.5 | Indexes and check constraints per [domain/data-model.md](domain/data-model.md) | idem |
 | 1.6 | Migration runner (`pnpm db:migrate`), forward-only, idempotent | `packages/db/src/migrate.ts` |
 | 1.7 | Connection pool, single instance, reused across requests | `packages/db/src/client.ts` |
-| 1.8 | Seed with the prototype's content, `pt-BR` keys populated | `packages/db/src/seed/` |
+| 1.8 | Seed with the prototype's content, `en-US` keys populated | `packages/db/src/seed/` |
 | 1.9 | Row ⇄ entity mappers | `packages/db/src/mappers/` |
 | 1.10 | Repository implementations of the `core` ports | `packages/db/src/repositories/` |
 | 1.11 | CI pipeline: typecheck, unit, integration, build | `.github/workflows/ci.yml` |
@@ -87,7 +87,7 @@ content.
 - Integration tests pass against a real PostgreSQL: every repository method,
   plus the constraints that should reject bad data (`progress_percent = 150`,
   `ended_on` before `started_on`, a `title` over its length budget, an unknown
-  locale key, a localized column missing `pt-BR`).
+  locale key, a localized column missing `en-US`).
 - No file in `packages/db` is imported by anything except `packages/core` types.
 
 ---
@@ -128,9 +128,9 @@ database.
   a test per rejection.
 - `DateRange` rejects `ended_on < started_on`.
 - `LocalizedText` rejects text over the field's budget, unknown locale keys, and
-  a missing `pt-BR` entry — one test per rule (NFR-10, NFR-11).
-- Fallback is tested where it matters: asking for `en` on a field that has only
-  `pt-BR` returns the Portuguese text, not an empty string (FR-34).
+  a missing `en-US` entry — one test per rule (NFR-10, NFR-11).
+- Fallback is tested where it matters: asking for `pt-BR` on a field that has
+  only `en-US` returns the English text, not an empty string (FR-34).
 - `packages/core` imports nothing from `db`, `web`, React, or a driver.
   Verified by inspecting its `package.json`: it has no dependencies.
 
@@ -146,7 +146,7 @@ chosen so that something is visible early and the hardest piece is not last:
 | # | Section | Notes |
 | --- | --- | --- |
 | 3.1 | Layout, tokens, global styles, `[locale]` segment | `tokens.css` from the prototype's `:root` |
-| 3.2 | Locale negotiation in `middleware.ts` + language switcher | `Accept-Language`, cookie, `pt-BR` fallback |
+| 3.2 | Locale negotiation in `proxy.ts` + language switcher | `Accept-Language`, cookie, `en-US` fallback |
 | 3.3 | Hero (server) + canvas field (client) | First `'use client'` boundary |
 | 3.4 | Footer, social links | Smallest end-to-end slice: database → page |
 | 3.5 | Projects section + cards | Data-driven, with modal |
@@ -158,12 +158,12 @@ chosen so that something is visible early and the hardest piece is not last:
 ### Exit criteria
 
 - Every section renders content from the database, not from a literal.
-- Both locales render; a visitor with an English browser lands on `/en` and one
-  with a Portuguese browser on `/pt-BR` (FR-30).
-- An unsupported browser language lands on `/pt-BR` (FR-31).
+- Both locales render; a visitor with an English browser lands on `/en-US` and
+  one with a Portuguese browser on `/pt-BR` (FR-30).
+- An unsupported browser language lands on `/en-US` (FR-31).
 - The switcher's choice survives closing the tab (FR-33).
 - The `/` redirect is not cached across visitors (NFR-12).
-- Static content exists in both `content/pt-BR/` and `content/en/`.
+- Static content exists in both `content/en-US/` and `content/pt-BR/`.
 - No Client Component imports `@portfolio/db`. Verified by inspecting the
   client bundle for the driver.
 - Responsive at 380 px, 760 px and desktop — the prototype's breakpoints.
@@ -224,7 +224,7 @@ Open questions, from [architecture/monorepo.md](architecture/monorepo.md):
   fail loudly at the boundary.
 
 Scaffolding that exists but is empty: `packages/telemetry/`,
-`apps/web/src/app/api/v1/`, `apps/web/src/middleware.ts`. `@portfolio/telemetry`
+`apps/web/src/app/api/v1/`, `apps/web/src/proxy.ts`. `@portfolio/telemetry`
 is deliberately **not** a dependency of `apps/web` until Phase 6 — an empty
 package in the dependency graph breaks the build for no benefit.
 

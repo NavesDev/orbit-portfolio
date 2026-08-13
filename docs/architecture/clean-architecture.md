@@ -63,7 +63,7 @@ src/
 | SVG sanitization | Domain (`IconSvg`) | An icon that can execute script is not a valid icon. Validating on construction means no unsanitized value can exist in memory. |
 | Localized text: length, allowed locales, required default | Domain (`LocalizedText`) | `jsonb` has no length limit, so the guarantee `varchar(n)` used to give must be restored somewhere. The domain is where it belongs; the `CHECK` is the second line. |
 | Resolving which locale to render | Application (`Locale` passed into every use case) | Which language a visitor gets is a request-scoped decision, not a property of a project. |
-| Negotiating `Accept-Language` | Presentation (middleware) | An HTTP concern. The domain never sees a header. |
+| Negotiating `Accept-Language` | Presentation (proxy) | An HTTP concern. The domain never sees a header. |
 | "Only published items are public" | Application | A use-case policy. The domain allows unpublished entities to exist. |
 | Default ordering | Application specifies, Infrastructure executes | The contract is a use-case concern; the `ORDER BY` is a detail. |
 | Skill usage union across two tables | Application (read model) | A projection across aggregates, driven by what the UI shows. |

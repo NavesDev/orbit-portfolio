@@ -8,7 +8,7 @@ import { withScratchDatabase } from '../../helpers/scratch-database.ts';
  */
 const db = withScratchDatabase();
 
-const TITLE = { 'pt-BR': 'Título', en: 'Title' };
+const TITLE = { 'en-US': 'Title', 'pt-BR': 'Título' };
 
 let slugCounter = 0;
 
@@ -78,19 +78,19 @@ describe('projects constraints', () => {
   });
 
   it('rejects a localized value over its length budget', async () => {
-    await expect(insertProject({ title: { 'pt-BR': 'a'.repeat(161) } })).rejects.toThrow(
+    await expect(insertProject({ title: { 'en-US': 'a'.repeat(161) } })).rejects.toThrow(
       /ck_projects__title/,
     );
   });
 
   it('rejects an unknown locale key', async () => {
     await expect(
-      insertProject({ title: { 'pt-BR': 'Título', 'en-US': 'Title' } }),
+      insertProject({ title: { 'en-US': 'Title', en: 'Title' } }),
     ).rejects.toThrow(/ck_projects__title/);
   });
 
-  it('rejects a localized column missing pt-BR', async () => {
-    await expect(insertProject({ title: { en: 'Title' } })).rejects.toThrow(
+  it('rejects a localized column missing en-US', async () => {
+    await expect(insertProject({ title: { 'pt-BR': 'Título' } })).rejects.toThrow(
       /ck_projects__title/,
     );
   });
@@ -105,37 +105,37 @@ describe('projects constraints', () => {
   });
 
   it('rejects a localized value whose entry is not a string', async () => {
-    await expect(insertProject({ title: { 'pt-BR': 42 } })).rejects.toThrow(
+    await expect(insertProject({ title: { 'en-US': 42 } })).rejects.toThrow(
       /ck_projects__title/,
     );
   });
 
-  it('accepts a localized column with only pt-BR', async () => {
-    await expect(insertProject({ title: { 'pt-BR': 'Só português' } })).resolves.toBeTypeOf(
+  it('accepts a localized column with only en-US', async () => {
+    await expect(insertProject({ title: { 'en-US': 'English only' } })).resolves.toBeTypeOf(
       'string',
     );
   });
 
   it('rejects a category over its own, shorter budget', async () => {
-    await expect(insertProject({ category: { 'pt-BR': 'a'.repeat(41) } })).rejects.toThrow(
+    await expect(insertProject({ category: { 'en-US': 'a'.repeat(41) } })).rejects.toThrow(
       /ck_projects__category/,
     );
   });
 
   it('rejects more tags than the budget allows', async () => {
     await expect(
-      insertProject({ tags: { 'pt-BR': Array.from({ length: 9 }, (_, i) => `t${i}`) } }),
+      insertProject({ tags: { 'en-US': Array.from({ length: 9 }, (_, i) => `t${i}`) } }),
     ).rejects.toThrow(/ck_projects__tags/);
   });
 
   it('rejects a tag over its length budget', async () => {
-    await expect(insertProject({ tags: { 'pt-BR': ['a'.repeat(61)] } })).rejects.toThrow(
+    await expect(insertProject({ tags: { 'en-US': ['a'.repeat(61)] } })).rejects.toThrow(
       /ck_projects__tags/,
     );
   });
 
   it('rejects tags that are not arrays', async () => {
-    await expect(insertProject({ tags: { 'pt-BR': 'Java' } })).rejects.toThrow(
+    await expect(insertProject({ tags: { 'en-US': 'Java' } })).rejects.toThrow(
       /ck_projects__tags/,
     );
   });
@@ -177,7 +177,7 @@ describe('timeline_entries constraints', () => {
       insertEntry(
         'kind, title, organization, description, started_on',
         `'professional', $1, 'Sea Tecnologia', $2, '2026-01-10'`,
-        [JSON.stringify(TITLE), JSON.stringify({ 'pt-BR': 'a'.repeat(8001) })],
+        [JSON.stringify(TITLE), JSON.stringify({ 'en-US': 'a'.repeat(8001) })],
       ),
     ).rejects.toThrow(/ck_timeline_entries__description/);
   });
@@ -242,7 +242,7 @@ describe('join table constraints', () => {
         .pool()
         .query(
           'INSERT INTO project_skill (project_id, skill_id, usage_note) VALUES ($1, $2, $3)',
-          [projectId, skillId, JSON.stringify({ 'pt-BR': 'a'.repeat(241) })],
+          [projectId, skillId, JSON.stringify({ 'en-US': 'a'.repeat(241) })],
         ),
     ).rejects.toThrow(/ck_project_skill__usage_note/);
   });

@@ -1,0 +1,32 @@
+/*
+ * The prototype's `:root`, ported.
+ *
+ * Colours and easing are verbatim. The page padding is the one addition: the
+ * prototype repeats `48px` / `24px` as a literal across nine rules, so the
+ * value lives here instead and the breakpoint changes it once.
+ */
+:root {
+  --bg: #fafaf8;
+  --ink: #191918;
+  --ink-soft: #6b6a66;
+  --ink-faint: #a6a49d;
+  --line: rgba(25, 25, 24, 0.1);
+  --line-strong: rgba(25, 25, 24, 0.18);
+  --blue: rgb(37, 106, 191);
+  --blue-soft: rgba(37, 106, 191, 0.1);
+  --blue-line: rgba(37, 106, 191, 0.35);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --pad-x: 48px;
+  --nav-pad-y: 22px;
+  --nav-mark-line: 20px;
+  --nav-height: calc(var(--nav-pad-y) * 2 + var(--nav-mark-line));
+}
+
+/* The prototype's mobile breakpoint. NFR-04's 380px sits inside it. */
+@media (max-width: 760px) {
+  :root {
+    --pad-x: 24px;
+    --nav-pad-y: 18px;
+  }
+}

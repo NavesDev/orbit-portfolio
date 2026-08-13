@@ -68,8 +68,8 @@ describe('seed', () => {
       .pool()
       .query<{ slug: string }>(
         `SELECT slug FROM projects
-          WHERE NOT (title ? 'en') OR NOT (category ? 'en')
-             OR NOT (description ? 'en') OR NOT (tags ? 'en')`,
+          WHERE NOT (title ? 'en-US') OR NOT (category ? 'en-US')
+             OR NOT (description ? 'en-US') OR NOT (tags ? 'en-US')`,
       );
     expect(rows).toEqual([]);
   });
@@ -80,7 +80,7 @@ describe('seed', () => {
       .pool()
       .query<{ organization: string }>(
         `SELECT organization FROM timeline_entries
-          WHERE NOT (title ? 'en') OR NOT (description ? 'en')`,
+          WHERE NOT (title ? 'en-US') OR NOT (description ? 'en-US')`,
       );
     expect(rows).toEqual([]);
   });
@@ -91,7 +91,7 @@ describe('seed', () => {
       .pool()
       .query<{ id: string }>(
         `INSERT INTO projects (slug, title) VALUES ('hand-written', $1) RETURNING id`,
-        [JSON.stringify({ 'pt-BR': 'Escrito à mão' })],
+        [JSON.stringify({ 'en-US': 'Written by hand' })],
       );
 
     await seed(db.pool());
@@ -113,7 +113,7 @@ describe('seed', () => {
   it('resolves a locale with fallback the way the application will', async () => {
     await seed(db.pool());
     const { rows } = await db.pool().query<{ title: string }>(
-      `SELECT coalesce(title ->> 'en', title ->> 'pt-BR') AS title
+      `SELECT coalesce(title ->> 'pt-BR', title ->> 'en-US') AS title
          FROM projects ORDER BY sort_order`,
     );
     expect(rows.every((row) => row.title.trim() !== '')).toBe(true);
