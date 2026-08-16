@@ -26,6 +26,9 @@ importers:
       '@portfolio/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@portfolio/infra':
+        specifier: workspace:*
+        version: link:../../packages/infra
       next:
         specifier: ^16.3.0
         version: 16.3.0(@babel/core@7.29.7)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -72,6 +75,12 @@ importers:
       '@types/pg':
         specifier: ^8.21.0
         version: 8.21.0
+
+  packages/infra:
+    dependencies:
+      '@portfolio/core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/telemetry: {}
 

@@ -9,7 +9,7 @@
     "dev": "pnpm --filter @portfolio/web dev",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
-    "test": "vitest run --passWithNoTests --project core --project web --project db-unit",
+    "test": "vitest run --passWithNoTests --project core --project infra --project web --project db-unit",
     "test:watch": "vitest",
     "test:integration": "vitest run --passWithNoTests --project db",
     "test:e2e": "pnpm --filter @portfolio/web test:e2e",
