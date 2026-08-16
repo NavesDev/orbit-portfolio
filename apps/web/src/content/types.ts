@@ -1,10 +1,6 @@
 import type { Locale } from '@portfolio/core';
 
-export interface StripPhrase {
-  /** A proper noun, identical in both locales (FR-35). */
-  readonly lead: string;
-  readonly rest: string;
-}
+import type { StatId } from './site';
 
 /**
  * The shape both locale modules satisfy.
@@ -15,8 +11,34 @@ export interface StripPhrase {
  * literal-type mismatch on every translated string, which reports the wrong
  * problem.
  */
+/**
+ * The headline, split at the fragment the design sets in italic serif (FR-01).
+ *
+ * Three fields rather than one string with markup in it: copy that carries its
+ * own `<em>` has to be parsed or injected to render, and a translator can
+ * unbalance a tag. Here the emphasis is structural, so neither locale can lose
+ * it.
+ */
+export interface Headline {
+  readonly lead: string;
+  readonly emphasis: string;
+  readonly trail: string;
+}
+
+/**
+ * The two states of the availability badge (FR-02).
+ *
+ * Both phrases exist in both locales at all times, so flipping
+ * `AVAILABLE_FOR_WORK` never leaves a language behind.
+ */
+export interface AvailabilityCopy {
+  readonly open: string;
+  readonly closed: string;
+}
+
 export interface SiteContent {
   readonly nav: {
+    /** The wordmark. A name, so it is the same in both locales (FR-35). */
     readonly mark: string;
     readonly skipToContent: string;
   };
@@ -34,7 +56,26 @@ export interface SiteContent {
      */
     readonly localeNames: Readonly<Record<Locale, string>>;
   };
-  readonly strip: {
-    readonly phrases: readonly StripPhrase[];
+  readonly hero: {
+    readonly availability: AvailabilityCopy;
+    readonly headline: Headline;
+    /** Beside the animated rule at the foot of the hero. */
+    readonly scrollCue: string;
+  };
+  readonly band: {
+    /** Names the band's landmark; the section has no visible heading. */
+    readonly label: string;
+    /**
+     * One label per figure. `Record<StatId, string>` rather than a list, so
+     * adding a stat is a type error in both locales rather than a gap in one.
+     */
+    readonly statLabels: Readonly<Record<StatId, string>>;
+    /**
+     * FR-22 — rendered only while the commit and pull-request counts are
+     * placeholder. With live counts nothing on the band is invented: the
+     * coffee is two cups per day of the year and the years are counted from a
+     * date, so a note claiming otherwise would be the only false thing there.
+     */
+    readonly illustrativeNote: string;
   };
 }

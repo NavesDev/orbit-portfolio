@@ -1,0 +1,19 @@
+/*
+ * The prototype's `.hero-grid` and `#heroField`.
+ *
+ * `pointer-events: none` is what lets the field sit over the whole hero while
+ * the headline underneath stays selectable. The pointer is tracked on
+ * `window`, so the field loses nothing by not receiving events itself.
+ */
+.field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}

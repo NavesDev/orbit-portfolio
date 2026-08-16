@@ -7,7 +7,7 @@ import type { SiteContent } from '../types';
  */
 export const ptBR: SiteContent = {
   nav: {
-    mark: 'DN',
+    mark: 'Davi Naves',
     skipToContent: 'Ir para o conteúdo',
   },
   languageSwitcher: {
@@ -15,12 +15,26 @@ export const ptBR: SiteContent = {
     localeLabels: { 'en-US': 'EN', 'pt-BR': 'PT' },
     localeNames: { 'en-US': 'Inglês (EN)', 'pt-BR': 'Português (PT)' },
   },
-  strip: {
-    phrases: [
-      { lead: 'Next.js', rest: '· React · Node' },
-      { lead: 'UNIP', rest: '· ADS · Brasília' },
-      { lead: 'Claude Code', rest: '· automação' },
-      { lead: 'PostgreSQL', rest: '· APIs REST' },
-    ],
+  hero: {
+    availability: {
+      open: 'Disponível para novos projetos',
+      closed: 'Agenda fechada para novos projetos',
+    },
+    headline: {
+      lead: 'Sistemas que funcionam ',
+      emphasis: 'de verdade',
+      trail: ', não só na demo.',
+    },
+    scrollCue: 'Role para explorar',
+  },
+  band: {
+    label: 'Números',
+    statLabels: {
+      commits: 'commits públicos',
+      pullRequests: 'pull requests abertos',
+      coffee: 'xícaras de café este ano',
+      years: 'anos codando',
+    },
+    illustrativeNote: 'Números ilustrativos — ainda não conectados ao GitHub.',
   },
 };

@@ -1,0 +1,47 @@
+/* The prototype's `.band`, `.band-inner` and `.band-source`. */
+.band {
+  position: relative;
+  padding: 140px var(--pad-x);
+  border-top: 0.5px solid var(--line);
+  border-bottom: 0.5px solid var(--line);
+  overflow: hidden;
+}
+
+.figures {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+/*
+ * `--ink-soft` rather than the prototype's `--ink-faint`, and for a stronger
+ * reason than the scroll cue: this is the FR-22 disclosure. Text that exists to
+ * tell a visitor the numbers above it are not real has to be readable, and
+ * `#a6a49d` at 11px is about 2.3:1 against the page.
+ */
+.note {
+  position: relative;
+  z-index: 2;
+  margin-top: 48px;
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 760px) {
+  .band {
+    padding: 90px var(--pad-x);
+  }
+
+  .figures {
+    justify-content: flex-start;
+    gap: 36px 28px;
+  }
+
+  .note {
+    margin-top: 32px;
+    font-size: 10px;
+  }
+}

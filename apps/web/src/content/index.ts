@@ -14,4 +14,4 @@ export function getContent(locale: Locale): SiteContent {
   return CONTENT[locale];
 }
 
-export type { SiteContent, StripPhrase } from './types';
+export type { SiteContent } from './types';

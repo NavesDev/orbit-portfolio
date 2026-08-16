@@ -1,0 +1,40 @@
+/* The prototype's `.stat`, `.stat .n` and `.stat .l`. */
+.stat {
+  min-width: 140px;
+  text-align: center;
+}
+
+/*
+ * `tabular-nums` is not in the prototype, which never sees the figures change
+ * width: while a figure counts up it passes through 9, 99, 999, and
+ * proportional digits make the whole band twitch sideways as it does.
+ */
+.figure {
+  font-size: clamp(40px, 6vw, 72px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--blue);
+  font-variant-numeric: tabular-nums;
+}
+
+.label {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 760px) {
+  .stat {
+    min-width: calc(50% - 14px);
+  }
+
+  .figure {
+    font-size: clamp(32px, 9vw, 44px);
+  }
+}
+
+@media (max-width: 380px) {
+  .stat {
+    min-width: 100%;
+  }
+}

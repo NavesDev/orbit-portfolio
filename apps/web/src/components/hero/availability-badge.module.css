@@ -1,0 +1,38 @@
+/*
+ * The prototype's `.kicker`, with one addition: the closed state.
+ *
+ * The prototype only ever draws the badge open, so it hardcodes the blue. The
+ * colour is part of what the badge means — blue reads as an invitation — and a
+ * closed agenda drawn in the same blue would contradict its own text.
+ */
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 22px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+}
+
+.badge[data-available='true'] {
+  color: var(--blue);
+}
+
+.icon {
+  display: inline-flex;
+  flex: none;
+}
+
+.icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+@media (max-width: 760px) {
+  .badge {
+    margin-bottom: 16px;
+    font-size: 12px;
+  }
+}
