@@ -1,0 +1,53 @@
+/*
+ * The prototype's `.strip` rules, inherited by what replaced it: same hairline
+ * borders, same overflow clip, so the band still reads as a rule across the
+ * page rather than as a floating illustration.
+ *
+ * The height is set inline, from the same constant the layout positions are
+ * written against — a band whose CSS height disagreed with those would crop
+ * the clouds it is sized for.
+ */
+.band:first-child {
+  margin-top: var(--nav-height);
+}
+
+.band {
+  position: relative;
+  border-top: 0.5px solid var(--line);
+  border-bottom: 0.5px solid var(--line);
+  overflow: hidden;
+}
+
+/*
+ * Each layer spans the band and carries its own drift. `will-change` goes here
+ * rather than on the clouds: three moving elements to promote instead of
+ * thirty, and the clouds inside never move relative to their layer.
+ */
+.layer {
+  position: absolute;
+  inset: 0;
+  color: var(--blue);
+  will-change: transform;
+}
+
+.repeat {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+.cloud {
+  position: absolute;
+  height: auto;
+}
+
+/*
+ * A layer's transform is an inline style driven by scroll position, so only
+ * `!important` can override it from here. A visitor who asked for less motion
+ * gets a still sky rather than one sliding under them.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .layer {
+    transform: none !important;
+  }
+}
