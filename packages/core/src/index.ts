@@ -31,3 +31,14 @@ export {
   type LocalizedTextViolation,
 } from './domain/errors/invalid-localized-text-error.ts';
 export { LocalizedText } from './domain/value-objects/localized-text.ts';
+export { ApplicationError } from './application/errors/application-error.ts';
+export { DeveloperStatsUnavailableError } from './application/errors/developer-stats-unavailable-error.ts';
+export type {
+  DeveloperStats,
+  DeveloperStatsProvider,
+} from './application/ports/developer-stats-provider.ts';
+export {
+  GetDeveloperStats,
+  type GetDeveloperStatsInput,
+  type GetDeveloperStatsOutput,
+} from './application/use-cases/stats/get-developer-stats.ts';
