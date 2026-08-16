@@ -9,6 +9,7 @@ pnpm workspaces. **One deployable**, three shared packages.
 ├── packages/
 │   ├── core/                   Portfolio domain + application (framework-free)
 │   ├── db/                     Portfolio persistence: migrations, repositories
+│   ├── infra/                  Adapters to systems we do not run (GitHub)
 │   └── telemetry/              Access counting and audit — self-contained
 ├── docs/
 ├── package.json                Workspace root
@@ -71,16 +72,18 @@ apps/web/
     │           └── health/
     │               └── route.ts
     ├── components/
-    │   ├── hero/
+    │   ├── hero/               Headline, availability badge, particle field
+    │   ├── band/               Stat band — figures, labels, drifting grid
     │   ├── projects/
     │   ├── timeline/
     │   ├── skills/             Orbit canvas + skill modal
     │   ├── footer/
     │   └── ui/
     ├── content/                Static copy, one folder per locale
+    │   ├── site.ts             Locale-independent facts — availability, figures
     │   ├── pt-BR/              headline, tagline, stat band labels
-    │   └── en/
-    ├── lib/                    Composition root — wires packages into use cases
+    │   └── en-US/
+    ├── lib/                    Composition root — reads env, wires adapters into use cases
     └── styles/
 ```
 
@@ -89,6 +92,12 @@ not persisted — headline, tagline, years coding, stat band. Typed TypeScript,
 not a CMS: changing the hero copy is a commit. One folder per locale, with the
 same module shape in each, so a missing translation is a type error rather than
 a blank space.
+
+`site.ts` sits beside those folders and holds what is *not* copy: the
+availability boolean behind FR-02, the illustrative stat figures, and the month
+that `years coding` is counted from. None of it translates, and duplicating it
+into each locale would make it possible for the two to disagree about a fact
+rather than about a wording.
 
 ### The HTTP surface
 
@@ -163,6 +172,24 @@ packages/db/src/
 ├── mappers/                    Row ⇄ entity
 └── seed/                       Prototype content as seed rows
 ```
+
+## `packages/infra`
+
+The `providers/` and `config/` half of the Infrastructure layer: adapters to
+systems this project does not run. Sibling to `packages/db`, never imported by
+it, and it imports only `@portfolio/core`.
+
+```
+packages/infra/src/
+├── providers/
+│   └── github/                 DeveloperStatsProvider over the search API
+└── constants/                  Names of the environment variables read
+```
+
+One folder per external system. The package reads no environment itself: the
+composition root in `apps/web/src/lib/` reads the variables and passes values
+to a constructor, which is what lets the adapter be tested without setting a
+secret.
 
 ## `packages/telemetry` — Phase 6, empty
 

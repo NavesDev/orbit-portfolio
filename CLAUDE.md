@@ -63,14 +63,15 @@ preview, not in CI.
 
 ## Architecture
 
-One deployable (`apps/web` on Vercel), three packages, dependencies pointing
-inward: `web → core ← db`.
+One deployable (`apps/web` on Vercel), four packages, dependencies pointing
+inward: `web → core ← db`, `web → core ← infra`.
 
 | Package | Holds | May import |
 | --- | --- | --- |
 | `@portfolio/core` | Domain entities, value objects, enums, errors; application ports, use cases, DTOs | **Nothing.** Zero runtime dependencies, no framework, no driver. |
 | `@portfolio/db` | Migrations, repositories, mappers, seed | `core` |
-| `@portfolio/web` | Pages, components, static copy, composition root | `core`, `db` |
+| `@portfolio/infra` | Adapters to systems we do not run — `providers/`, `config/`. GitHub stats today | `core`. **Never `db`, and `db` never imports it.** |
+| `@portfolio/web` | Pages, components, static copy, composition root | `core`, `db`, `infra` |
 | `@portfolio/telemetry` | Access counting — self-contained, **deferred to Phase 6** | `core` conventions, nothing else. Deliberately not yet a dependency of `web`. |
 
 `docs/architecture/clean-architecture.md` draws the layer map as one `src/`
