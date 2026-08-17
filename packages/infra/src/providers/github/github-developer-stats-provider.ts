@@ -1,7 +1,7 @@
 import type { DeveloperStats, DeveloperStatsProvider } from '@portfolio/core';
 import { DeveloperStatsUnavailableError } from '@portfolio/core';
 
-import * as API from '../../constants/github-api.ts';
+import * as GITHUB_API_CONSTANTS from '../../constants/github-api.ts';
 
 export interface GitHubStatsConfig {
   /** The account the figures are counted for. */
@@ -67,14 +67,14 @@ export class GitHubDeveloperStatsProvider implements DeveloperStatsProvider {
     private readonly config: GitHubStatsConfig,
     private readonly fetchImpl: FetchLike = fetch,
   ) {
-    this.baseUrl = config.apiBaseUrl ?? API.GITHUB_API_BASE_URL;
-    this.timeoutMs = config.timeoutMs ?? API.DEFAULT_TIMEOUT_MS;
+    this.baseUrl = config.apiBaseUrl ?? GITHUB_API_CONSTANTS.GITHUB_API_BASE_URL;
+    this.timeoutMs = config.timeoutMs ?? GITHUB_API_CONSTANTS.DEFAULT_TIMEOUT_MS;
   }
 
   async fetchStats(): Promise<DeveloperStats> {
     const [publicCommits, pullRequests] = await Promise.all([
-      this.count(API.COMMIT_SEARCH_PATH, `author:${this.config.login}`),
-      this.count(API.ISSUE_SEARCH_PATH, `author:${this.config.login} type:pr`),
+      this.count(GITHUB_API_CONSTANTS.COMMIT_SEARCH_PATH, `author:${this.config.login}`),
+      this.count(GITHUB_API_CONSTANTS.ISSUE_SEARCH_PATH, `author:${this.config.login} type:pr`),
     ]);
 
     return { publicCommits, pullRequests };
@@ -84,7 +84,7 @@ export class GitHubDeveloperStatsProvider implements DeveloperStatsProvider {
     const url = new URL(path, this.baseUrl);
 
     url.searchParams.set('q', query);
-    url.searchParams.set('per_page', API.SMALLEST_PAGE);
+    url.searchParams.set('per_page', GITHUB_API_CONSTANTS.SMALLEST_PAGE);
 
     const response = await this.request(url.toString());
 
@@ -112,9 +112,9 @@ export class GitHubDeveloperStatsProvider implements DeveloperStatsProvider {
       return await this.fetchImpl(url, {
         signal: AbortSignal.timeout(this.timeoutMs),
         headers: {
-          Accept: API.ACCEPT,
-          'User-Agent': API.USER_AGENT,
-          'X-GitHub-Api-Version': API.API_VERSION,
+          Accept: GITHUB_API_CONSTANTS.ACCEPT,
+          'User-Agent': GITHUB_API_CONSTANTS.USER_AGENT,
+          'X-GitHub-Api-Version': GITHUB_API_CONSTANTS.API_VERSION,
           ...(this.config.token === undefined
             ? {}
             : { Authorization: `Bearer ${this.config.token}` }),

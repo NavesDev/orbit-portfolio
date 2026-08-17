@@ -4,7 +4,7 @@ import { useScrollOffset } from '../../hooks/use-scroll';
 import { Cloud, CloudSprite } from './cloud';
 import styles from './cloud-drift.module.css';
 import type { Layer } from './constants/sky';
-import * as SKY from './constants/sky';
+import * as SKY_CONSTANTS from './constants/sky';
 
 /**
  * Where a layer sits after drifting, wrapped into a single repeat.
@@ -14,12 +14,12 @@ import * as SKY from './constants/sky';
  * exactly what the first version did once the page was scrolled past the hero.
  */
 export function driftOf(offset: number, depth: number): number {
-  return -((offset * SKY.SCROLL_TRANSLATION_FACTOR * depth) % SKY.LAYER_WIDTH);
+  return -((offset * SKY_CONSTANTS.SCROLL_TRANSLATION_FACTOR * depth) % SKY_CONSTANTS.LAYER_WIDTH);
 }
 
 function Repeat({ layer, at }: { readonly layer: Layer; readonly at: number }) {
   return (
-    <div className={styles.repeat} style={{ left: `${at * SKY.LAYER_WIDTH}px` }}>
+    <div className={styles.repeat} style={{ left: `${at * SKY_CONSTANTS.LAYER_WIDTH}px` }}>
       {layer.clouds.map((cloud) => (
         <Cloud
           key={cloud.id}
@@ -55,10 +55,14 @@ export function CloudDrift() {
   const offset = useScrollOffset();
 
   return (
-    <div className={styles.band} style={{ height: `${SKY.BAND_HEIGHT}px` }} aria-hidden="true">
+    <div
+      className={styles.band}
+      style={{ height: `${SKY_CONSTANTS.BAND_HEIGHT}px` }}
+      aria-hidden="true"
+    >
       <CloudSprite />
 
-      {SKY.LAYERS.map((layer) => (
+      {SKY_CONSTANTS.LAYERS.map((layer) => (
         <div
           key={layer.id}
           className={styles.layer}
@@ -67,7 +71,7 @@ export function CloudDrift() {
             transform: `translateX(${driftOf(offset, layer.depth)}px)`,
           }}
         >
-          {Array.from({ length: SKY.LAYER_COPIES }, (unusedValue, copy) => (
+          {Array.from({ length: SKY_CONSTANTS.LAYER_COPIES }, (unusedValue, copy) => (
             <Repeat key={`${layer.id}-${String(copy)}`} layer={layer} at={copy} />
           ))}
         </div>

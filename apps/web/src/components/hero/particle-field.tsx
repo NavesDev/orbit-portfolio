@@ -6,7 +6,7 @@ import { REDUCED_MOTION_QUERY } from '../../constants/media-queries';
 import { drawField } from '../../lib/particles/draw';
 import type { Dot, FieldSize, Pointer } from '../../lib/particles/field';
 import { buildDots, stepDots } from '../../lib/particles/field';
-import * as CANVAS from './constants/particle-field';
+import * as CANVAS_CONSTANTS from './constants/particle-field';
 import styles from './particle-field.module.css';
 
 function sizeCanvas(canvas: HTMLCanvasElement, size: FieldSize): CanvasRenderingContext2D | null {
@@ -17,8 +17,8 @@ function sizeCanvas(canvas: HTMLCanvasElement, size: FieldSize): CanvasRendering
   }
 
   const ratio = Math.min(
-    window.devicePixelRatio || CANVAS.DEFAULT_PIXEL_RATIO,
-    CANVAS.MAX_PIXEL_RATIO,
+    window.devicePixelRatio || CANVAS_CONSTANTS.DEFAULT_PIXEL_RATIO,
+    CANVAS_CONSTANTS.MAX_PIXEL_RATIO,
   );
 
   canvas.width = size.width * ratio;
@@ -27,11 +27,11 @@ function sizeCanvas(canvas: HTMLCanvasElement, size: FieldSize): CanvasRendering
   canvas.style.height = `${size.height}px`;
   context.setTransform(
     ratio,
-    CANVAS.NO_SKEW,
-    CANVAS.NO_SKEW,
+    CANVAS_CONSTANTS.NO_SKEW,
+    CANVAS_CONSTANTS.NO_SKEW,
     ratio,
-    CANVAS.CANVAS_ORIGIN,
-    CANVAS.CANVAS_ORIGIN,
+    CANVAS_CONSTANTS.CANVAS_ORIGIN,
+    CANVAS_CONSTANTS.CANVAS_ORIGIN,
   );
 
   return context;
@@ -76,7 +76,7 @@ export function ParticleField() {
 
     const host = canvas.parentElement ?? canvas;
     let dots: Dot[] = [];
-    let size: FieldSize = CANVAS.EMPTY_SIZE;
+    let size: FieldSize = CANVAS_CONSTANTS.EMPTY_SIZE;
     let context: CanvasRenderingContext2D | null = null;
     let frame: number | null = null;
     let resizeTimer: ReturnType<typeof setTimeout> | null = null;
@@ -139,7 +139,7 @@ export function ParticleField() {
         clearTimeout(resizeTimer);
       }
 
-      resizeTimer = setTimeout(build, CANVAS.RESIZE_SETTLE_MS);
+      resizeTimer = setTimeout(build, CANVAS_CONSTANTS.RESIZE_SETTLE_MS);
     }
 
     build();
@@ -153,7 +153,7 @@ export function ParticleField() {
     const wantsReducedMotion = window.matchMedia(REDUCED_MOTION_QUERY).matches;
 
     if (wantsReducedMotion) {
-      paint(CANVAS.FIRST_FRAME_MS);
+      paint(CANVAS_CONSTANTS.FIRST_FRAME_MS);
     } else {
       window.addEventListener('mousemove', handleMouseMove, { passive: true });
       window.addEventListener('touchmove', handleTouchMove, { passive: true });

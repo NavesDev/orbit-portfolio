@@ -8,7 +8,7 @@
  * `constants/paint.ts`.
  */
 
-import * as PAINT from './constants/paint';
+import * as PAINT_CONSTANTS from './constants/paint';
 import type { Dot, FieldSize, Pointer } from './field';
 import { linkDistanceFor, proximityAt } from './field';
 
@@ -17,9 +17,15 @@ function distanceToPointer(x: number, y: number, pointer: Pointer): number {
 }
 
 function colourAt(proximity: number, alpha: number): string {
-  const red = Math.round(PAINT.BASE_COLOUR.red + proximity * PAINT.PROXIMITY_COLOUR_SHIFT.red);
-  const green = Math.round(PAINT.BASE_COLOUR.green + proximity * PAINT.PROXIMITY_COLOUR_SHIFT.green);
-  const blue = Math.round(PAINT.BASE_COLOUR.blue + proximity * PAINT.PROXIMITY_COLOUR_SHIFT.blue);
+  const red = Math.round(
+    PAINT_CONSTANTS.BASE_COLOUR.red + proximity * PAINT_CONSTANTS.PROXIMITY_COLOUR_SHIFT.red,
+  );
+  const green = Math.round(
+    PAINT_CONSTANTS.BASE_COLOUR.green + proximity * PAINT_CONSTANTS.PROXIMITY_COLOUR_SHIFT.green,
+  );
+  const blue = Math.round(
+    PAINT_CONSTANTS.BASE_COLOUR.blue + proximity * PAINT_CONSTANTS.PROXIMITY_COLOUR_SHIFT.blue,
+  );
 
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
@@ -32,7 +38,7 @@ function drawLinks(
 ): void {
   const linkDistance = linkDistanceFor(size);
 
-  for (let i = PAINT.ORIGIN; i < dots.length; i += 1) {
+  for (let i = PAINT_CONSTANTS.ORIGIN; i < dots.length; i += 1) {
     const a = dots[i];
 
     if (a === undefined) {
@@ -52,17 +58,20 @@ function drawLinks(
         continue;
       }
 
-      const midX = (a.x + b.x) / PAINT.MIDPOINT_DIVISOR;
-      const midY = (a.y + b.y) / PAINT.MIDPOINT_DIVISOR;
+      const midX = (a.x + b.x) / PAINT_CONSTANTS.MIDPOINT_DIVISOR;
+      const midY = (a.y + b.y) / PAINT_CONSTANTS.MIDPOINT_DIVISOR;
       const proximity =
-        pointer === null ? PAINT.NO_PROXIMITY : proximityAt(distanceToPointer(midX, midY, pointer));
+        pointer === null
+          ? PAINT_CONSTANTS.NO_PROXIMITY
+          : proximityAt(distanceToPointer(midX, midY, pointer));
       const alpha = Math.min(
-        PAINT.LINK_MAX_ALPHA,
-        (PAINT.FULL_LINK_STRENGTH - distance / linkDistance) * PAINT.LINK_BASE_ALPHA +
-          proximity * PAINT.LINK_PROXIMITY_ALPHA,
+        PAINT_CONSTANTS.LINK_MAX_ALPHA,
+        (PAINT_CONSTANTS.FULL_LINK_STRENGTH - distance / linkDistance) *
+          PAINT_CONSTANTS.LINK_BASE_ALPHA +
+          proximity * PAINT_CONSTANTS.LINK_PROXIMITY_ALPHA,
       );
 
-      if (alpha < PAINT.LINK_MIN_VISIBLE_ALPHA) {
+      if (alpha < PAINT_CONSTANTS.LINK_MIN_VISIBLE_ALPHA) {
         continue;
       }
 
@@ -70,7 +79,7 @@ function drawLinks(
       context.moveTo(a.x, a.y);
       context.lineTo(b.x, b.y);
       context.strokeStyle = colourAt(proximity, alpha);
-      context.lineWidth = PAINT.LINK_WIDTH;
+      context.lineWidth = PAINT_CONSTANTS.LINK_WIDTH;
       context.stroke();
     }
   }
@@ -84,21 +93,27 @@ function drawNodes(
 ): void {
   for (const dot of dots) {
     const proximity =
-      pointer === null ? PAINT.NO_PROXIMITY : proximityAt(distanceToPointer(dot.x, dot.y, pointer));
+      pointer === null
+        ? PAINT_CONSTANTS.NO_PROXIMITY
+        : proximityAt(distanceToPointer(dot.x, dot.y, pointer));
     const breathe =
-      Math.sin(elapsedMs * PAINT.BREATHE_RATE + dot.pulse) * PAINT.BREATHE_AMPLITUDE + PAINT.BREATHE_OFFSET;
+      Math.sin(elapsedMs * PAINT_CONSTANTS.BREATHE_RATE + dot.pulse) *
+        PAINT_CONSTANTS.BREATHE_AMPLITUDE +
+      PAINT_CONSTANTS.BREATHE_OFFSET;
     const alpha = Math.min(
-      PAINT.NODE_MAX_ALPHA,
-      PAINT.NODE_BASE_ALPHA + proximity * PAINT.NODE_PROXIMITY_ALPHA + breathe * PAINT.NODE_BREATHE_ALPHA,
+      PAINT_CONSTANTS.NODE_MAX_ALPHA,
+      PAINT_CONSTANTS.NODE_BASE_ALPHA +
+        proximity * PAINT_CONSTANTS.NODE_PROXIMITY_ALPHA +
+        breathe * PAINT_CONSTANTS.NODE_BREATHE_ALPHA,
     );
 
     context.beginPath();
     context.arc(
       dot.x,
       dot.y,
-      PAINT.NODE_BASE_RADIUS + proximity * PAINT.NODE_PROXIMITY_RADIUS,
-      PAINT.ARC_START_RADIANS,
-      PAINT.FULL_ARC_RADIANS,
+      PAINT_CONSTANTS.NODE_BASE_RADIUS + proximity * PAINT_CONSTANTS.NODE_PROXIMITY_RADIUS,
+      PAINT_CONSTANTS.ARC_START_RADIANS,
+      PAINT_CONSTANTS.FULL_ARC_RADIANS,
     );
     context.fillStyle = colourAt(proximity, alpha);
     context.fill();
@@ -113,7 +128,7 @@ export function drawField(
   size: FieldSize,
   elapsedMs: number,
 ): void {
-  context.clearRect(PAINT.ORIGIN, PAINT.ORIGIN, size.width, size.height);
+  context.clearRect(PAINT_CONSTANTS.ORIGIN, PAINT_CONSTANTS.ORIGIN, size.width, size.height);
   drawLinks(context, dots, pointer, size);
   drawNodes(context, dots, pointer, elapsedMs);
 }

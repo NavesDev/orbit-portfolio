@@ -16,7 +16,7 @@
  * kind of garbage that shows up as jank.
  */
 
-import * as FIELD from './constants/field';
+import * as FIELD_CONSTANTS from './constants/field';
 
 export { POINTER_RADIUS } from './constants/field';
 
@@ -44,41 +44,48 @@ export type Pointer = { readonly x: number; readonly y: number } | null;
 export type Random = () => number;
 
 export function spacingFor(size: FieldSize): number {
-  return size.width < FIELD.NARROW_VIEWPORT_WIDTH ? FIELD.SPACING_NARROW : FIELD.SPACING_WIDE;
+  return size.width < FIELD_CONSTANTS.NARROW_VIEWPORT_WIDTH
+    ? FIELD_CONSTANTS.SPACING_NARROW
+    : FIELD_CONSTANTS.SPACING_WIDE;
 }
 
 export function linkDistanceFor(size: FieldSize): number {
-  return size.width < FIELD.NARROW_VIEWPORT_WIDTH ? FIELD.LINK_DISTANCE_NARROW : FIELD.LINK_DISTANCE_WIDE;
+  return size.width < FIELD_CONSTANTS.NARROW_VIEWPORT_WIDTH
+    ? FIELD_CONSTANTS.LINK_DISTANCE_NARROW
+    : FIELD_CONSTANTS.LINK_DISTANCE_WIDE;
 }
 
 /**
  * Lays a jittered, staggered grid of dots over the field.
  *
- * One extra column and row beyond the edge (`FIELD.EDGE_OVERSHOOT`): without it the
+ * One extra column and row beyond the edge (`FIELD_CONSTANTS.EDGE_OVERSHOOT`): without it the
  * jitter can pull the last dots inward and leave a visible bare margin.
  */
 export function buildDots(size: FieldSize, random: Random): Dot[] {
   const spacing = spacingFor(size);
-  const jitter = spacing * FIELD.JITTER_RATIO;
-  const columns = Math.ceil(size.width / spacing) + FIELD.EDGE_OVERSHOOT;
-  const rows = Math.ceil(size.height / spacing) + FIELD.EDGE_OVERSHOOT;
+  const jitter = spacing * FIELD_CONSTANTS.JITTER_RATIO;
+  const columns = Math.ceil(size.width / spacing) + FIELD_CONSTANTS.EDGE_OVERSHOOT;
+  const rows = Math.ceil(size.height / spacing) + FIELD_CONSTANTS.EDGE_OVERSHOOT;
   const dots: Dot[] = [];
 
-  for (let column = FIELD.ORIGIN; column < columns; column += 1) {
-    for (let row = FIELD.ORIGIN; row < rows; row += 1) {
+  for (let column = FIELD_CONSTANTS.ORIGIN; column < columns; column += 1) {
+    for (let row = FIELD_CONSTANTS.ORIGIN; row < rows; row += 1) {
       const stagger =
-        row % FIELD.ROW_PARITY === FIELD.STAGGERED_ROW_REMAINDER ? spacing / FIELD.ROW_OFFSET_DIVISOR : FIELD.ORIGIN;
-      const originX = column * spacing + stagger + (random() - FIELD.JITTER_CENTRE) * jitter;
-      const originY = row * spacing + (random() - FIELD.JITTER_CENTRE) * jitter;
+        row % FIELD_CONSTANTS.ROW_PARITY === FIELD_CONSTANTS.STAGGERED_ROW_REMAINDER
+          ? spacing / FIELD_CONSTANTS.ROW_OFFSET_DIVISOR
+          : FIELD_CONSTANTS.ORIGIN;
+      const originX =
+        column * spacing + stagger + (random() - FIELD_CONSTANTS.JITTER_CENTRE) * jitter;
+      const originY = row * spacing + (random() - FIELD_CONSTANTS.JITTER_CENTRE) * jitter;
 
       dots.push({
         originX,
         originY,
         x: originX,
         y: originY,
-        vx: FIELD.ORIGIN,
-        vy: FIELD.ORIGIN,
-        pulse: random() * FIELD.FULL_TURN_RADIANS,
+        vx: FIELD_CONSTANTS.ORIGIN,
+        vy: FIELD_CONSTANTS.ORIGIN,
+        pulse: random() * FIELD_CONSTANTS.FULL_TURN_RADIANS,
       });
     }
   }
@@ -92,7 +99,10 @@ export function buildDots(size: FieldSize, random: Random): Dot[] {
  * nodes, which is why it is exported rather than kept to the physics.
  */
 export function proximityAt(distance: number): number {
-  return Math.max(FIELD.ORIGIN, FIELD.FULL_PROXIMITY - distance / FIELD.POINTER_RADIUS);
+  return Math.max(
+    FIELD_CONSTANTS.ORIGIN,
+    FIELD_CONSTANTS.FULL_PROXIMITY - distance / FIELD_CONSTANTS.POINTER_RADIUS,
+  );
 }
 
 /**
@@ -106,18 +116,18 @@ export function stepDots(dots: readonly Dot[], pointer: Pointer): void {
       const dy = dot.y - pointer.y;
       const distance = Math.hypot(dx, dy);
 
-      if (distance < FIELD.POINTER_RADIUS && distance > FIELD.ORIGIN) {
-        const force = proximityAt(distance) * FIELD.REPULSION_STRENGTH;
+      if (distance < FIELD_CONSTANTS.POINTER_RADIUS && distance > FIELD_CONSTANTS.ORIGIN) {
+        const force = proximityAt(distance) * FIELD_CONSTANTS.REPULSION_STRENGTH;
 
-        dot.vx += (dx / distance) * force * FIELD.REPULSION_SCALE;
-        dot.vy += (dy / distance) * force * FIELD.REPULSION_SCALE;
+        dot.vx += (dx / distance) * force * FIELD_CONSTANTS.REPULSION_SCALE;
+        dot.vy += (dy / distance) * force * FIELD_CONSTANTS.REPULSION_SCALE;
       }
     }
 
-    dot.vx += (dot.originX - dot.x) * FIELD.SPRING_STIFFNESS;
-    dot.vy += (dot.originY - dot.y) * FIELD.SPRING_STIFFNESS;
-    dot.vx *= FIELD.DAMPING;
-    dot.vy *= FIELD.DAMPING;
+    dot.vx += (dot.originX - dot.x) * FIELD_CONSTANTS.SPRING_STIFFNESS;
+    dot.vy += (dot.originY - dot.y) * FIELD_CONSTANTS.SPRING_STIFFNESS;
+    dot.vx *= FIELD_CONSTANTS.DAMPING;
+    dot.vy *= FIELD_CONSTANTS.DAMPING;
     dot.x += dot.vx;
     dot.y += dot.vy;
   }
@@ -125,5 +135,5 @@ export function stepDots(dots: readonly Dot[], pointer: Pointer): void {
 
 /** Whether the field has stopped moving — what "settles back to rest" means in FR-03. */
 export function isAtRest(dots: readonly Dot[]): boolean {
-  return dots.every((dot) => Math.hypot(dot.vx, dot.vy) < FIELD.AT_REST_VELOCITY);
+  return dots.every((dot) => Math.hypot(dot.vx, dot.vy) < FIELD_CONSTANTS.AT_REST_VELOCITY);
 }

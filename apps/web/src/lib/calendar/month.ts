@@ -1,4 +1,4 @@
-import * as CALENDAR from './constants/calendar';
+import * as CALENDAR_CONSTANTS from './constants/calendar';
 
 /**
  * Calendar arithmetic the stat band counts two of its figures with.
@@ -8,7 +8,7 @@ import * as CALENDAR from './constants/calendar';
  */
 export { MONTH } from './constants/calendar';
 
-export type MonthNumber = (typeof CALENDAR.MONTH)[keyof typeof CALENDAR.MONTH];
+export type MonthNumber = (typeof CALENDAR_CONSTANTS.MONTH)[keyof typeof CALENDAR_CONSTANTS.MONTH];
 
 /** A point on the calendar no finer than a month — a start date nobody recalls to the day. */
 export interface CalendarMonth {
@@ -27,11 +27,11 @@ export function dayOfYear(now: Date): number {
   const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
   const yearStart = Date.UTC(
     now.getFullYear(),
-    CALENDAR.FIRST_MONTH_INDEX,
-    CALENDAR.FIRST_DAY_OF_MONTH,
+    CALENDAR_CONSTANTS.FIRST_MONTH_INDEX,
+    CALENDAR_CONSTANTS.FIRST_DAY_OF_MONTH,
   );
 
-  return (today - yearStart) / CALENDAR.MS_PER_DAY + CALENDAR.FIRST_DAY_OF_YEAR;
+  return (today - yearStart) / CALENDAR_CONSTANTS.MS_PER_DAY + CALENDAR_CONSTANTS.FIRST_DAY_OF_YEAR;
 }
 
 /**
@@ -46,10 +46,10 @@ export function dayOfYear(now: Date): number {
  * clock.
  */
 export function fullYearsSince(start: CalendarMonth, now: Date): number {
-  const startMonths = start.year * CALENDAR.MONTHS_PER_YEAR + start.month;
-  const nowMonths = now.getFullYear() * CALENDAR.MONTHS_PER_YEAR + (now.getMonth() + 1);
+  const startMonths = start.year * CALENDAR_CONSTANTS.MONTHS_PER_YEAR + start.month;
+  const nowMonths = now.getFullYear() * CALENDAR_CONSTANTS.MONTHS_PER_YEAR + (now.getMonth() + 1);
 
-  const elapsed = Math.floor((nowMonths - startMonths) / CALENDAR.MONTHS_PER_YEAR);
+  const elapsed = Math.floor((nowMonths - startMonths) / CALENDAR_CONSTANTS.MONTHS_PER_YEAR);
 
-  return Math.max(CALENDAR.NO_ELAPSED_TIME, elapsed);
+  return Math.max(CALENDAR_CONSTANTS.NO_ELAPSED_TIME, elapsed);
 }

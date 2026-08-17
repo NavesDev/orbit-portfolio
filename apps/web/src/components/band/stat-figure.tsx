@@ -7,7 +7,7 @@ import { REDUCED_MOTION_QUERY } from '../../constants/media-queries';
 import { useHasBeenInView } from '../../hooks/use-in-view';
 import { COUNT_UP_INTERVAL_MS, figureAtStep, isCountComplete } from '../../lib/stats/count-up';
 import { Skeleton } from '../ui/skeleton';
-import * as FIGURE from './constants/stat-figure';
+import * as FIGURE_CONSTANTS from './constants/stat-figure';
 import styles from './stat-figure.module.css';
 
 function wantsReducedMotion(): boolean {
@@ -29,8 +29,8 @@ function MissingFigure({ label }: { readonly label: string }) {
   return (
     <div className={styles.missing}>
       <Skeleton
-        width={FIGURE.MISSING_FIGURE_WIDTH}
-        height={FIGURE.MISSING_FIGURE_HEIGHT}
+        width={FIGURE_CONSTANTS.MISSING_FIGURE_WIDTH}
+        height={FIGURE_CONSTANTS.MISSING_FIGURE_HEIGHT}
         label={label}
       />
     </div>
@@ -70,11 +70,11 @@ export function StatFigure({
       return;
     }
 
-    setStep(FIGURE.FIRST_STEP);
+    setStep(FIGURE_CONSTANTS.FIRST_STEP);
 
     const timer = setInterval(() => {
       setStep((current) => {
-        const next = (current ?? FIGURE.FIRST_STEP) + FIGURE.NEXT_STEP;
+        const next = (current ?? FIGURE_CONSTANTS.FIRST_STEP) + FIGURE_CONSTANTS.NEXT_STEP;
 
         if (isCountComplete(next)) {
           clearInterval(timer);
