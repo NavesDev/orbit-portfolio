@@ -1,16 +1,7 @@
 import type { DeveloperStats, DeveloperStatsProvider } from '@portfolio/core';
 import { DeveloperStatsUnavailableError } from '@portfolio/core';
 
-import {
-  ACCEPT,
-  API_VERSION,
-  COMMIT_SEARCH_PATH,
-  DEFAULT_TIMEOUT_MS,
-  GITHUB_API_BASE_URL,
-  ISSUE_SEARCH_PATH,
-  SMALLEST_PAGE,
-  USER_AGENT,
-} from '../../constants/github-api.ts';
+import * as API from '../../constants/github-api.ts';
 
 export interface GitHubStatsConfig {
   /** The account the figures are counted for. */
@@ -76,14 +67,14 @@ export class GitHubDeveloperStatsProvider implements DeveloperStatsProvider {
     private readonly config: GitHubStatsConfig,
     private readonly fetchImpl: FetchLike = fetch,
   ) {
-    this.baseUrl = config.apiBaseUrl ?? GITHUB_API_BASE_URL;
-    this.timeoutMs = config.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+    this.baseUrl = config.apiBaseUrl ?? API.GITHUB_API_BASE_URL;
+    this.timeoutMs = config.timeoutMs ?? API.DEFAULT_TIMEOUT_MS;
   }
 
   async fetchStats(): Promise<DeveloperStats> {
     const [publicCommits, pullRequests] = await Promise.all([
-      this.count(COMMIT_SEARCH_PATH, `author:${this.config.login}`),
-      this.count(ISSUE_SEARCH_PATH, `author:${this.config.login} type:pr`),
+      this.count(API.COMMIT_SEARCH_PATH, `author:${this.config.login}`),
+      this.count(API.ISSUE_SEARCH_PATH, `author:${this.config.login} type:pr`),
     ]);
 
     return { publicCommits, pullRequests };
@@ -93,7 +84,7 @@ export class GitHubDeveloperStatsProvider implements DeveloperStatsProvider {
     const url = new URL(path, this.baseUrl);
 
     url.searchParams.set('q', query);
-    url.searchParams.set('per_page', SMALLEST_PAGE);
+    url.searchParams.set('per_page', API.SMALLEST_PAGE);
 
     const response = await this.request(url.toString());
 
@@ -121,9 +112,9 @@ export class GitHubDeveloperStatsProvider implements DeveloperStatsProvider {
       return await this.fetchImpl(url, {
         signal: AbortSignal.timeout(this.timeoutMs),
         headers: {
-          Accept: ACCEPT,
-          'User-Agent': USER_AGENT,
-          'X-GitHub-Api-Version': API_VERSION,
+          Accept: API.ACCEPT,
+          'User-Agent': API.USER_AGENT,
+          'X-GitHub-Api-Version': API.API_VERSION,
           ...(this.config.token === undefined
             ? {}
             : { Authorization: `Bearer ${this.config.token}` }),
