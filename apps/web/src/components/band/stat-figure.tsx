@@ -18,11 +18,12 @@ function wantsReducedMotion(): boolean {
 /**
  * A figure with no source, drawn as a placeholder (FR-22).
  *
- * **It does not pulse.** A shimmering skeleton promises that a number is on
- * its way, and on a statically generated page it is not: this markup was
- * rendered when the source could not be reached, and the same HTML is served
- * until the next revalidation. It is a mark of absence, not of loading, and it
- * says so to a screen reader rather than leaving the stat silent.
+ * The bar carries a slow idle sheen rather than a loading shimmer, and the
+ * distinction is the point: on a statically generated page nothing is loading,
+ * because this markup was rendered when the source could not be reached and
+ * the same HTML is served until the next revalidation. It marks an absence, at
+ * a pace that does not promise an arrival — and it says so to a screen reader
+ * rather than leaving the stat silent.
  */
 function MissingFigure({ label }: { readonly label: string }) {
   return (

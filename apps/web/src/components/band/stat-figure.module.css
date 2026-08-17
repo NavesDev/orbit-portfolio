@@ -18,20 +18,56 @@
 }
 
 /*
- * The placeholder for a figure with no source. Sized from the same clamp as
- * the digits it stands in for, so the band does not change height when GitHub
- * is unreachable — a layout that shifts on a failure turns one problem into two.
+ * The placeholder for a figure with no source.
  *
- * Deliberately not animated: see `MissingFigure`. On a static page a shimmer
- * would promise a number that cannot arrive before the next revalidation.
+ * It occupies the digits' full height so the band does not change height when
+ * GitHub is unreachable — a failure that also shifts the layout is two
+ * problems — while the bar itself is a fraction of that, centred. A solid
+ * block the size of a 72px numeral reads as a redaction; a bar reads as a
+ * value that is not there.
  */
 .missing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: clamp(40px, 6vw, 72px);
-  width: 2.2ch;
-  margin: 0 auto;
-  border-radius: 6px;
-  background: var(--line);
-  font-size: clamp(40px, 6vw, 72px);
+}
+
+/*
+ * The sheen is slow on purpose — 3.2s, with most of that spent off the bar.
+ * A fast left-to-right shimmer is the vocabulary of loading, and on a
+ * statically generated page nothing is loading: this markup was rendered when
+ * the source failed and the same HTML is served until the next revalidation.
+ * At this pace it reads as idle rather than as progress.
+ */
+.missing::before {
+  content: '';
+  width: 2.4ch;
+  height: 42%;
+  border-radius: 999px;
+  background: linear-gradient(
+    100deg,
+    var(--line) 0 38%,
+    var(--line-strong) 50%,
+    var(--line) 62% 100%
+  );
+  background-size: 320% 100%;
+  background-position: 100% 0;
+  animation: figure-sheen 3.2s var(--ease) infinite;
+}
+
+@keyframes figure-sheen {
+  to {
+    background-position: -60% 0;
+  }
+}
+
+/* Asked for less motion: the bar stays, the light stops travelling over it. */
+@media (prefers-reduced-motion: reduce) {
+  .missing::before {
+    animation: none;
+    background: var(--line);
+  }
 }
 
 /* Available to a screen reader, absent from the page — the stat is not silent. */
