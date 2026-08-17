@@ -115,13 +115,14 @@ no value until the project data behind them renders.
 
   **Scope changed in #4.** The band's figures were specified as static values.
   They are now read through a `DeveloperStatsProvider` port: `@portfolio/infra`
-  implements it over GitHub's search API, and the prototype's numbers became
-  the fallback for a build with no account configured or an unreachable forge. WN-03 in
+  implements it over GitHub's search API. A build with no account configured, or
+  an unreachable forge, renders those two figures as placeholders rather than
+  as stand-in numbers — the prototype's were roughly double the real counts,
+  which made the least reliable moment the one claiming the most. WN-03 in
   [requirements.md](../requirements.md) recorded live statistics as out of
-  scope for v1 and is reversed there, in the same pass. FR-22's label now
-  renders only while the counts are placeholder: the coffee became two cups
-  per day of the year, so a build with an account configured has nothing left
-  to disclaim.
+  scope for v1 and is reversed there, in the same pass. FR-22 changed with it: the coffee became two
+  cups per day of the year, so with the counts read there is nothing left to
+  disclaim, and with them missing the band says which it could not read.
 - **Expected outcome:** The top of the home page is visibly complete in both
   locales — the first thing a visitor sees renders correctly before any
   data-driven section exists.

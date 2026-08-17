@@ -33,18 +33,13 @@ export default async function HomePage({
   }
 
   const content = getContent(locale);
-  const stats = await resolveStatFigures(new Date(), createDeveloperStatsProvider());
+  const figures = await resolveStatFigures(new Date(), createDeveloperStatsProvider());
 
   return (
     <main id="content">
       <Hero content={content.hero} available={AVAILABLE_FOR_WORK} />
       <CloudDrift />
-      <StatBand
-        content={content.band}
-        figures={stats.figures}
-        isIllustrative={stats.isIllustrative}
-        locale={locale}
-      />
+      <StatBand content={content.band} figures={figures} locale={locale} />
     </main>
   );
 }

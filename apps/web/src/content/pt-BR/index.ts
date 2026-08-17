@@ -35,6 +35,7 @@ export const ptBR: SiteContent = {
       coffee: 'xícaras de café este ano',
       years: 'anos codando',
     },
-    illustrativeNote: 'Números ilustrativos — ainda não conectados ao GitHub.',
+    missingNote: 'Alguns números não puderam ser lidos do GitHub agora.',
+    unavailable: 'indisponível',
   },
 };

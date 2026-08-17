@@ -7,18 +7,13 @@ import { STAT_IDS } from '../../content/site';
 import { COUNT_UP_INTERVAL_MS, COUNT_UP_STEPS } from '../../lib/stats/count-up';
 import { StatBand } from './stat-band';
 
-const FIGURES = { commits: 1847, pullRequests: 73, coffee: 412, years: 4 } as const;
+const FIGURES = { commits: 1847, pullRequests: 73, coffee: 454, years: 4 } as const;
 
-/** Deliberately equal to the fallback: the note must not be inferred from the numbers. */
-const FALLBACK_SHAPED = { commits: 1230, pullRequests: 50, coffee: 412, years: 4 } as const;
+/** What the band gets when GitHub could not be reached: the two counts absent. */
+const WITHOUT_SOURCE = { commits: null, pullRequests: null, coffee: 454, years: 4 } as const;
 
 function props(locale: Locale) {
-  return {
-    content: getContent(locale).band,
-    figures: FIGURES,
-    isIllustrative: true,
-    locale,
-  } as const;
+  return { content: getContent(locale).band, figures: FIGURES, locale } as const;
 }
 
 /**
@@ -87,23 +82,42 @@ describe('StatBand', () => {
     }
   });
 
-  it('marks the figures as illustrative, in the visitor language (FR-22)', () => {
-    render(<StatBand {...props('en-US')} isIllustrative />);
+  it('accounts for a figure it could not read, in the visitor language (FR-22)', () => {
+    render(<StatBand {...props('en-US')} figures={WITHOUT_SOURCE} />);
 
-    expect(screen.getByText(getContent('en-US').band.illustrativeNote)).toBeInTheDocument();
-    expect(screen.queryByText(getContent('pt-BR').band.illustrativeNote)).not.toBeInTheDocument();
+    expect(screen.getByText(getContent('en-US').band.missingNote)).toBeInTheDocument();
+    expect(screen.queryByText(getContent('pt-BR').band.missingNote)).not.toBeInTheDocument();
   });
 
-  it('says nothing once the counts are live — no figure is invented then', () => {
-    render(<StatBand {...props('pt-BR')} isIllustrative={false} />);
+  it('says nothing when every figure is there', () => {
+    render(<StatBand {...props('pt-BR')} />);
 
-    expect(screen.queryByText(getContent('pt-BR').band.illustrativeNote)).not.toBeInTheDocument();
+    expect(screen.queryByText(getContent('pt-BR').band.missingNote)).not.toBeInTheDocument();
   });
 
-  it('takes the state from the caller, not from comparing figures', () => {
-    render(<StatBand {...props('pt-BR')} figures={FALLBACK_SHAPED} isIllustrative={false} />);
+  it('draws a placeholder instead of a stand-in number (FR-22)', () => {
+    render(<StatBand {...props('pt-BR')} figures={WITHOUT_SOURCE} />);
 
-    expect(screen.queryByText(getContent('pt-BR').band.illustrativeNote)).not.toBeInTheDocument();
+    const { statLabels, unavailable } = getContent('pt-BR').band;
+
+    expect(screen.getByText(`${statLabels.commits}: ${unavailable}`)).toBeInTheDocument();
+    expect(screen.getByText(`${statLabels.pullRequests}: ${unavailable}`)).toBeInTheDocument();
+  });
+
+  it('keeps the figures it can still work out from the calendar', () => {
+    render(<StatBand {...props('pt-BR')} figures={WITHOUT_SOURCE} />);
+
+    expect(screen.getByText('454')).toBeInTheDocument();
+    expect(screen.getByText('4')).toBeInTheDocument();
+  });
+
+  it('does not count up a figure that is not there', () => {
+    render(<StatBand {...props('en-US')} figures={WITHOUT_SOURCE} />);
+
+    enterView();
+    finishCounting();
+
+    expect(screen.getAllByText(/unavailable/)).toHaveLength(2);
   });
 
   it('names the section, which has no visible heading of its own', () => {
@@ -130,7 +144,7 @@ describe('StatBand', () => {
     finishCounting();
 
     expect(screen.getByText('1,847')).toBeInTheDocument();
-    expect(screen.getByText('412')).toBeInTheDocument();
+    expect(screen.getByText('454')).toBeInTheDocument();
   });
 
   it('counts once — a second view does not restart it', () => {

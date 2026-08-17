@@ -1,19 +1,16 @@
 import { DeveloperStatsUnavailableError } from '../../errors/developer-stats-unavailable-error.ts';
 import type { DeveloperStats, DeveloperStatsProvider } from '../../ports/developer-stats-provider.ts';
 
-/** What the caller offers to show when no real figures can be had. */
-export interface GetDeveloperStatsInput {
-  readonly fallback: DeveloperStats;
-}
-
 export interface GetDeveloperStatsOutput {
-  readonly stats: DeveloperStats;
   /**
-   * Whether what came back is placeholder. FR-22 requires the page to say so
-   * whenever it is, so this travels with the figures rather than being
-   * inferred from them — equal numbers prove nothing either way.
+   * The counts, or `null` when there are none to be had.
+   *
+   * `null` is the whole answer: no source configured, an unreachable one and a
+   * source that answered with something that is not a count are the same fact
+   * to a caller — this figure cannot be vouched for. What the page does about
+   * it is presentation's business.
    */
-  readonly isIllustrative: boolean;
+  readonly stats: DeveloperStats | null;
 }
 
 const MINIMUM_COUNT = 0;
@@ -23,42 +20,42 @@ function isCount(value: number): boolean {
 }
 
 /**
- * Resolves the figures the stat band shows (FR-21, FR-22).
+ * Resolves the counts the stat band shows (FR-21, FR-22).
  *
- * **The fallback is a policy, not error handling.** Deciding that an
- * unreachable source means "show the placeholder figures and admit it" is a
- * use-case decision, so it lives here instead of in a `try` around a fetch in
- * a component. Presentation asks once and renders what it gets.
+ * **It returns nothing rather than something plausible.** An earlier version
+ * took a set of stand-in figures and handed those back when the source failed,
+ * which meant the page's least reliable moment was also the one where it
+ * claimed the most: the stand-ins were the prototype's numbers, and they ran
+ * to roughly double the real ones. A figure that cannot be vouched for is
+ * absent, and the band renders that absence.
  *
- * A provider of `null` is the unconfigured case — no token, no source — and it
- * is not an error: a checkout without credentials must still build a page.
+ * A provider of `null` is the unconfigured case — no account, no source — and
+ * it is not an error: a checkout without configuration must still build.
  */
 export class GetDeveloperStats {
   constructor(private readonly provider: DeveloperStatsProvider | null) {}
 
-  async execute(input: GetDeveloperStatsInput): Promise<GetDeveloperStatsOutput> {
+  async execute(): Promise<GetDeveloperStatsOutput> {
     if (this.provider === null) {
-      return { stats: input.fallback, isIllustrative: true };
+      return { stats: null };
     }
 
     try {
       const stats = await this.provider.fetchStats();
 
       if (!isCount(stats.publicCommits) || !isCount(stats.pullRequests)) {
-        throw new DeveloperStatsUnavailableError(
-          'The stats provider returned something that is not a count.',
-        );
+        return { stats: null };
       }
 
-      return { stats, isIllustrative: false };
+      return { stats };
     } catch (error) {
       /*
        * Only the port's declared failure is absorbed. Anything else is a
-       * programming error in the adapter, and swallowing it would turn a bug
-       * into a page that quietly shows made-up numbers forever.
+       * programming error in the adapter, and swallowing it would hide a bug
+       * behind a permanently empty band.
        */
       if (error instanceof DeveloperStatsUnavailableError) {
-        return { stats: input.fallback, isIllustrative: true };
+        return { stats: null };
       }
 
       throw error;

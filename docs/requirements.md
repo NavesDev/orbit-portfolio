@@ -71,7 +71,7 @@ requirement wins; see [Open against the prototype](#open-against-the-prototype).
 | ID | Requirement |
 | --- | --- |
 | FR-21 | MUST display the stat figures, animating once on first view. Commit and pull-request counts come from a `DeveloperStatsProvider`; the rest are counted from the calendar. |
-| FR-22 | MUST label placeholder figures as illustrative for as long as they are not real, and MUST NOT carry the label once none of them are. |
+| FR-22 | MUST NOT present a figure it cannot vouch for. A figure with no source MUST render as an explicit placeholder, never as a stand-in number, and the band MUST account for it in the visitor's language. |
 | FR-23 | MUST list published social links ordered by `sort_order`, rendering `icon_svg` inline. |
 | FR-24 | Each social link MUST have an accessible name derived from `platform`. |
 
@@ -109,7 +109,7 @@ requirement wins; see [Open against the prototype](#open-against-the-prototype).
 | --- | --- | --- |
 | WN-01 | Telemetry endpoints | Deferred to Phase 6 — needs its own design pass |
 | WN-02 | Admin interface | Content is edited by SQL or seed until it hurts |
-| WN-03 | ~~Live GitHub statistics~~ | **Brought into scope in #4.** Commit and pull-request counts are read through a port, with the prototype's numbers as the fallback when no account is configured or GitHub is unreachable. The coffee figure is not read from anywhere either: it is two cups for every day of the year so far, which is a claim about a habit that a visitor can check against the date. With the counts live, nothing on the band is invented and FR-22's label is not rendered at all. |
+| WN-03 | ~~Live GitHub statistics~~ | **Brought into scope in #4.** Commit and pull-request counts are read through a port, and no stand-in when no account is configured or GitHub is unreachable: the figure renders as a placeholder instead, so the site never claims a number it did not read. The coffee figure is not read from anywhere either: it is two cups for every day of the year so far, which is a claim about a habit that a visitor can check against the date. With the counts live, nothing on the band is unaccounted for and its note is not rendered at all. |
 | WN-04 | Contact form | The footer links to e-mail |
 | WN-05 | Authentication | Nothing to protect while everything is public and read-only |
 | WN-06 | A third locale | Two are enough to prove the model; adding one is a key and a route segment |
@@ -140,8 +140,11 @@ Two places where the prototype is wrong and the requirement stands:
 - **Animation lifetime.** Neither canvas in the prototype cancels its
   `requestAnimationFrame` loop. FR-04 exists to correct that.
 
-One place where the prototype already answers a requirement: the stat-band copy
-FR-22 asks for exists in its `pt-BR` form. Only the `en-US` translation is new.
+One place where the prototype looked like it answered a requirement and did
+not: its stat band carries the `pt-BR` copy FR-22 asks for, but the copy says
+the figures are illustrative, and the numbers under it were roughly double the
+author's real ones. FR-22 was rewritten in #4 to forbid the stand-in rather
+than to label it, so the prototype's line is not the copy that ships.
 
 ## Traceability
 

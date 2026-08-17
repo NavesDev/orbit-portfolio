@@ -30,21 +30,8 @@ export const STAT_IDS = ['commits', 'pullRequests', 'coffee', 'years'] as const;
 
 export type StatId = (typeof STAT_IDS)[number];
 
-/** The figures the band never reads from a constant — see `lib/stats/figures.ts`. */
+/** The figures that come from a source rather than from the calendar. */
 export type SourcedStatId = 'commits' | 'pullRequests';
-
-/**
- * What the band shows when GitHub cannot be reached, or when no token is
- * configured (FR-21, FR-22).
- *
- * The prototype's numbers, kept for exactly that case. They are placeholder,
- * and whenever they are what renders, the band says so in the visitor's
- * language — which is the whole of FR-22.
- */
-export const FALLBACK_FIGURES = {
-  commits: 1230,
-  pullRequests: 50,
-} as const;
 
 /**
  * The joke, made checkable: coffee is counted as two cups for every day of the

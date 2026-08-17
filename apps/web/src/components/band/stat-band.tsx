@@ -2,6 +2,8 @@ import type { Locale } from '@portfolio/core';
 
 import { STAT_IDS } from '../../content/site';
 import type { SiteContent } from '../../content/types';
+import type { StatFigures } from '../../lib/stats/figures';
+import { hasMissingFigure } from '../../lib/stats/figures';
 import { BAND_SECTION_ID } from '../ui/section-registry';
 import { BandBackdrop } from './band-backdrop';
 import styles from './stat-band.module.css';
@@ -19,20 +21,17 @@ import { StatFigure } from './stat-figure';
  * landmark list as an unnamed region.
  *
  * The note is not decoration and not a footnote: FR-22 requires the band to
- * admit when its figures are placeholder, so it renders exactly while they
- * are. The component is told so by `isIllustrative` rather than working it out
- * from the numbers — a live count that happens to equal the placeholder proves
- * nothing either way.
+ * account for a figure it cannot show, so it renders exactly while one is
+ * missing. Which is a question about the figures themselves — a `null` is the
+ * absence — rather than a flag the caller has to remember to pass.
  */
 export function StatBand({
   content,
   figures,
-  isIllustrative,
   locale,
 }: {
   readonly content: SiteContent['band'];
-  readonly figures: Readonly<Record<(typeof STAT_IDS)[number], number>>;
-  readonly isIllustrative: boolean;
+  readonly figures: StatFigures;
   readonly locale: Locale;
 }) {
   return (
@@ -41,11 +40,17 @@ export function StatBand({
 
       <div className={styles.figures}>
         {STAT_IDS.map((id) => (
-          <StatFigure key={id} value={figures[id]} label={content.statLabels[id]} locale={locale} />
+          <StatFigure
+            key={id}
+            value={figures[id]}
+            label={content.statLabels[id]}
+            unavailableLabel={content.unavailable}
+            locale={locale}
+          />
         ))}
       </div>
 
-      {isIllustrative ? <p className={styles.note}>{content.illustrativeNote}</p> : null}
+      {hasMissingFigure(figures) ? <p className={styles.note}>{content.missingNote}</p> : null}
     </section>
   );
 }

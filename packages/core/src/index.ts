@@ -39,6 +39,5 @@ export type {
 } from './application/ports/developer-stats-provider.ts';
 export {
   GetDeveloperStats,
-  type GetDeveloperStatsInput,
   type GetDeveloperStatsOutput,
 } from './application/use-cases/stats/get-developer-stats.ts';

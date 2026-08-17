@@ -17,6 +17,36 @@
   font-variant-numeric: tabular-nums;
 }
 
+/*
+ * The placeholder for a figure with no source. Sized from the same clamp as
+ * the digits it stands in for, so the band does not change height when GitHub
+ * is unreachable — a layout that shifts on a failure turns one problem into two.
+ *
+ * Deliberately not animated: see `MissingFigure`. On a static page a shimmer
+ * would promise a number that cannot arrive before the next revalidation.
+ */
+.missing {
+  height: clamp(40px, 6vw, 72px);
+  width: 2.2ch;
+  margin: 0 auto;
+  border-radius: 6px;
+  background: var(--line);
+  font-size: clamp(40px, 6vw, 72px);
+}
+
+/* Available to a screen reader, absent from the page — the stat is not silent. */
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 .label {
   margin-top: 6px;
   font-size: 13px;

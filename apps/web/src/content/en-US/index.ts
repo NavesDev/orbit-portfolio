@@ -34,6 +34,7 @@ export const enUS: SiteContent = {
       coffee: 'cups of coffee this year',
       years: 'years coding',
     },
-    illustrativeNote: 'Illustrative figures — not yet connected to GitHub.',
+    missingNote: 'Some figures could not be read from GitHub right now.',
+    unavailable: 'unavailable',
   },
 };

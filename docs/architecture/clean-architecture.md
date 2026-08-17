@@ -82,7 +82,7 @@ src/
 | Orbit colors, ring radii, icon rendering | Presentation | Visual decisions keyed off `category`. |
 | Hero copy, availability boolean | Presentation | Static content, not data. |
 | "years coding", "cups of coffee" | Presentation | Counted from the calendar against a constant in `content/site.ts`. Facts with no system to read them from. |
-| Falling back when a stats provider is unreachable | Application (`GetDeveloperStats`) | A policy about what the page owes the visitor, not error handling. Which figures to offer instead is the caller's input. |
+| What an unreachable stats provider means | Application (`GetDeveloperStats`) | A policy about what the page owes the visitor, not error handling: no source, no configuration and a nonsensical answer are one fact — this cannot be vouched for — and the use case returns nothing rather than something plausible. How an absent figure looks is presentation's business. |
 | GitHub query syntax, status codes, API version | Infrastructure (`providers/`) | Types and vocabulary the application never names. |
 
 ## 4. Aggregates

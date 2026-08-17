@@ -71,11 +71,15 @@ export interface SiteContent {
      */
     readonly statLabels: Readonly<Record<StatId, string>>;
     /**
-     * FR-22 — rendered only while the commit and pull-request counts are
-     * placeholder. With live counts nothing on the band is invented: the
-     * coffee is two cups per day of the year and the years are counted from a
-     * date, so a note claiming otherwise would be the only false thing there.
+     * FR-22 — rendered only while a figure has no source to come from. With
+     * every figure present nothing on the band is unaccounted for: the coffee
+     * is two cups per day of the year and the years are counted from a date.
      */
-    readonly illustrativeNote: string;
+    readonly missingNote: string;
+    /**
+     * What a screen reader hears in place of a missing figure. The placeholder
+     * is a grey block on screen; silence would be worse than either.
+     */
+    readonly unavailable: string;
   };
 }

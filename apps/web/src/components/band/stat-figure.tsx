@@ -16,6 +16,23 @@ function wantsReducedMotion(): boolean {
 }
 
 /**
+ * A figure with no source, drawn as a placeholder (FR-22).
+ *
+ * **It does not pulse.** A shimmering skeleton promises that a number is on
+ * its way, and on a statically generated page it is not: this markup was
+ * rendered when the source could not be reached, and the same HTML is served
+ * until the next revalidation. It is a mark of absence, not of loading, and it
+ * says so to a screen reader rather than leaving the stat silent.
+ */
+function MissingFigure({ label }: { readonly label: string }) {
+  return (
+    <div className={styles.missing}>
+      <span className={styles.hidden}>{label}</span>
+    </div>
+  );
+}
+
+/**
  * One figure of the stat band, counting up the first time it is seen (FR-21).
  *
  * It starts rendered at its final value, not at zero. That is what the server
@@ -31,17 +48,20 @@ function wantsReducedMotion(): boolean {
 export function StatFigure({
   value,
   label,
+  unavailableLabel,
   locale,
 }: {
-  readonly value: number;
+  /** `null` when the figure has no source — see `MissingFigure`. */
+  readonly value: number | null;
   readonly label: string;
+  readonly unavailableLabel: string;
   readonly locale: Locale;
 }) {
   const [ref, hasBeenInView] = useHasBeenInView<HTMLDivElement>();
   const [step, setStep] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!hasBeenInView || wantsReducedMotion()) {
+    if (value === null || !hasBeenInView || wantsReducedMotion()) {
       return;
     }
 
@@ -62,13 +82,17 @@ export function StatFigure({
     return () => {
       clearInterval(timer);
     };
-  }, [hasBeenInView]);
+  }, [hasBeenInView, value]);
 
-  const shown = step === null ? value : figureAtStep(value, step);
+  const shown = value === null || step === null ? value : figureAtStep(value, step);
 
   return (
     <div className={styles.stat} ref={ref}>
-      <div className={styles.figure}>{shown.toLocaleString(locale)}</div>
+      {shown === null ? (
+        <MissingFigure label={`${label}: ${unavailableLabel}`} />
+      ) : (
+        <div className={styles.figure}>{shown.toLocaleString(locale)}</div>
+      )}
       <div className={styles.label}>{label}</div>
     </div>
   );
