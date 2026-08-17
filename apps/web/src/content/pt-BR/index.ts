@@ -31,7 +31,7 @@ export const ptBR: SiteContent = {
     label: 'Números',
     statLabels: {
       commits: 'commits públicos',
-      pullRequests: 'pull requests abertos',
+      pullRequests: 'pull requests públicos',
       coffee: 'xícaras de café este ano',
       years: 'anos codando',
     },

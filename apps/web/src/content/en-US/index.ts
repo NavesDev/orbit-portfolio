@@ -30,7 +30,7 @@ export const enUS: SiteContent = {
     label: 'By the numbers',
     statLabels: {
       commits: 'public commits',
-      pullRequests: 'pull requests opened',
+      pullRequests: 'public pull requests',
       coffee: 'cups of coffee this year',
       years: 'years coding',
     },
