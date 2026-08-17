@@ -1,17 +1,15 @@
-const NO_PROGRESS = 0;
-const FULL_PROGRESS = 1;
+import {
+  COUNT_UP_INTERVAL_MS,
+  COUNT_UP_STEPS,
+  FULL_PROGRESS,
+  NO_PROGRESS,
+} from './constants/count-up';
 
 /**
- * How many steps a figure counts through before it arrives.
- *
- * The prototype's `target / 34` at 20ms: the same 34 steps, expressed as the
- * count rather than as a step size, because the step size is what made the
- * prototype's small figures jump by one and its large ones by dozens.
+ * The count-up's arithmetic. Its step count and interval are in
+ * `constants/count-up.ts`.
  */
-export const COUNT_UP_STEPS = 34;
-
-/** The prototype's interval between steps — roughly 680ms end to end. */
-export const COUNT_UP_INTERVAL_MS = 20;
+export { COUNT_UP_INTERVAL_MS, COUNT_UP_STEPS } from './constants/count-up';
 
 /**
  * The figure shown at `step`, counting from zero to `target`.

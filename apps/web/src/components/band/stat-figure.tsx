@@ -3,27 +3,17 @@
 import type { Locale } from '@portfolio/core';
 import { useEffect, useState } from 'react';
 
+import { REDUCED_MOTION_QUERY } from '../../constants/media-queries';
 import { useHasBeenInView } from '../../hooks/use-in-view';
 import { COUNT_UP_INTERVAL_MS, figureAtStep, isCountComplete } from '../../lib/stats/count-up';
 import { Skeleton } from '../ui/skeleton';
+import {
+  FIRST_STEP,
+  MISSING_FIGURE_HEIGHT,
+  MISSING_FIGURE_WIDTH,
+  NEXT_STEP,
+} from './constants/stat-figure';
 import styles from './stat-figure.module.css';
-
-const FIRST_STEP = 0;
-const NEXT_STEP = 1;
-const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
-
-/**
- * The bar that stands in for a figure, measured in the figure's own type:
- * `.missing` carries the digits' size and weight, so `ch` is a digit's width
- * and `em` is their size.
- *
- * Two and a half digits wide and about the height of their ink — the figures
- * run to two, three and four digits, so the placeholder sits between rather
- * than matching the longest. Taller and it reads as a redaction; much shorter
- * and it stops belonging to the number it replaces.
- */
-const MISSING_FIGURE_WIDTH = '2.5ch';
-const MISSING_FIGURE_HEIGHT = '0.7em';
 
 function wantsReducedMotion(): boolean {
   return window.matchMedia(REDUCED_MOTION_QUERY).matches;

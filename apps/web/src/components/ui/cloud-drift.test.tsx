@@ -13,13 +13,8 @@ vi.mock('../../hooks/use-scroll', () => ({
   useScrollProgress: () => 0,
 }));
 
-import {
-  CLOUD_LAYER_COPIES,
-  CLOUD_LAYER_WIDTH,
-  CLOUD_LAYERS,
-  CloudDrift,
-  driftOf,
-} from './cloud-drift';
+import { CloudDrift, driftOf } from './cloud-drift';
+import { LAYER_COPIES, LAYER_WIDTH, LAYERS } from './constants/sky';
 
 /** The widest viewport the band promises to keep covered. */
 const WIDEST_SUPPORTED_VIEWPORT = 2560;
@@ -67,7 +62,7 @@ describe('CloudDrift', () => {
   });
 
   it('draws no cloud below the size the traced artwork survives', () => {
-    const widths = CLOUD_LAYERS.flatMap((layer) => layer.clouds.map((cloud) => cloud.width));
+    const widths = LAYERS.flatMap((layer) => layer.clouds.map((cloud) => cloud.width));
 
     expect(Math.min(...widths)).toBeGreaterThanOrEqual(SMALLEST_LEGIBLE_WIDTH);
   });
@@ -80,7 +75,7 @@ describe('CloudDrift', () => {
  * like, so each is asserted on the geometry.
  */
 describe('CloudDrift once the page has scrolled', () => {
-  it.each(CLOUD_LAYERS.map((layer) => [layer.id, layer] as const))(
+  it.each(LAYERS.map((layer) => [layer.id, layer] as const))(
     'never lets two clouds of the %s layer touch, at any offset',
     (unusedId, layer) => {
       const ordered = [...layer.clouds].sort((a, b) => a.x - b.x);
@@ -96,31 +91,31 @@ describe('CloudDrift once the page has scrolled', () => {
   );
 
   it('keeps the last cloud of a repeat clear of the first of the next', () => {
-    for (const layer of CLOUD_LAYERS) {
+    for (const layer of LAYERS) {
       const rightmost = Math.max(...layer.clouds.map((cloud) => cloud.x + cloud.width));
 
-      expect(rightmost).toBeLessThanOrEqual(CLOUD_LAYER_WIDTH);
+      expect(rightmost).toBeLessThanOrEqual(LAYER_WIDTH);
     }
   });
 
   it('wraps rather than marching off screen, however far the page scrolls', () => {
-    for (const layer of CLOUD_LAYERS) {
+    for (const layer of LAYERS) {
       const drift = driftOf(A_LONG_SCROLL, layer.depth);
 
       expect(drift).toBeLessThanOrEqual(0);
-      expect(drift).toBeGreaterThan(-CLOUD_LAYER_WIDTH);
+      expect(drift).toBeGreaterThan(-LAYER_WIDTH);
     }
   });
 
   it('lays out enough repeats to cover a wide viewport at the worst offset', () => {
-    const covered = CLOUD_LAYER_COPIES * CLOUD_LAYER_WIDTH - CLOUD_LAYER_WIDTH;
+    const covered = LAYER_COPIES * LAYER_WIDTH - LAYER_WIDTH;
 
     expect(covered).toBeGreaterThanOrEqual(WIDEST_SUPPORTED_VIEWPORT);
   });
 
   it('still moves the near layer further than the far one — that is the parallax', () => {
-    const far = CLOUD_LAYERS[0];
-    const near = CLOUD_LAYERS[CLOUD_LAYERS.length - 1];
+    const far = LAYERS[0];
+    const near = LAYERS[LAYERS.length - 1];
 
     if (far === undefined || near === undefined) {
       throw new Error('the sky has no layers');
@@ -132,11 +127,11 @@ describe('CloudDrift once the page has scrolled', () => {
   it('holds every layer inside one repeat in the rendered markup', () => {
     const shifts = layerTransforms(renderAt(A_LONG_SCROLL).container);
 
-    expect(shifts).toHaveLength(CLOUD_LAYERS.length);
+    expect(shifts).toHaveLength(LAYERS.length);
 
     for (const shift of shifts) {
       expect(shift).toBeLessThanOrEqual(0);
-      expect(shift).toBeGreaterThan(-CLOUD_LAYER_WIDTH);
+      expect(shift).toBeGreaterThan(-LAYER_WIDTH);
     }
   });
 

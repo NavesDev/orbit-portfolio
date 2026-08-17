@@ -11,9 +11,9 @@
  * this site talks to is another folder rather than another workspace package.
  */
 export {
-  GITHUB_API_BASE_URL,
   GitHubDeveloperStatsProvider,
   type FetchLike,
   type GitHubStatsConfig,
 } from './providers/github/github-developer-stats-provider.ts';
 export { GITHUB_LOGIN, GITHUB_TOKEN } from './constants/env-keys.ts';
+export { GITHUB_API_BASE_URL } from './constants/github-api.ts';

@@ -4,11 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useScrollOffset } from '../../hooks/use-scroll';
 import styles from './band-backdrop.module.css';
-
-/** The prototype's factor: the grid drifts against the scroll at a sixth of its speed. */
-const PARALLAX_FACTOR = -0.15;
-const UNMEASURED = null;
-const AT_REST = 0;
+import { AT_REST, PARALLAX_FACTOR, UNMEASURED } from './constants/band-backdrop';
 
 /**
  * The stat band's drifting dot grid.

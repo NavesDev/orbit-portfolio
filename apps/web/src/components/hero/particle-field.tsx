@@ -2,24 +2,20 @@
 
 import { useEffect, useRef } from 'react';
 
+import { REDUCED_MOTION_QUERY } from '../../constants/media-queries';
 import { drawField } from '../../lib/particles/draw';
 import type { Dot, FieldSize, Pointer } from '../../lib/particles/field';
 import { buildDots, stepDots } from '../../lib/particles/field';
+import {
+  CANVAS_ORIGIN,
+  DEFAULT_PIXEL_RATIO,
+  EMPTY_SIZE,
+  FIRST_FRAME_MS,
+  MAX_PIXEL_RATIO,
+  NO_SKEW,
+  RESIZE_SETTLE_MS,
+} from './constants/particle-field';
 import styles from './particle-field.module.css';
-
-/** The cap on device pixel ratio: past 2 the cost doubles and nobody sees it. */
-const MAX_PIXEL_RATIO = 2;
-const DEFAULT_PIXEL_RATIO = 1;
-const CANVAS_ORIGIN = 0;
-const NO_SKEW = 0;
-
-/** Rebuilding on every resize event would rebuild the field mid-drag. */
-const RESIZE_SETTLE_MS = 150;
-
-const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
-const FIRST_FRAME_MS = 0;
-
-const EMPTY_SIZE: FieldSize = { width: CANVAS_ORIGIN, height: CANVAS_ORIGIN };
 
 function sizeCanvas(canvas: HTMLCanvasElement, size: FieldSize): CanvasRenderingContext2D | null {
   const context = canvas.getContext('2d');

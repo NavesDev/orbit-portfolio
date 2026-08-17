@@ -1,49 +1,39 @@
-import type { Dot, FieldSize, Pointer } from './field';
-import { linkDistanceFor, proximityAt } from './field';
-
 /**
  * Painting for the hero field.
  *
  * Split from `field.ts` because the two are tested differently: the physics
  * are asserted directly, while canvas pixels are explicitly not tested
  * (`docs/testing.md`). Keeping them apart means the untested half is only the
- * half that draws.
- *
- * The base colour is `--blue` from `tokens.css`. A canvas cannot read a custom
- * property, so the value is restated here as numbers the painting can
- * interpolate — named, and pointing at the token it mirrors.
+ * half that draws. The colours and opacities it paints with are in
+ * `constants/paint.ts`.
  */
-const BASE_COLOUR = { red: 37, green: 106, blue: 191 } as const;
 
-/** How far the colour travels towards a lighter cyan as the pointer nears. */
-const PROXIMITY_COLOUR_SHIFT = { red: 25, green: 90, blue: 50 } as const;
-
-/** A link's strength where the two dots touch, before distance fades it out. */
-const FULL_LINK_STRENGTH = 1;
-const LINK_BASE_ALPHA = 0.14;
-const LINK_PROXIMITY_ALPHA = 0.4;
-const LINK_MAX_ALPHA = 0.5;
-/** Below this the line is invisible and drawing it is pure cost. */
-const LINK_MIN_VISIBLE_ALPHA = 0.012;
-const LINK_WIDTH = 1;
-
-const NODE_BASE_ALPHA = 0.18;
-const NODE_PROXIMITY_ALPHA = 0.55;
-const NODE_BREATHE_ALPHA = 0.05;
-const NODE_MAX_ALPHA = 0.7;
-const NODE_BASE_RADIUS = 1.4;
-const NODE_PROXIMITY_RADIUS = 2.2;
-
-/** How fast the dots breathe, in radians per millisecond. */
-const BREATHE_RATE = 0.0012;
-const BREATHE_AMPLITUDE = 0.5;
-const BREATHE_OFFSET = 0.5;
-
-const MIDPOINT_DIVISOR = 2;
-const FULL_ARC_RADIANS = Math.PI * 2;
-const ARC_START_RADIANS = 0;
-const ORIGIN = 0;
-const NO_PROXIMITY = 0;
+import {
+  ARC_START_RADIANS,
+  BASE_COLOUR,
+  BREATHE_AMPLITUDE,
+  BREATHE_OFFSET,
+  BREATHE_RATE,
+  FULL_ARC_RADIANS,
+  FULL_LINK_STRENGTH,
+  LINK_BASE_ALPHA,
+  LINK_MAX_ALPHA,
+  LINK_MIN_VISIBLE_ALPHA,
+  LINK_PROXIMITY_ALPHA,
+  LINK_WIDTH,
+  MIDPOINT_DIVISOR,
+  NO_PROXIMITY,
+  NODE_BASE_ALPHA,
+  NODE_BASE_RADIUS,
+  NODE_BREATHE_ALPHA,
+  NODE_MAX_ALPHA,
+  NODE_PROXIMITY_ALPHA,
+  NODE_PROXIMITY_RADIUS,
+  ORIGIN,
+  PROXIMITY_COLOUR_SHIFT,
+} from './constants/paint';
+import type { Dot, FieldSize, Pointer } from './field';
+import { linkDistanceFor, proximityAt } from './field';
 
 function distanceToPointer(x: number, y: number, pointer: Pointer): number {
   return pointer === null ? Number.POSITIVE_INFINITY : Math.hypot(x - pointer.x, y - pointer.y);

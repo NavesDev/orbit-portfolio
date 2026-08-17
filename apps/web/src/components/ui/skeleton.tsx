@@ -1,7 +1,5 @@
+import { SKELETON_DEFAULT_RADIUS } from './constants/skeleton';
 import styles from './skeleton.module.css';
-
-/** A pill by default: the shape reads as "a value", not as a cropped box. */
-const DEFAULT_RADIUS = '999px';
 
 /**
  * A placeholder standing in for content that is not there.
@@ -27,7 +25,7 @@ const DEFAULT_RADIUS = '999px';
 export function Skeleton({
   width,
   height,
-  radius = DEFAULT_RADIUS,
+  radius = SKELETON_DEFAULT_RADIUS,
   label,
 }: {
   /** Any CSS length: `2.4ch`, `100%`, `48px`. */

@@ -1,27 +1,16 @@
 import type { DeveloperStats, DeveloperStatsProvider } from '@portfolio/core';
 import { DeveloperStatsUnavailableError } from '@portfolio/core';
 
-/** GitHub's REST root. Overridable so tests never depend on the network. */
-export const GITHUB_API_BASE_URL = 'https://api.github.com';
-
-/** Pinned: an unpinned API version changes response shapes without a deploy. */
-const API_VERSION = '2022-11-28';
-const ACCEPT = 'application/vnd.github+json';
-
-/** GitHub rejects requests without one, and asks that it identify the caller. */
-const USER_AGENT = 'portfolio-stat-band';
-
-/**
- * Only the count is wanted, never the results — one item is the smallest page
- * the API will return, and `total_count` is the same either way.
- */
-const SMALLEST_PAGE = '1';
-
-/** A build must not hang on a slow forge. */
-const DEFAULT_TIMEOUT_MS = 8000;
-
-const COMMIT_SEARCH_PATH = '/search/commits';
-const ISSUE_SEARCH_PATH = '/search/issues';
+import {
+  ACCEPT,
+  API_VERSION,
+  COMMIT_SEARCH_PATH,
+  DEFAULT_TIMEOUT_MS,
+  GITHUB_API_BASE_URL,
+  ISSUE_SEARCH_PATH,
+  SMALLEST_PAGE,
+  USER_AGENT,
+} from '../../constants/github-api.ts';
 
 export interface GitHubStatsConfig {
   /** The account the figures are counted for. */

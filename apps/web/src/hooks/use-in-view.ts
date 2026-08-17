@@ -3,8 +3,8 @@
 import type { RefObject } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
-/** The share of the element that must be showing before it counts as seen. */
-const DEFAULT_VISIBLE_RATIO = 0.4;
+import { DEFAULT_VISIBLE_RATIO } from './constants/in-view';
+
 
 /**
  * Whether an element has been scrolled into view — once, and then never again.

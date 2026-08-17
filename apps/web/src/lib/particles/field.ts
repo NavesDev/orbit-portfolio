@@ -16,43 +16,30 @@
  * kind of garbage that shows up as jank.
  */
 
-/** Below this width the field thins out so a phone is not drawing a solid mesh. */
-const NARROW_VIEWPORT_WIDTH = 700;
+import {
+  AT_REST_VELOCITY,
+  DAMPING,
+  EDGE_OVERSHOOT,
+  FULL_PROXIMITY,
+  FULL_TURN_RADIANS,
+  JITTER_CENTRE,
+  JITTER_RATIO,
+  LINK_DISTANCE_NARROW,
+  LINK_DISTANCE_WIDE,
+  NARROW_VIEWPORT_WIDTH,
+  ORIGIN,
+  POINTER_RADIUS,
+  REPULSION_SCALE,
+  REPULSION_STRENGTH,
+  ROW_OFFSET_DIVISOR,
+  ROW_PARITY,
+  SPACING_NARROW,
+  SPACING_WIDE,
+  SPRING_STIFFNESS,
+  STAGGERED_ROW_REMAINDER,
+} from './constants/field';
 
-const SPACING_NARROW = 74;
-const SPACING_WIDE = 96;
-
-/** How far a dot may sit from its grid slot, as a share of the spacing. */
-const JITTER_RATIO = 0.28;
-const JITTER_CENTRE = 0.5;
-
-/** Odd rows are offset by half a cell, which is what stops the grid reading as a grid. */
-const ROW_OFFSET_DIVISOR = 2;
-const STAGGERED_ROW_REMAINDER = 1;
-const ROW_PARITY = 2;
-
-const EDGE_OVERSHOOT = 1;
-
-/** Proximity at the pointer itself, before distance fades it towards zero. */
-const FULL_PROXIMITY = 1;
-
-const LINK_DISTANCE_NARROW = 130;
-const LINK_DISTANCE_WIDE = 160;
-
-/** How close the pointer must come before a dot feels it, in CSS pixels. */
-export const POINTER_RADIUS = 220;
-
-const REPULSION_STRENGTH = 10;
-const REPULSION_SCALE = 0.05;
-
-/** Pull back towards the origin, and the friction that stops it oscillating forever. */
-const SPRING_STIFFNESS = 0.04;
-const DAMPING = 0.85;
-
-const AT_REST_VELOCITY = 0.01;
-const ORIGIN = 0;
-
-const FULL_TURN_RADIANS = Math.PI * 2;
+export { POINTER_RADIUS } from './constants/field';
 
 export interface Dot {
   /** The grid slot this dot springs back to. */
