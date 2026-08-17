@@ -1,5 +1,19 @@
 /* The prototype's `.stat`, `.stat .n` and `.stat .l`. */
+
+/*
+ * The figure's type is declared once, as custom properties, because two things
+ * are sized from it: the digits themselves and the slot a missing figure
+ * leaves behind. Written twice they drifted — the slot was a flat
+ * `clamp(40px, 6vw, 72px)` against a line box of `72px x 1.2`, so a column
+ * whose figure was missing came out 15px shorter than its neighbours.
+ *
+ * `line-height` is explicit for the same reason: `normal` is whatever the font
+ * says, which cannot be multiplied out in the slot's `calc`.
+ */
 .stat {
+  --figure-size: clamp(40px, 6vw, 72px);
+  --figure-line: 1.2;
+
   min-width: 140px;
   text-align: center;
 }
@@ -10,7 +24,8 @@
  * proportional digits make the whole band twitch sideways as it does.
  */
 .figure {
-  font-size: clamp(40px, 6vw, 72px);
+  font-size: var(--figure-size);
+  line-height: var(--figure-line);
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--blue);
@@ -18,15 +33,22 @@
 }
 
 /*
- * The slot a missing figure leaves behind. It holds the digits' full height so
- * the band does not change height when GitHub is unreachable; the bar inside
- * it is a `Skeleton`, which owns its own look and motion.
+ * The slot a missing figure leaves behind: the same line box as the digits, so
+ * the band does not change height when GitHub is unreachable.
+ *
+ * It also carries the digits' own type, which is what makes the `Skeleton`'s
+ * `ch` and `em` mean something here — a bar measured in `ch` against an
+ * inherited 16px body font came out a quarter of the width of the number it
+ * stood in for.
  */
 .missing {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: clamp(40px, 6vw, 72px);
+  height: calc(var(--figure-size) * var(--figure-line));
+  font-size: var(--figure-size);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .label {
@@ -37,11 +59,9 @@
 
 @media (max-width: 760px) {
   .stat {
-    min-width: calc(50% - 14px);
-  }
+    --figure-size: clamp(32px, 9vw, 44px);
 
-  .figure {
-    font-size: clamp(32px, 9vw, 44px);
+    min-width: calc(50% - 14px);
   }
 }
 
