@@ -5,11 +5,21 @@ import { useEffect, useState } from 'react';
 
 import { useHasBeenInView } from '../../hooks/use-in-view';
 import { COUNT_UP_INTERVAL_MS, figureAtStep, isCountComplete } from '../../lib/stats/count-up';
+import { Skeleton } from '../ui/skeleton';
 import styles from './stat-figure.module.css';
 
 const FIRST_STEP = 0;
 const NEXT_STEP = 1;
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
+
+/**
+ * The bar that stands in for a figure, in the figure's own units: about as
+ * wide as the two or three digits it replaces, and a fraction of their height.
+ * A block the full height of a 72px numeral reads as a redaction rather than
+ * as a value that is not there.
+ */
+const MISSING_FIGURE_WIDTH = '2.4ch';
+const MISSING_FIGURE_HEIGHT = '42%';
 
 function wantsReducedMotion(): boolean {
   return window.matchMedia(REDUCED_MOTION_QUERY).matches;
@@ -18,17 +28,18 @@ function wantsReducedMotion(): boolean {
 /**
  * A figure with no source, drawn as a placeholder (FR-22).
  *
- * The bar carries a slow idle sheen rather than a loading shimmer, and the
- * distinction is the point: on a statically generated page nothing is loading,
- * because this markup was rendered when the source could not be reached and
- * the same HTML is served until the next revalidation. It marks an absence, at
- * a pace that does not promise an arrival — and it says so to a screen reader
- * rather than leaving the stat silent.
+ * The wrapper keeps the digits' full height so the band does not shift when a
+ * figure is missing — a failure that also moves the layout is two problems —
+ * while the bar inside is sized against it.
+ *
+ * It is labelled rather than silent: this placeholder replaces a figure the
+ * page has already named, so a screen reader hearing the label and nothing
+ * else would be told a stat exists and never told what became of it.
  */
 function MissingFigure({ label }: { readonly label: string }) {
   return (
     <div className={styles.missing}>
-      <span className={styles.hidden}>{label}</span>
+      <Skeleton width={MISSING_FIGURE_WIDTH} height={MISSING_FIGURE_HEIGHT} label={label} />
     </div>
   );
 }

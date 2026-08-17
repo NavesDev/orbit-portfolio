@@ -1,0 +1,48 @@
+/*
+ * The sheen is slow on purpose — 3.2s, most of it spent off the bar. A fast
+ * left-to-right shimmer is the vocabulary of loading; see `skeleton.tsx` for
+ * why nothing here is loading.
+ *
+ * `display: block` so the caller's width and height are the whole story: an
+ * inline element would have its height ignored and pick up line-height from
+ * whatever it sits in.
+ */
+.skeleton {
+  display: block;
+  background: linear-gradient(
+    100deg,
+    var(--line) 0 38%,
+    var(--line-strong) 50%,
+    var(--line) 62% 100%
+  );
+  background-size: 320% 100%;
+  background-position: 100% 0;
+  animation: skeleton-sheen 3.2s var(--ease) infinite;
+}
+
+@keyframes skeleton-sheen {
+  to {
+    background-position: -60% 0;
+  }
+}
+
+/* Available to a screen reader, absent from the page — the slot is not silent. */
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Asked for less motion: the bar stays, the light stops travelling over it. */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background: var(--line);
+  }
+}
