@@ -212,6 +212,11 @@ needs a documentation change first.
   [clean-architecture.md](docs/architecture/clean-architecture.md).
 - **TypeScript.** `strict`, no `any`, no non-null assertions to silence the
   compiler. Types describe the domain, not the ORM.
+- **Constants.** No magic numbers, no magic strings. A literal that carries
+  meaning gets a named constant in the `constants/` folder of the module that
+  owns it, and the module is imported as a namespace suffixed `_CONSTANTS` —
+  never value by value. See
+  [monorepo.md](docs/architecture/monorepo.md#constants-belong-to-the-module-that-owns-them).
 - **Tests.** Each layer owns its level: domain logic is unit-tested in `core`,
   repositories are integration-tested against a real PostgreSQL, components are
   tested with Testing Library, and flows with Playwright. See

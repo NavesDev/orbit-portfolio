@@ -156,6 +156,15 @@ and `verbatimModuleSyntax` on top of `strict`. Nullable columns map to `T | null
 in the domain. Packages are consumed straight from source (`main` points at
 `src/index.ts`) and transpiled by Next via `transpilePackages`.
 
+**Constants.** No magic numbers, no magic strings. A meaningful literal gets a
+named constant in the `constants/` folder of the module that owns it, and that
+module is imported as a namespace — `import * as FIELD_CONSTANTS from
+'./constants/field'`, then `FIELD_CONSTANTS.SPACING_WIDE`. Never value by value:
+the import line should not grow when the table does. The `_CONSTANTS` suffix is
+what keeps a tuning table from reading as runtime state. Package barrels and
+type-only imports are the exceptions. Full rule and rationale in
+`docs/architecture/monorepo.md`.
+
 ## Tests
 
 Each layer owns its level: domain and use cases are unit-tested in `core` against
@@ -172,6 +181,29 @@ covered by E2E. `docs/testing.md` also records what is deliberately *not* tested
 `<type>/<issue-number>-<slug>`, commits are Conventional Commits scoped by
 package (`feat(db): …`), and **`main` is never committed to directly** — always
 branch and open a PR using `.github/PULL_REQUEST_TEMPLATE.md`.
+
+**Before opening an issue or a pull request, re-read the conventions — do not
+work from memory of them.** `CONTRIBUTING.md` first, then the documents under
+`docs/` that the work derives from. The conventions change; a PR written against
+a remembered version of them is a PR that has to be redone.
+
+What that check is for, every time:
+
+- **Title.** Issue and PR titles are commit subjects — `<type>(<scope>): <subject>`,
+  imperative, lowercase, no trailing period.
+- **Labels are not optional.** Every issue carries a type label (`feat`, `fix`,
+  `docs`, `refactor`, `test`, `perf`, `chore`, `ci`) and every area it touches
+  (`core`, `db`, `web`, `telemetry`, plus `docs`/`ci` when they apply). The type
+  label is what decides the branch prefix and the commit prefix, so it is chosen
+  at the issue and reused unchanged. Confirm the label exists — `gh label list` —
+  rather than inventing one.
+- **Templates are filled in, not deleted.** Issues use
+  `.github/ISSUE_TEMPLATE/task.yml` (description, expected outcome, checkable
+  acceptance criteria, out of scope, references into `docs/`). PRs use
+  `.github/PULL_REQUEST_TEMPLATE.md`.
+- **Linking.** The PR body carries `Closes #<n>`; commits carry `Refs #<n>`.
+- **Scope.** One issue, one branch. Anything noticed along the way that does not
+  belong in the diff becomes its own issue instead of riding along in this one.
 
 ## Agent skills
 
