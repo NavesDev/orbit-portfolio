@@ -9,25 +9,78 @@
   align-items: center;
   padding: calc(var(--nav-pad-y) + env(safe-area-inset-top)) var(--pad-x)
     var(--nav-pad-y);
-  mix-blend-mode: difference;
+
+  isolation: isolate;
 }
 
+/*
+ * The bar's backdrop, as a layer of its own.
+ *
+ * The prototype uses `mix-blend-mode: difference` on the nav, which works only
+ * because its nav never has anything but the hero behind it. This page scrolls
+ * a band of blue clouds and a row of 72px blue figures under the same bar, and
+ * difference against those inverts the text into whatever colour happens to be
+ * passing — unreadable, and different every frame.
+ *
+ * A translucent, blurred plate instead. Over the hero it is all but invisible,
+ * being the page's own background; over anything else it holds the text's
+ * contrast steady at better than 11:1 no matter what scrolls beneath.
+ *
+ * **It is a pseudo-element rather than the nav's own background so it can be
+ * masked without taking the text with it.** The mask is the whole point: a
+ * plate that simply stops has a hard edge where the blur ends, and that edge
+ * is more distracting than the blur is helpful. Here it fades out over the
+ * last third, and the layer extends past the bar so the fade has room below
+ * the text rather than across it.
+ */
+.nav::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--nav-fade) * -1);
+  z-index: -1;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  backdrop-filter: blur(10px);
+
+  /*
+   * Four stops rather than two: a straight ramp of alpha bands visibly against
+   * a flat background, and the extra stops bend it into something closer to an
+   * ease. Only the unprefixed property is written — the build adds `-webkit-`
+   * where its targets need it, and writing both by hand made it emit the
+   * prefixed one alone.
+   */
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 58%,
+    rgba(0, 0, 0, 0.72) 74%,
+    rgba(0, 0, 0, 0.28) 88%,
+    transparent 100%
+  );
+}
+
+/* No blur available: an opaque bar beats unreadable text, fade and all. */
+@supports not (backdrop-filter: blur(1px)) {
+  .nav::before {
+    background: var(--bg);
+  }
+}
+
+/*
+ * The headline's emphasis face, at nav scale: one italic serif is the site's
+ * voice, and the mark is the first place a visitor meets it.
+ */
 .mark {
-  font-weight: 600;
-  font-size: 14px;
-  color: #fff;
-  letter-spacing: 0.02em;
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--blue);
-  display: inline-block;
-  margin-right: 8px;
-  mix-blend-mode: normal;
-  vertical-align: 1px;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 17px;
+  color: var(--ink);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
 }
 
 .skipLink {
@@ -42,11 +95,10 @@
   color: var(--ink);
   padding: 8px 14px;
   border-radius: 20px;
-  mix-blend-mode: normal;
 }
 
 @media (max-width: 760px) {
   .mark {
-    font-size: 13px;
+    font-size: 15px;
   }
 }

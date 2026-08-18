@@ -1,0 +1,118 @@
+/*
+ * The prototype's `.hero`, `.hero-content` and `.scroll-cue`.
+ *
+ * `100svh` rather than the prototype's `100vh`: on a phone `vh` is measured
+ * against the viewport with the browser chrome retracted, so the scroll cue —
+ * pinned to the bottom — sits under the address bar until the visitor scrolls.
+ */
+.hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 0 var(--pad-x);
+  position: relative;
+  overflow: hidden;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  max-width: 640px;
+}
+
+/*
+ * `text-wrap: balance` instead of the prototype's hard `<br>`s. The breaks are
+ * tuned to one string at one width; the same markup has to hold two languages
+ * of different length across 380px, 760px and desktop (NFR-04), and a `<br>`
+ * in the middle of a translated sentence is a break in the wrong place in the
+ * other language.
+ */
+.headline {
+  font-size: clamp(34px, 5vw, 58px);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.emphasis {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--blue);
+}
+
+/*
+ * `--ink-soft`, where the prototype uses `--ink-faint`: `#a6a49d` on `#fafaf8`
+ * is a contrast ratio of about 2.3:1, and this is 12px text. NFR-06 asks for a
+ * Lighthouse accessibility score of 95 or better, which that cannot reach.
+ *
+ * The safe-area inset is not in the prototype either — on a phone with a home
+ * indicator the cue would otherwise sit under it.
+ */
+.cue {
+  position: absolute;
+  bottom: calc(44px + env(safe-area-inset-bottom));
+  left: var(--pad-x);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.cueTrack {
+  position: relative;
+  width: 1px;
+  height: 34px;
+  background: var(--line-strong);
+  overflow: hidden;
+}
+
+.cueTrack::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 40%;
+  background: var(--blue);
+  animation: cue-move 1.8s var(--ease) infinite;
+}
+
+@keyframes cue-move {
+  from {
+    transform: translateY(-100%);
+  }
+
+  to {
+    transform: translateY(250%);
+  }
+}
+
+@media (max-width: 760px) {
+  .headline {
+    font-size: clamp(28px, 8vw, 38px);
+  }
+
+  .cue {
+    bottom: calc(28px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 380px) {
+  .headline {
+    font-size: 26px;
+  }
+}
+
+/* The cue marks a direction; it does not need to move to do that. */
+@media (prefers-reduced-motion: reduce) {
+  .cueTrack::after {
+    animation: none;
+    height: 100%;
+    opacity: 0.4;
+  }
+}

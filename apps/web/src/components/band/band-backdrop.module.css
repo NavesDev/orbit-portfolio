@@ -1,0 +1,21 @@
+/*
+ * The prototype's `.band-bg`. The inset overhang is what gives the grid room
+ * to drift without exposing an edge.
+ */
+.backdrop {
+  position: absolute;
+  inset: -10% -10%;
+  background-image: radial-gradient(circle, var(--line-strong) 1px, transparent 1px);
+  background-size: 34px 34px;
+  will-change: transform;
+}
+
+/*
+ * The drift is an inline style driven by scroll position, so only `!important`
+ * can override it from here — the same bargain the marquee strikes.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .backdrop {
+    transform: none !important;
+  }
+}

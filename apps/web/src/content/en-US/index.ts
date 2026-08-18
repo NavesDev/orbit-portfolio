@@ -3,13 +3,10 @@ import type { SiteContent } from '../types';
 /**
  * The required locale (FR-34): every key here must exist, because this is what
  * renders when `pt-BR` has no translation for a field.
- *
- * The strip's phrases come from the prototype. Proper nouns are not translated
- * (FR-35), so only the trailing words differ between the two modules.
- */
+ * */
 export const enUS: SiteContent = {
   nav: {
-    mark: 'DN',
+    mark: 'Davi Naves',
     skipToContent: 'Skip to content',
   },
   languageSwitcher: {
@@ -17,12 +14,27 @@ export const enUS: SiteContent = {
     localeLabels: { 'en-US': 'EN', 'pt-BR': 'PT' },
     localeNames: { 'en-US': 'English (EN)', 'pt-BR': 'Portuguese (PT)' },
   },
-  strip: {
-    phrases: [
-      { lead: 'Next.js', rest: '· React · Node' },
-      { lead: 'UNIP', rest: '· ADS · Brasília' },
-      { lead: 'Claude Code', rest: '· automation' },
-      { lead: 'PostgreSQL', rest: '· REST APIs' },
-    ],
+  hero: {
+    availability: {
+      open: 'Available for new projects',
+      closed: 'Not taking new projects',
+    },
+    headline: {
+      lead: 'Systems that ',
+      emphasis: 'really work',
+      trail: ', not just in the demo.',
+    },
+    scrollCue: 'Scroll to explore',
+  },
+  band: {
+    label: 'By the numbers',
+    statLabels: {
+      commits: 'public commits',
+      pullRequests: 'public pull requests',
+      coffee: 'cups of coffee this year',
+      years: 'years coding',
+    },
+    missingNote: 'Some figures could not be read from GitHub right now.',
+    unavailable: 'unavailable',
   },
 };

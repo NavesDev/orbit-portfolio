@@ -152,7 +152,7 @@ chosen so that something is visible early and the hardest piece is not last:
 | 3.5 | Projects section + cards | Data-driven, with modal |
 | 3.6 | Timeline + spine fill + expand toggle | |
 | 3.7 | Skills orbit + skill modal | Canvas, hit testing, `GetSkillUsage` |
-| 3.8 | Stat band | Static values from `content/stats.ts` |
+| 3.8 | Stat band | Live counts through `DeveloperStatsProvider`; a placeholder, not a stand-in, when there are none |
 | 3.9 | Scroll behaviours consolidated into one hook | Replaces the prototype's four listeners |
 
 ### Exit criteria

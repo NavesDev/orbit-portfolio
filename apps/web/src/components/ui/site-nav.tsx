@@ -15,6 +15,15 @@ const CONTENT_ANCHOR = '#content';
  * that inside a second, unnamed `<nav>` would list two indistinguishable
  * navigations to a screen reader.
  *
+ * The mark is the name, set in the same italic serif as the headline's
+ * emphasis. Initials needed a legend nobody is given, and the dot beside them
+ * was a bullet standing in for a mark.
+ *
+ * No cloud here, though the band below is full of them: the drawing is traced
+ * artwork whose stroke is a fill, so at the 22px this line allows it washes
+ * out and there is no line weight to raise. A wordmark that holds on its own
+ * beats an icon that only works above 48px — see `cloud-path.ts`.
+ *
  * A Server Component: only the switcher and the index need the client, and
  * only they declare `'use client'`.
  */
@@ -27,7 +36,6 @@ export function SiteNav({ locale }: { readonly locale: Locale }) {
         {content.nav.skipToContent}
       </a>
       <span className={styles.mark} translate="no">
-        <span className={styles.dot} aria-hidden="true" />
         {content.nav.mark}
       </span>
       <SectionIndex />

@@ -15,8 +15,19 @@ Presentation  ──▶  Application  ──▶  Domain  ◀──  Infrastructu
   no framework imports.
 - **Application** imports Domain only.
 - **Infrastructure** imports Domain and Application, to implement their ports.
-- **Presentation** imports Application only. It never touches a repository or a
-  database type.
+- **Presentation** imports Application only. It never touches a repository, a
+  database type or an HTTP client for someone else's API. The composition root
+  is the exception it is meant to be: it names every adapter once, in one
+  place, so that nothing else has to.
+
+**Infrastructure is two packages, not one.** `@portfolio/db` is the
+`persistence/` branch above and owns the portfolio's own database.
+`@portfolio/infra` is the `providers/` and `config/` branches and owns adapters
+to systems this project does not run. They are siblings and never import each
+other: a package named for a database that also holds an HTTP client for a
+forge is a package whose name has stopped being true. One folder per external
+system under `providers/`, so a fourth service is a folder rather than a fourth
+workspace package.
 
 Inversion happens at the port boundary: Application declares
 `ProjectRepository` as an interface, Infrastructure provides
@@ -42,12 +53,12 @@ src/
       social/          ListSocialLinks
     dto/               Use-case input/output shapes
   infrastructure/
-    persistence/
+    persistence/       @portfolio/db
       migrations/      Schema, in the order given in the data model
       repositories/    Postgres implementations of the ports
       mappers/         Row ⇄ domain entity
-    providers/         SystemClock
-    config/            Environment loading
+    providers/         @portfolio/infra — SystemClock, GitHubDeveloperStatsProvider
+    config/            @portfolio/infra — the names of the variables read
   presentation/
     web/               Pages, components, view models
     api/               Route handlers
@@ -69,7 +80,10 @@ src/
 | Skill usage union across two tables | Application (read model) | A projection across aggregates, driven by what the UI shows. |
 | `uuid`, `varchar(160)`, native enums | Infrastructure | Types the domain never names. |
 | Orbit colors, ring radii, icon rendering | Presentation | Visual decisions keyed off `category`. |
-| Hero copy, "years coding" | Presentation | Static content, not data. |
+| Hero copy, availability boolean | Presentation | Static content, not data. |
+| "years coding", "cups of coffee" | Presentation | Counted from the calendar against a constant in `content/site.ts`. Facts with no system to read them from. |
+| What an unreachable stats provider means | Application (`GetDeveloperStats`) | A policy about what the page owes the visitor, not error handling: no source, no configuration and a nonsensical answer are one fact — this cannot be vouched for — and the use case returns nothing rather than something plausible. How an absent figure looks is presentation's business. |
+| GitHub query syntax, status codes, API version | Infrastructure (`providers/`) | Types and vocabulary the application never names. |
 
 ## 4. Aggregates
 
@@ -98,10 +112,19 @@ way.
 | `SkillRepository` | `listAll`, `findUsage(skillId)`, `save`, `delete` |
 | `SocialLinkRepository` | `listPublished`, `save`, `delete` |
 | `Clock` | `today()` — makes "ongoing" and "expired" testable |
+| `DeveloperStatsProvider` | `fetchStats()` — public commit and pull-request counts for FR-21 |
 
 `findUsage` returns a `SkillUsage[]` read model, not entities. Reads and writes
 have different shapes; forcing both through one interface is what turns a
 repository into a leaky query builder.
+
+`DeveloperStatsProvider` is a port and not a repository, and the distinction is
+not cosmetic: it reads a system this project does not own, so it may be slow,
+rate-limited or simply absent. It declares exactly one failure,
+`DeveloperStatsUnavailableError`, and the use case behind it decides what an
+absent source means for the page — showing the static fallback and saying so.
+Adapters translate their own failures into that error; a `fetch` rejection
+reaching presentation would mean the boundary leaked.
 
 Every read use case takes a `Locale`. Repositories do **not** — they return
 entities holding a full `LocalizedText`, and the use case resolves the language

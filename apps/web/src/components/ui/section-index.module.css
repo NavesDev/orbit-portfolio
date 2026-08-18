@@ -1,6 +1,13 @@
+/*
+ * `--ink`, not `--ink-soft`, though the counter is secondary type. The nav is
+ * translucent, so its effective background is whatever scrolls under it: over
+ * a stat figure's blue, `--ink-soft` measures 3.5:1 against the tinted plate,
+ * under the 4.5:1 that 12px text needs. NFR-06 asks for a Lighthouse
+ * accessibility score of 95 or better, and this is the kind of thing it counts.
+ */
 .index {
   font-size: 12px;
-  color: #fff;
+  color: var(--ink);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.05em;
 }

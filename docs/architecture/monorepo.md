@@ -9,6 +9,7 @@ pnpm workspaces. **One deployable**, three shared packages.
 ├── packages/
 │   ├── core/                   Portfolio domain + application (framework-free)
 │   ├── db/                     Portfolio persistence: migrations, repositories
+│   ├── infra/                  Adapters to systems we do not run (GitHub)
 │   └── telemetry/              Access counting and audit — self-contained
 ├── docs/
 ├── package.json                Workspace root
@@ -71,16 +72,18 @@ apps/web/
     │           └── health/
     │               └── route.ts
     ├── components/
-    │   ├── hero/
+    │   ├── hero/               Headline, availability badge, particle field
+    │   ├── band/               Stat band — figures, labels, drifting grid
     │   ├── projects/
     │   ├── timeline/
     │   ├── skills/             Orbit canvas + skill modal
     │   ├── footer/
     │   └── ui/
     ├── content/                Static copy, one folder per locale
+    │   ├── site.ts             Locale-independent facts — availability, figures
     │   ├── pt-BR/              headline, tagline, stat band labels
-    │   └── en/
-    ├── lib/                    Composition root — wires packages into use cases
+    │   └── en-US/
+    ├── lib/                    Composition root — reads env, wires adapters into use cases
     └── styles/
 ```
 
@@ -89,6 +92,12 @@ not persisted — headline, tagline, years coding, stat band. Typed TypeScript,
 not a CMS: changing the hero copy is a commit. One folder per locale, with the
 same module shape in each, so a missing translation is a type error rather than
 a blank space.
+
+`site.ts` sits beside those folders and holds what is *not* copy: the
+availability boolean behind FR-02, the illustrative stat figures, and the month
+that `years coding` is counted from. None of it translates, and duplicating it
+into each locale would make it possible for the two to disagree about a fact
+rather than about a wording.
 
 ### The HTTP surface
 
@@ -164,6 +173,24 @@ packages/db/src/
 └── seed/                       Prototype content as seed rows
 ```
 
+## `packages/infra`
+
+The `providers/` and `config/` half of the Infrastructure layer: adapters to
+systems this project does not run. Sibling to `packages/db`, never imported by
+it, and it imports only `@portfolio/core`.
+
+```
+packages/infra/src/
+├── providers/
+│   └── github/                 DeveloperStatsProvider over the search API
+└── constants/                  Names of the environment variables read
+```
+
+One folder per external system. The package reads no environment itself: the
+composition root in `apps/web/src/lib/` reads the variables and passes values
+to a constructor, which is what lets the adapter be tested without setting a
+secret.
+
 ## `packages/telemetry` — Phase 6, empty
 
 Access counting and audit. Not implemented. Self-contained by design: its own domain, application and
@@ -182,6 +209,59 @@ packages/telemetry/src/
 
 `infrastructure/http/` holds request-level concerns so the route handler in
 `apps/web` stays thin and so they survive a future extraction to `apps/api`.
+
+## Constants belong to the module that owns them
+
+No magic numbers, no magic strings. Every literal that means something — a
+tuning value, an environment variable name, a length budget, a media query —
+lives in a `constants/` folder beside the code that reads it, never at the top
+of the file that happens to use it first and never in one workspace-wide bucket.
+
+```
+apps/web/src/lib/particles/
+├── constants/
+│   ├── field.ts            Spacing, damping, link distances
+│   └── paint.ts            Stroke widths, alphas
+├── field.ts
+└── draw.ts
+```
+
+A `constants/` folder sits at the level that owns the values. `field.ts` is read
+by two files in `lib/particles/`, so it lives there; `media-queries.ts` is read
+across components, so it lives in `apps/web/src/constants/`. The folder is the
+unit — one file per subject inside it, not one file per consumer.
+
+**Import the module as a namespace, never value by value:**
+
+```ts
+import * as FIELD_CONSTANTS from './constants/field';
+
+const spacing = FIELD_CONSTANTS.SPACING_WIDE;
+```
+
+Two things this buys, and one it costs.
+
+The import line is written once and does not grow. Adding a twelfth tuning value
+changes the constants file and the call site — not a third place listing every
+name in between.
+
+The `_CONSTANTS` suffix keeps a tuning table from reading as runtime state.
+`FIELD.DAMPING` looks like a field object with a damping property; `SPACING_WIDE`
+alone in the middle of a function looks like a local. Neither misreading is
+available once the prefix is there.
+
+It costs characters at every reference, and long expressions wrap that would
+otherwise fit. Wrap them — do not shorten the namespace to buy back the width.
+
+**Naming.** The namespace says what the table holds, not what the file is
+called. `components/hero/constants/particle-field.ts` is imported as
+`CANVAS_CONSTANTS` because canvas geometry is what is inside it. One namespace
+per imported module; if two would collide in one file, that is a signal the two
+tables are the same subject.
+
+**Exempt.** Package barrels (`src/index.ts`) re-export constants by name — that
+is the public API of the package, not a call site. Type-only imports
+(`import type { Layer } from './constants/sky'`) stay named.
 
 ## Dependency graph
 

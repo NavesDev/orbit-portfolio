@@ -19,17 +19,22 @@ describe('getContent', () => {
     );
   });
 
-  it('carries the same number of strip phrases in both locales', () => {
-    expect(getContent('pt-BR').strip.phrases).toHaveLength(
-      getContent('en-US').strip.phrases.length,
+  it('leaves the wordmark untranslated — it is a name (FR-35)', () => {
+    expect(getContent('pt-BR').nav.mark).toBe(getContent('en-US').nav.mark);
+  });
+
+  it('carries a label for every stat figure in both locales', () => {
+    expect(Object.keys(getContent('pt-BR').band.statLabels)).toEqual(
+      Object.keys(getContent('en-US').band.statLabels),
     );
   });
 
-  it('leaves proper nouns untranslated (FR-35)', () => {
-    const leads = (locale: 'en-US' | 'pt-BR') =>
-      getContent(locale).strip.phrases.map((phrase) => phrase.lead);
+  it('translates the availability badge in both directions (FR-02)', () => {
+    for (const locale of LOCALES) {
+      const { availability } = getContent(locale).hero;
 
-    expect(leads('pt-BR')).toEqual(leads('en-US'));
+      expect(availability.open).not.toBe(availability.closed);
+    }
   });
 
   it("names every locale in the reader's own language, including its visible label", () => {

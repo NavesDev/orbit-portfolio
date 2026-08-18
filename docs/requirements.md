@@ -70,8 +70,8 @@ requirement wins; see [Open against the prototype](#open-against-the-prototype).
 
 | ID | Requirement |
 | --- | --- |
-| FR-21 | MUST display the stat figures from static content, animating once on first view. |
-| FR-22 | MUST label placeholder figures as illustrative for as long as they are not real. |
+| FR-21 | MUST display the stat figures, animating once on first view. Commit and pull-request counts come from a `DeveloperStatsProvider`; the rest are counted from the calendar. |
+| FR-22 | MUST NOT present a figure it cannot vouch for. A figure with no source MUST render as an explicit placeholder, never as a stand-in number, and the band MUST account for it in the visitor's language. |
 | FR-23 | MUST list published social links ordered by `sort_order`, rendering `icon_svg` inline. |
 | FR-24 | Each social link MUST have an accessible name derived from `platform`. |
 
@@ -90,7 +90,7 @@ requirement wins; see [Open against the prototype](#open-against-the-prototype).
 | --- | --- |
 | NFR-01 | Pages MUST be statically generated and revalidated on a timer (`revalidate = 3600`). |
 | NFR-02 | Content MUST be read in Server Components; no Client Component may import the database package. |
-| NFR-03 | The database driver and connection string MUST NOT appear in the client bundle. |
+| NFR-03 | The database driver, the connection string and any provider credential MUST NOT appear in the client bundle. |
 | NFR-04 | Layout MUST work at 380 px, 760 px and desktop widths. |
 | NFR-05 | Modals MUST close on `Escape` and return focus to the trigger. |
 | NFR-06 | Lighthouse accessibility score MUST be ≥ 95. |
@@ -109,7 +109,7 @@ requirement wins; see [Open against the prototype](#open-against-the-prototype).
 | --- | --- | --- |
 | WN-01 | Telemetry endpoints | Deferred to Phase 6 — needs its own design pass |
 | WN-02 | Admin interface | Content is edited by SQL or seed until it hurts |
-| WN-03 | Live GitHub statistics | Figures stay illustrative and labelled as such |
+| WN-03 | ~~Live GitHub statistics~~ | **Brought into scope in #4.** Commit and pull-request counts are read through a port, and no stand-in when no account is configured or GitHub is unreachable: the figure renders as a placeholder instead, so the site never claims a number it did not read. The coffee figure is not read from anywhere either: it is two cups for every day of the year so far, which is a claim about a habit that a visitor can check against the date. With the counts live, nothing on the band is unaccounted for and its note is not rendered at all. |
 | WN-04 | Contact form | The footer links to e-mail |
 | WN-05 | Authentication | Nothing to protect while everything is public and read-only |
 | WN-06 | A third locale | Two are enough to prove the model; adding one is a key and a route segment |
@@ -123,13 +123,13 @@ each needs a decision before it earns an ID.
 
 | # | What the prototype does | Question |
 | --- | --- | --- |
-| OQ-01 | A fixed nav carrying a mark and a section index (`01 / 06`) that tracks the scrolled section. | Does it ship in v1, and does the index survive sections being added or removed? **Answered in #3:** ships. The index derives its position and its total from a section registry, so it cannot disagree with the page, and it renders nothing while the registry is empty. |
+| OQ-01 | A fixed nav carrying a mark and a section index (`01 / 06`) that tracks the scrolled section. | Does it ship in v1, and does the index survive sections being added or removed? **Answered in #3:** ships. The index derives its position and its total from a section registry, so it cannot disagree with the page, and it renders nothing while the registry is empty. **Revised in #4:** the mark is the author's name in the headline's italic serif, beside the site's cloud drawn small. The prototype's `DN` needed a legend nobody is given, and the dot beside it was a bullet standing in for a mark. |
 | OQ-02 | A scroll progress bar pinned to the top of the viewport. | Ships, or dropped as decoration? **Answered in #3:** ships, `aria-hidden`, scaled rather than resized. |
-| OQ-03 | A marquee strip below the hero, translated by scroll position rather than autoplaying, carrying four fixed phrases. | Ships? If so, its copy is static content and needs a `pt-BR` translation. **Answered in #3:** ships, copy in `content/`, and it honours `prefers-reduced-motion`. |
+| OQ-03 | A marquee strip below the hero, translated by scroll position rather than autoplaying, carrying four fixed phrases. | Ships? If so, its copy is static content and needs a `pt-BR` translation. **Answered in #3:** ships, copy in `content/`, and it honours `prefers-reduced-motion`. **Revised in #4:** the phrases are gone and the band draws a parallax sky instead. They named four technologies that the skills section already renders from the database, at length — the same claim in a worse form, and copy to keep in two languages. Drawn clouds carry no claim and no translation, so the band is now wholly decorative and `aria-hidden`. The scroll-driven motion and the reduced-motion rule are unchanged. |
 | OQ-04 | A closing CTA section — headline plus a call to action — which is also what physically contains the social links of FR-23. | FR-23 and FR-24 specify the links but nothing specifies the section around them. Its copy needs a home in `content/` and a `pt-BR` translation. |
 | OQ-05 | Each project card and project modal carries a bespoke decorative SVG. | No column holds it and it cannot be derived from `category`. Presentation keyed by `slug`, or a new column? See the extension points in [domain/data-model.md](domain/data-model.md#extension-points). |
 | OQ-06 | The card eyebrow embeds an ordinal — `01 — agendamento`. | FR-06 renders `projects.category` there. Is the ordinal derived from `sort_order` at render time, or genuinely part of the category text? Storing it duplicates the ordering in translatable copy. |
-| OQ-07 | The availability badge (FR-02) is fixed text. | FR-02 requires it to reflect a boolean. Where does that boolean live — a `content/` constant, or something else? |
+| OQ-07 | The availability badge (FR-02) is fixed text. | FR-02 requires it to reflect a boolean. Where does that boolean live — a `content/` constant, or something else? **Answered in #4:** a `content/` constant, `AVAILABLE_FOR_WORK`, outside the locale folders. Both phrases exist in both locales at all times. |
 
 Two places where the prototype is wrong and the requirement stands:
 
@@ -140,8 +140,11 @@ Two places where the prototype is wrong and the requirement stands:
 - **Animation lifetime.** Neither canvas in the prototype cancels its
   `requestAnimationFrame` loop. FR-04 exists to correct that.
 
-One place where the prototype already answers a requirement: the stat-band copy
-FR-22 asks for exists in its `pt-BR` form. Only the `en-US` translation is new.
+One place where the prototype looked like it answered a requirement and did
+not: its stat band carries the `pt-BR` copy FR-22 asks for, but the copy says
+the figures are illustrative, and the numbers under it were roughly double the
+author's real ones. FR-22 was rewritten in #4 to forbid the stand-in rather
+than to label it, so the prototype's line is not the copy that ships.
 
 ## Traceability
 
