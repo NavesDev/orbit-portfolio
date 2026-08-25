@@ -1,0 +1,27 @@
+/* The prototype's `.cta-orb`. */
+.orb {
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--blue-soft), transparent 70%);
+  will-change: transform;
+  pointer-events: none;
+}
+
+@media (max-width: 760px) {
+  .orb {
+    width: 340px;
+    height: 340px;
+  }
+}
+
+/*
+ * The drift is an inline style driven by scroll position, so only `!important`
+ * can override it from here — the same bargain the band's backdrop strikes.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .orb {
+    transform: none !important;
+  }
+}

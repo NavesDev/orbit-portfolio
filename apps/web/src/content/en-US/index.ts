@@ -37,4 +37,13 @@ export const enUS: SiteContent = {
     missingNote: 'Some figures could not be read from GitHub right now.',
     unavailable: 'unavailable',
   },
+  closing: {
+    headline: {
+      lead: "Let's build something ",
+      emphasis: 'done right',
+      trail: '.',
+    },
+    action: 'Start a conversation',
+    linksLabel: 'Links and contact',
+  },
 };

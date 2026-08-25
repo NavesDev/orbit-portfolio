@@ -24,6 +24,13 @@
 
   /* How far the nav's blurred plate reaches past the bar to fade out. */
   --nav-fade: 28px;
+
+  /*
+   * The footer's own height. The closing section subtracts it from the
+   * viewport so the two together fill one screen — the prototype pinned the
+   * links inside the section and had no need to name it.
+   */
+  --footer-height: 96px;
 }
 
 /* The prototype's mobile breakpoint. NFR-04's 380px sits inside it. */
