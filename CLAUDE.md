@@ -58,7 +58,10 @@ its files share one server and would race on schema. Test code never lives in
 published entry point is a harness that ships.
 
 CI (`.github/workflows/ci.yml`) runs, in order: `install --frozen-lockfile`,
-`typecheck`, `test`, `test:integration`, `build`. E2E runs against the Vercel
+`typecheck`, `test`, `test:integration`, `db:migrate` + `db:seed` into a
+`portfolio_build` database, `build`. The migrate and seed step is not
+housekeeping: pages are statically generated from rows, so `next build` needs a
+populated database or it has no page to emit. E2E runs against the Vercel
 preview, not in CI.
 
 ## Architecture
