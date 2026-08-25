@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { ENTITY_VIOLATIONS, InvalidEntityError } from '../errors/invalid-entity-error.ts';
 import {
   InvalidSocialLinkError,
   SOCIAL_LINK_VIOLATIONS,
@@ -25,7 +26,7 @@ function violationOf(overrides: Partial<SocialLinkProperties>): string {
   try {
     SocialLink.create(properties(overrides));
   } catch (error) {
-    if (error instanceof InvalidSocialLinkError) {
+    if (error instanceof InvalidSocialLinkError || error instanceof InvalidEntityError) {
       return error.violation;
     }
 
@@ -66,6 +67,18 @@ describe('SocialLink', () => {
     expect(violationOf({ platform: 'p'.repeat(41) })).toBe(
       SOCIAL_LINK_VIOLATIONS.PLATFORM_OVER_BUDGET,
     );
+  });
+
+  /* The id rule belongs to `Entity`, and this is what proves it still runs. */
+  it('rejects a blank id through the entity base', () => {
+    expect(violationOf({ id: '  ' })).toBe(ENTITY_VIOLATIONS.MISSING_ID);
+  });
+
+  it('is the same link as another with its id, whatever else changed', () => {
+    const original = SocialLink.create(properties());
+    const renamed = SocialLink.create(properties({ platform: 'github-mirror' }));
+
+    expect(original.equals(renamed)).toBe(true);
   });
 
   it('rejects a fractional sort order', () => {

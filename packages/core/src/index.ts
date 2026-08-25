@@ -26,6 +26,11 @@ export {
 } from './domain/constants/text-budgets.ts';
 export { DomainError } from './domain/errors/domain-error.ts';
 export {
+  ENTITY_VIOLATIONS,
+  InvalidEntityError,
+  type EntityViolation,
+} from './domain/errors/invalid-entity-error.ts';
+export {
   InvalidLocalizedTextError,
   LOCALIZED_TEXT_VIOLATIONS,
   type LocalizedTextViolation,
@@ -42,6 +47,7 @@ export {
 } from './domain/errors/invalid-social-link-error.ts';
 export { IconSvg } from './domain/value-objects/icon-svg.ts';
 export { LocalizedText } from './domain/value-objects/localized-text.ts';
+export { Entity, type EntityProperties } from './domain/entities/entity.ts';
 export { SocialLink, type SocialLinkProperties } from './domain/entities/social-link.ts';
 export { ApplicationError } from './application/errors/application-error.ts';
 export { DeveloperStatsUnavailableError } from './application/errors/developer-stats-unavailable-error.ts';

@@ -1,7 +1,6 @@
 import { DomainError } from './domain-error.ts';
 
 export const SOCIAL_LINK_VIOLATIONS = {
-  MISSING_ID: 'missing-id',
   MISSING_PLATFORM: 'missing-platform',
   PLATFORM_OVER_BUDGET: 'platform-over-budget',
   MISSING_URL: 'missing-url',

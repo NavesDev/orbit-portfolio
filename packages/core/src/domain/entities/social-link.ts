@@ -4,11 +4,11 @@ import {
   SOCIAL_LINK_VIOLATIONS,
 } from '../errors/invalid-social-link-error.ts';
 import { IconSvg } from '../value-objects/icon-svg.ts';
+import { Entity, type EntityProperties } from './entity.ts';
 
 const ALLOWED_URL_SCHEMES = new Set(SOCIAL_LINK_CONSTANTS.ALLOWED_URL_SCHEMES);
 
-export interface SocialLinkProperties {
-  readonly id: string;
+export interface SocialLinkProperties extends EntityProperties {
   readonly platform: string;
   readonly url: string;
   readonly iconSvg: IconSvg;
@@ -23,6 +23,9 @@ export interface SocialLinkProperties {
  * it. Nothing on it is translated: `platform` is a proper noun that doubles as
  * the link's accessible name, and a URL has no language.
  *
+ * The id and equality come from `Entity`; everything below is what makes this
+ * one a social link rather than an entity in general.
+ *
  * **The URL is validated here rather than by a `Url` value object.** The
  * generic one belongs to the project slice, where `repo_url` and `live_url`
  * make three call sites for it. Here the rule is narrower than a URL in
@@ -30,11 +33,12 @@ export interface SocialLinkProperties {
  * shared abstraction forward would mean writing it against one case and then
  * widening it against the next.
  */
-export class SocialLink {
-  private constructor(private readonly properties: SocialLinkProperties) {}
+export class SocialLink extends Entity<SocialLinkProperties> {
+  private constructor(properties: SocialLinkProperties) {
+    super(properties);
+  }
 
   static create(properties: SocialLinkProperties): SocialLink {
-    requirePresent(properties.id, SOCIAL_LINK_VIOLATIONS.MISSING_ID, 'A social link needs an id.');
     requirePresent(
       properties.platform,
       SOCIAL_LINK_VIOLATIONS.MISSING_PLATFORM,
@@ -58,10 +62,6 @@ export class SocialLink {
     }
 
     return new SocialLink({ ...properties, platform: properties.platform.trim() });
-  }
-
-  get id(): string {
-    return this.properties.id;
   }
 
   /** Also the link's accessible name (FR-24). */
