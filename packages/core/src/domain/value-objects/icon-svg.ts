@@ -71,54 +71,68 @@ export class IconSvg {
 /**
  * Walks the markup once, rejecting on the first thing that is not whitelisted.
  *
- * Depth is tracked so the scan can insist the whole string is one `svg`
- * element: markup that closes its root early could carry anything after it,
- * and a check that only looked at the first tag would not notice.
+ * The elements still open are kept by name, not counted, so the scan can
+ * insist the whole string is one properly nested `svg` element: markup that
+ * closes its root early could carry anything after it, and a check that only
+ * looked at the first tag would not notice. A counter would balance
+ * `<svg><path></svg></path>` back to zero and call it closed — elements that
+ * do not nest are elements a browser is free to reinterpret, so the names have
+ * to match, not just the arithmetic.
  */
 function scan(markup: string): void {
   let index = 0;
-  let depth = 0;
+  const open: string[] = [];
   let rootSeen = false;
 
   while (index < markup.length) {
     const nextTag = markup.indexOf('<', index);
 
     if (nextTag === -1) {
-      requireOnlyWhitespace(markup.slice(index), depth, rootSeen);
+      requireOnlyWhitespace(markup.slice(index), open.length, rootSeen);
       break;
     }
 
-    requireOnlyWhitespace(markup.slice(index, nextTag), depth, rootSeen);
+    requireOnlyWhitespace(markup.slice(index, nextTag), open.length, rootSeen);
 
     const tag = readTag(markup, nextTag);
 
     if (tag.closing) {
-      depth -= 1;
-
-      if (depth < 0) {
-        throw new InvalidIconSvgError(
-          ICON_SVG_VIOLATIONS.MALFORMED,
-          `An icon closes </${tag.name}> that was never opened.`,
-        );
-      }
+      requireClosesTheOpenElement(tag.name, open.pop());
     } else {
-      if (depth === 0) {
+      if (open.length === 0) {
         requireRoot(tag.name, rootSeen);
         rootSeen = true;
       }
 
       if (!tag.selfClosing) {
-        depth += 1;
+        open.push(tag.name);
       }
     }
 
     index = tag.end;
   }
 
-  if (depth !== 0 || !rootSeen) {
+  if (open.length > 0 || !rootSeen) {
     throw new InvalidIconSvgError(
       ICON_SVG_VIOLATIONS.MALFORMED,
       'An icon must be a single, closed <svg> element.',
+    );
+  }
+}
+
+/** The element a `</name>` has to be closing: the innermost one still open. */
+function requireClosesTheOpenElement(name: string, innermost: string | undefined): void {
+  if (innermost === undefined) {
+    throw new InvalidIconSvgError(
+      ICON_SVG_VIOLATIONS.MALFORMED,
+      `An icon closes </${name}> that was never opened.`,
+    );
+  }
+
+  if (innermost !== name) {
+    throw new InvalidIconSvgError(
+      ICON_SVG_VIOLATIONS.MALFORMED,
+      `An icon closes </${name}> while <${innermost}> is still open.`,
     );
   }
 }

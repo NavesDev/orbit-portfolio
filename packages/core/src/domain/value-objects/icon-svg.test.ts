@@ -114,6 +114,15 @@ describe('IconSvg', () => {
   });
 
   /*
+   * The closes balance, so a scan counting depth alone ends on zero and lets
+   * this through — markup whose elements do not nest is markup the browser is
+   * free to reinterpret.
+   */
+  it('rejects a close tag that does not close the element it sits in', () => {
+    expect(violationOf('<svg><path></svg></path>')).toBe(ICON_SVG_VIOLATIONS.MALFORMED);
+  });
+
+  /*
    * The tokenizer honours quotes, so this `>` does not end the tag. A scan
    * that split on `>` would see `<svg fill="` as a complete element and treat
    * the handler that follows as text.
