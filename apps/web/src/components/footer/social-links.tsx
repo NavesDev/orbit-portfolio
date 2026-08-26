@@ -29,6 +29,13 @@ function opensAPage(url: string): boolean {
  * The accessible name is `platform` verbatim (FR-24). Title-casing it here
  * would be a display rule this component would get wrong on the first
  * platform that capitalizes its own name in the middle.
+ *
+ * **The list is keyed by position.** `platform` is the only field left to key
+ * by — `SocialLinkView` drops `id` on purpose — and nothing constrains it to
+ * be unique, so two rows naming the same platform would collide and React
+ * would keep one. The order is fixed by the query and this component never
+ * reorders or filters, which is exactly the case where the index is a stable
+ * key rather than a lazy one.
  */
 export function SocialLinks({
   links,
@@ -40,8 +47,8 @@ export function SocialLinks({
   return (
     <footer className={styles.footer}>
       <ul className={styles.list} aria-label={label}>
-        {links.map((link) => (
-          <li key={link.platform}>
+        {links.map((link, position) => (
+          <li key={position}>
             <a
               className={styles.link}
               href={link.url}
