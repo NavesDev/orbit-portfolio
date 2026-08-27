@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { getContent } from '../../content/index';
-import styles from './not-found.module.css';
+import styles from './locale-not-found.module.css';
 
 /**
  * The locale-aware 404 (roadmap 4.3) — an unknown path under an already
@@ -19,6 +19,12 @@ import styles from './not-found.module.css';
  * URL itself. That this segment matched at all is what makes doing so safe —
  * `[locale]/layout.tsx` already rejected any first segment that is not a real
  * locale before this file could ever render.
+ *
+ * Its stylesheet is `locale-not-found.module.css`, not `not-found.module.css`
+ * — Turbopack's file-convention scanner matches on the `not-found` prefix
+ * regardless of extension, so a same-named CSS Module sitting beside this
+ * file gets swallowed as if it were another special file and never resolves
+ * as an importable module.
  */
 export default function LocaleNotFound() {
   const pathname = usePathname();

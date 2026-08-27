@@ -19,8 +19,17 @@ import { interTight, newsreader } from '../fonts';
  */
 export const revalidate = 3600;
 
-/** A segment outside `LOCALES` is a 404, not a locale to guess at. */
-export const dynamicParams = false;
+/**
+ * An unsupported locale still 404s (the `isLocale` check below throws
+ * `notFound()` for one), but not through `dynamicParams = false` here: that
+ * option is inherited by every dynamic segment nested under this layout, and
+ * in practice the ancestor's `false` wins even when a descendant segment
+ * (`/[locale]/projetos/[slug]`) declares its own `dynamicParams = true` to
+ * render an unlisted slug on demand — the override the docs describe did not
+ * take effect. Leaving this layout's own dynamicParams at Next's default
+ * (`true`) is what lets that override actually work; the runtime check is
+ * the real guard for an unsupported locale either way.
+ */
 
 /**
  * The design is light-only, and saying so is not decoration: without

@@ -18,6 +18,18 @@ import { getProjectDetail, listFeaturedProjects } from '../../../../lib/projects
  */
 export const revalidate = 3600;
 
+/**
+ * Explicit, even though `true` is Next's default: `[locale]/layout.tsx` used
+ * to set `dynamicParams = false` for unsupported locales, and that value
+ * turned out to be inherited by every dynamic segment nested under it,
+ * `slug` included — a slug outside `generateStaticParams` below 404ed at the
+ * router level, before this page's own `notFound()` call (and therefore
+ * `[locale]/not-found.tsx`'s localized message) ever ran. The layout no
+ * longer sets it, for exactly that reason; this line stays so the same
+ * regression can't come back from that direction either.
+ */
+export const dynamicParams = true;
+
 export async function generateStaticParams(): Promise<{ locale: string; slug: string }[]> {
   const params: { locale: string; slug: string }[] = [];
 
