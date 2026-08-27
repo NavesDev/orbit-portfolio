@@ -1,6 +1,6 @@
 'use client';
 
-import { useScrollProgress } from '../../hooks/use-scroll';
+import { useActiveSectionIndex } from '../../hooks/use-scroll';
 import styles from './section-index.module.css';
 import { SECTION_IDS } from './section-registry';
 
@@ -20,22 +20,20 @@ function format(ordinal: number): string {
  * noise, and hiding it here means the tasks that add sections need no
  * coordination with this component beyond appending an id.
  *
- * The active section comes from scroll progress across the registry rather
- * than the prototype's per-element `getBoundingClientRect` sweep, which cannot
- * run while no section exists. The task that adds the first section is free to
- * replace this derivation with one that measures elements.
+ * The active section comes from `useActiveSectionIndex`, which measures each
+ * registered section's actual position against the viewport — not a fraction
+ * of total scroll progress. An equal-division guess is only right while every
+ * section happens to be a similar height; the projects section broke that the
+ * moment it landed several cards tall between the hero and the band.
  */
 export function SectionIndex() {
-  const progress = useScrollProgress();
+  const activeIndex = useActiveSectionIndex(SECTION_IDS);
 
   if (SECTION_IDS.length === 0) {
     return null;
   }
 
-  const active = Math.min(
-    SECTION_IDS.length,
-    Math.floor(progress * SECTION_IDS.length) + FIRST_SECTION_ORDINAL,
-  );
+  const active = activeIndex + FIRST_SECTION_ORDINAL;
 
   return (
     <span className={styles.index}>
