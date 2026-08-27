@@ -1,0 +1,120 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(25, 25, 24, 0.5);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.card {
+  background: var(--bg);
+  border-radius: 16px;
+  border: 0.5px solid var(--line-strong);
+  max-width: 440px;
+  width: 100%;
+  padding: 32px;
+  position: relative;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+}
+
+.close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  border-radius: 24px;
+  border: 0.5px solid var(--line-strong);
+  background: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.close:hover,
+.close:focus-visible {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.visual {
+  aspect-ratio: 21 / 9;
+  border-radius: 12px;
+  background: var(--blue-soft, rgba(37, 106, 191, 0.1));
+  border: 0.5px solid var(--line);
+  margin-bottom: 22px;
+  overflow: hidden;
+}
+
+.kicker {
+  font-size: 11px;
+  color: var(--blue);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+
+.description {
+  font-size: 14px;
+  color: var(--ink-soft);
+  line-height: 1.65;
+  margin-bottom: 22px;
+  white-space: pre-wrap;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.sectionHeading {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.chips {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.chips span {
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 0.5px solid var(--line-strong);
+  color: var(--ink-soft);
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 16px;
+  border-radius: 24px;
+  text-decoration: none;
+  background: var(--ink);
+  color: var(--bg);
+  margin-top: 6px;
+}
+
+.action:hover,
+.action:focus-visible {
+  background: var(--blue);
+}
