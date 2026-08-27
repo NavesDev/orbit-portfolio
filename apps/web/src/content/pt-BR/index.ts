@@ -27,6 +27,16 @@ export const ptBR: SiteContent = {
     },
     scrollCue: 'Role para explorar',
   },
+  projects: {
+    kicker: 'Projetos selecionados',
+    heading: 'Cada card abaixo representa um problema real resolvido do início ao fim.',
+    viewAll: 'Ver todos os projetos',
+    detailsCta: 'Ver detalhes',
+    repoCta: 'Repositório',
+    modalTagsHeading: 'Tags',
+    modalSkillsHeading: 'Habilidades aplicadas',
+    closeModal: 'Fechar',
+  },
   band: {
     label: 'Números',
     statLabels: {

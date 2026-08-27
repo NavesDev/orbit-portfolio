@@ -62,6 +62,24 @@ export interface SiteContent {
     /** Beside the animated rule at the foot of the hero. */
     readonly scrollCue: string;
   };
+  /**
+   * The featured-projects section (FR-05–FR-10).
+   *
+   * `detailsCta` and `repoCta` are the card's two buttons; `modalTagsHeading`
+   * and `modalSkillsHeading` label the two lists inside the detail modal. The
+   * eyebrow's ordinal (`01 —`) is not copy — it is computed from list
+   * position (U-6) — so nothing here represents it.
+   */
+  readonly projects: {
+    readonly kicker: string;
+    readonly heading: string;
+    readonly viewAll: string;
+    readonly detailsCta: string;
+    readonly repoCta: string;
+    readonly modalTagsHeading: string;
+    readonly modalSkillsHeading: string;
+    readonly closeModal: string;
+  };
   readonly band: {
     /** Names the band's landmark; the section has no visible heading. */
     readonly label: string;

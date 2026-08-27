@@ -26,6 +26,16 @@ export const enUS: SiteContent = {
     },
     scrollCue: 'Scroll to explore',
   },
+  projects: {
+    kicker: 'Selected work',
+    heading: 'Each card below is a real problem solved start to finish.',
+    viewAll: 'See all projects',
+    detailsCta: 'View details',
+    repoCta: 'Repository',
+    modalTagsHeading: 'Tags',
+    modalSkillsHeading: 'Applied skills',
+    closeModal: 'Close',
+  },
   band: {
     label: 'By the numbers',
     statLabels: {
