@@ -48,7 +48,11 @@ export function ProjectCard({
   return (
     <article className={styles.card}>
       {card.visualSvg === null ? null : (
-        <div className={styles.visual} dangerouslySetInnerHTML={{ __html: card.visualSvg }} />
+        <div
+          className={styles.visual}
+          aria-hidden="true"
+          dangerouslySetInnerHTML={{ __html: card.visualSvg }}
+        />
       )}
 
       <div className={styles.meta}>

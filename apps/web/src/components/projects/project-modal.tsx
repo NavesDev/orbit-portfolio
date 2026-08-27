@@ -57,7 +57,11 @@ export function ProjectModal({
         </button>
 
         {detail.visualSvg === null ? null : (
-          <div className={styles.visual} dangerouslySetInnerHTML={{ __html: detail.visualSvg }} />
+          <div
+            className={styles.visual}
+            aria-hidden="true"
+            dangerouslySetInnerHTML={{ __html: detail.visualSvg }}
+          />
         )}
 
         {detail.category === null ? null : <p className={styles.kicker}>{detail.category}</p>}
