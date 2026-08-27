@@ -32,6 +32,7 @@ export interface SeedProject {
   category: Localized;
   description: Localized;
   tags: LocalizedList;
+  visualSvg: string | null;
   repoUrl: string | null;
   liveUrl: string | null;
   progressPercent: number;
@@ -84,6 +85,17 @@ function icon(body: string): string {
     ' fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"' +
     ` stroke-linejoin="round">${body}</svg>`
   );
+}
+
+/**
+ * A project's decorative visual (U-5): fixed colours rather than
+ * `currentColor` — this is a standalone illustration, not an icon inheriting
+ * a link's hover state — sized to the card's `4:3` box. Elements may carry a
+ * `class` naming one of `IconSvg`'s four whitelisted animations; the
+ * `@keyframes` themselves live in `apps/web`.
+ */
+function projectVisual(body: string): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 225">${body}</svg>`;
 }
 
 export const seedContent: SeedContent = {
@@ -147,6 +159,11 @@ export const seedContent: SeedContent = {
         'pt-BR': ['Next.js', 'TypeScript', 'PostgreSQL', 'Arquitetura limpa', 'Bilíngue'],
         'en-US': ['Next.js', 'TypeScript', 'PostgreSQL', 'Clean architecture', 'Bilingual'],
       },
+      visualSvg: projectVisual(
+        '<line x1="0" y1="75" x2="300" y2="75" stroke="rgb(37,106,191)" opacity="0.25"/>' +
+          '<line x1="100" y1="0" x2="100" y2="225" stroke="rgb(37,106,191)" opacity="0.25"/>' +
+          '<circle class="orbit-pulse" cx="100" cy="75" r="5" fill="rgb(37,106,191)"/>',
+      ),
       repoUrl: 'https://github.com/NavesDev/orbit-portfolio',
       liveUrl: null,
       progressPercent: 100,
@@ -250,6 +267,10 @@ export const seedContent: SeedContent = {
         'pt-BR': ['Ruby on Rails', 'Python', 'RAG', 'Finanças pessoais', 'Monorepo'],
         'en-US': ['Ruby on Rails', 'Python', 'RAG', 'Personal finance', 'Monorepo'],
       },
+      visualSvg: projectVisual(
+        '<circle class="orbit-spin" cx="150" cy="112" r="70" fill="none" stroke="rgb(37,106,191)" opacity="0.35" stroke-dasharray="8 10"/>' +
+          '<circle cx="150" cy="112" r="40" fill="none" stroke="rgb(37,106,191)" opacity="0.2"/>',
+      ),
       repoUrl: 'https://github.com/NavesDev/Navi',
       liveUrl: null,
       progressPercent: 70,
@@ -323,6 +344,11 @@ export const seedContent: SeedContent = {
         'pt-BR': ['TypeScript', 'React', 'Produtividade', 'Interface'],
         'en-US': ['TypeScript', 'React', 'Productivity', 'Interface'],
       },
+      visualSvg: projectVisual(
+        '<polyline class="orbit-draw" points="20,180 90,120 160,150 230,60 280,90" fill="none"' +
+          ' stroke="rgb(37,106,191)" stroke-width="2" opacity="0.6"/>' +
+          '<circle class="orbit-drift" cx="280" cy="90" r="5" fill="rgb(37,106,191)"/>',
+      ),
       repoUrl: 'https://github.com/NavesDev/Personal-Dashboard',
       liveUrl: null,
       progressPercent: 80,

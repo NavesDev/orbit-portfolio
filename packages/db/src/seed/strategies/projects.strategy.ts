@@ -11,16 +11,17 @@ export class ProjectsSeedStrategy implements SeedStrategy {
     for (const project of seedContent.projects) {
       const id = seedId('project', project.slug);
       await client.query(
-        `INSERT INTO projects (id, slug, title, category, description, tags, repo_url,
-                               live_url, progress_percent, started_on, ended_on,
+        `INSERT INTO projects (id, slug, title, category, description, tags, visual_svg,
+                               repo_url, live_url, progress_percent, started_on, ended_on,
                                is_featured, is_published, sort_order)
-              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
          ON CONFLICT (id) DO UPDATE
                 SET slug = EXCLUDED.slug,
                     title = EXCLUDED.title,
                     category = EXCLUDED.category,
                     description = EXCLUDED.description,
                     tags = EXCLUDED.tags,
+                    visual_svg = EXCLUDED.visual_svg,
                     repo_url = EXCLUDED.repo_url,
                     live_url = EXCLUDED.live_url,
                     progress_percent = EXCLUDED.progress_percent,
@@ -37,6 +38,7 @@ export class ProjectsSeedStrategy implements SeedStrategy {
           json(project.category),
           json(project.description),
           json(project.tags),
+          project.visualSvg,
           project.repoUrl,
           project.liveUrl,
           project.progressPercent,
