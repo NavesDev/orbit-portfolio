@@ -159,10 +159,12 @@ export const seedContent: SeedContent = {
         'pt-BR': ['Next.js', 'TypeScript', 'PostgreSQL', 'Arquitetura limpa', 'Bilíngue'],
         'en-US': ['Next.js', 'TypeScript', 'PostgreSQL', 'Clean architecture', 'Bilingual'],
       },
+      // A planet on its ring, one moon in orbit — the name, drawn.
       visualSvg: projectVisual(
-        '<line x1="0" y1="75" x2="300" y2="75" stroke="rgb(37,106,191)" opacity="0.25"/>' +
-          '<line x1="100" y1="0" x2="100" y2="225" stroke="rgb(37,106,191)" opacity="0.25"/>' +
-          '<circle class="orbit-pulse" cx="100" cy="75" r="5" fill="rgb(37,106,191)"/>',
+        '<circle cx="150" cy="112" r="34" fill="none" stroke="rgb(37,106,191)" stroke-width="2"/>' +
+          '<path d="M60,112 A90,26 0 1,0 240,112 A90,26 0 1,0 60,112" fill="none"' +
+          ' stroke="rgb(37,106,191)" stroke-width="1.5" opacity="0.45"/>' +
+          '<circle class="orbit-pulse" cx="228" cy="98" r="5" fill="rgb(37,106,191)"/>',
       ),
       repoUrl: 'https://github.com/NavesDev/orbit-portfolio',
       liveUrl: null,
@@ -267,9 +269,16 @@ export const seedContent: SeedContent = {
         'pt-BR': ['Ruby on Rails', 'Python', 'RAG', 'Finanças pessoais', 'Monorepo'],
         'en-US': ['Ruby on Rails', 'Python', 'RAG', 'Personal finance', 'Monorepo'],
       },
+      // A compass — Navi as in "navigate" — with a slowly turning needle.
       visualSvg: projectVisual(
-        '<circle class="orbit-spin" cx="150" cy="112" r="70" fill="none" stroke="rgb(37,106,191)" opacity="0.35" stroke-dasharray="8 10"/>' +
-          '<circle cx="150" cy="112" r="40" fill="none" stroke="rgb(37,106,191)" opacity="0.2"/>',
+        '<circle cx="150" cy="112" r="55" fill="none" stroke="rgb(37,106,191)" stroke-width="2"/>' +
+          '<circle cx="150" cy="112" r="55" fill="none" stroke="rgb(37,106,191)" opacity="0.25"' +
+          ' stroke-dasharray="2 6"/>' +
+          '<g class="orbit-spin">' +
+          '<polygon points="150,72 160,112 150,102 140,112" fill="rgb(37,106,191)"/>' +
+          '<polygon points="150,152 160,112 150,122 140,112" fill="rgb(37,106,191)" opacity="0.4"/>' +
+          '</g>' +
+          '<circle cx="150" cy="112" r="4" fill="rgb(37,106,191)"/>',
       ),
       repoUrl: 'https://github.com/NavesDev/Navi',
       liveUrl: null,
@@ -344,10 +353,16 @@ export const seedContent: SeedContent = {
         'pt-BR': ['TypeScript', 'React', 'Produtividade', 'Interface'],
         'en-US': ['TypeScript', 'React', 'Productivity', 'Interface'],
       },
+      // A gauge — the dashboard, literally — with the needle mid-read.
       visualSvg: projectVisual(
-        '<polyline class="orbit-draw" points="20,180 90,120 160,150 230,60 280,90" fill="none"' +
-          ' stroke="rgb(37,106,191)" stroke-width="2" opacity="0.6"/>' +
-          '<circle class="orbit-drift" cx="280" cy="90" r="5" fill="rgb(37,106,191)"/>',
+        '<path class="orbit-draw" d="M70,150 A80,80 0 0,1 230,150" fill="none"' +
+          ' stroke="rgb(37,106,191)" stroke-width="3"/>' +
+          '<line x1="90" y1="150" x2="90" y2="140" stroke="rgb(37,106,191)" opacity="0.4"/>' +
+          '<line x1="150" y1="72" x2="150" y2="82" stroke="rgb(37,106,191)" opacity="0.4"/>' +
+          '<line x1="210" y1="150" x2="210" y2="140" stroke="rgb(37,106,191)" opacity="0.4"/>' +
+          '<line class="orbit-drift" x1="150" y1="150" x2="185" y2="105" stroke="rgb(37,106,191)"' +
+          ' stroke-width="3" stroke-linecap="round"/>' +
+          '<circle cx="150" cy="150" r="6" fill="rgb(37,106,191)"/>',
       ),
       repoUrl: 'https://github.com/NavesDev/Personal-Dashboard',
       liveUrl: null,
