@@ -26,6 +26,12 @@ jobs:
 
     env:
       TEST_DATABASE_URL: postgres://portfolio:portfolio@localhost:5432/portfolio_test
+      # The home page is statically generated from database rows, so `next
+      # build` reads content the same way a Vercel build does. A separate
+      # database from the tests': the integration suite creates and drops
+      # scratch databases beside `portfolio_test`, and content the build reads
+      # has no business living where a test could reach it.
+      DATABASE_URL: postgres://portfolio:portfolio@localhost:5432/portfolio_build
 
     steps:
       - name: Checkout
@@ -51,6 +57,13 @@ jobs:
 
       - name: Integration tests
         run: pnpm test:integration
+
+      - name: Prepare the build database
+        run: |
+          psql "postgres://portfolio:portfolio@localhost:5432/portfolio_test" \
+            -v ON_ERROR_STOP=1 -c 'CREATE DATABASE portfolio_build'
+          pnpm db:migrate
+          pnpm db:seed
 
       - name: Build
         run: pnpm build

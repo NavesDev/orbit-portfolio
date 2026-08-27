@@ -82,4 +82,23 @@ export interface SiteContent {
      */
     readonly unavailable: string;
   };
+  /**
+   * The closing section (OQ-04 / U-2 — no `FR` names it; the prototype does).
+   *
+   * The headline reuses `Headline` rather than declaring a shape of its own:
+   * it is the same figure as the hero's, one emphasized fragment in italic
+   * serif, so it is the same type. The e-mail address the action points at is
+   * not here — it is a `social_links` row (WN-04), so the copy names the act
+   * and the database names the destination.
+   */
+  readonly closing: {
+    readonly headline: Headline;
+    /** The visible text of the mailto action. */
+    readonly action: string;
+    /**
+     * Names the footer's list of icon-only links for a screen reader. The
+     * links themselves are named by `platform` (FR-24); this names the group.
+     */
+    readonly linksLabel: string;
+  };
 }

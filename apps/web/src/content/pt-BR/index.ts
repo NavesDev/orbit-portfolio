@@ -38,4 +38,13 @@ export const ptBR: SiteContent = {
     missingNote: 'Alguns números não puderam ser lidos do GitHub agora.',
     unavailable: 'indisponível',
   },
+  closing: {
+    headline: {
+      lead: 'Vamos construir algo ',
+      emphasis: 'bem feito',
+      trail: '.',
+    },
+    action: 'Iniciar conversa',
+    linksLabel: 'Redes e contato',
+  },
 };

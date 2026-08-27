@@ -1,0 +1,96 @@
+/*
+ * The prototype's `.foot-links`, which it pins to the bottom of the CTA with
+ * `position: absolute`. Here it is a landmark of its own in normal flow, so
+ * the height it reserves is a token the closing section subtracts — the two
+ * together still fill one viewport, and neither has to guess the other's size.
+ */
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: var(--footer-height);
+  padding-bottom: 36px;
+}
+
+.list {
+  display: flex;
+  gap: 22px;
+  list-style: none;
+}
+
+.link {
+  color: var(--ink-faint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 0.5px solid var(--line);
+  text-decoration: none;
+  touch-action: manipulation;
+  transition:
+    color 0.25s var(--ease),
+    border-color 0.25s var(--ease),
+    transform 0.25s var(--ease);
+}
+
+.link:hover,
+.link:focus-visible {
+  color: var(--blue);
+  border-color: var(--blue-line);
+  transform: translateY(-2px);
+}
+
+/*
+ * A hairline border going blue is the hover affordance; on its own it is not a
+ * focus indicator a keyboard user can find. The ring is.
+ */
+.link:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+
+/*
+ * The icon is a `<span>` carrying the stored markup, so the size lives here
+ * rather than on the `width`/`height` the SVG was authored with.
+ */
+.icon {
+  display: flex;
+}
+
+.icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link {
+    transition: none;
+  }
+
+  .link:hover,
+  .link:focus-visible {
+    transform: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .footer {
+    padding-bottom: 26px;
+  }
+
+  .list {
+    gap: 16px;
+  }
+
+  .link {
+    width: 30px;
+    height: 30px;
+  }
+
+  .icon svg {
+    width: 14px;
+    height: 14px;
+  }
+}

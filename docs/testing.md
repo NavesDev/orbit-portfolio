@@ -195,7 +195,14 @@ all is a suite that stops being run.
 2. `pnpm typecheck`
 3. `pnpm test`
 4. `pnpm test:integration` against a PostgreSQL service container
-5. `pnpm build`
+5. `pnpm db:migrate` and `pnpm db:seed` into a `portfolio_build` database
+6. `pnpm build`
+
+Step 5 exists because the home page is statically generated from database rows
+(NFR-01): `next build` reads content, so a build with no database is a build
+with no page. It is a database of its own rather than the tests': the
+integration suite creates and drops scratch databases beside `portfolio_test`,
+and content the build reads has no business living where a test could reach it.
 
 E2E runs against the Vercel preview deployment, not in CI — it needs the real
 rendering and revalidation behaviour, which a local build does not reproduce.

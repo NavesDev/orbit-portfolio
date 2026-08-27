@@ -38,7 +38,7 @@ Inversion happens at the port boundary: Application declares
 ```
 src/
   domain/
-    entities/          Project, TimelineEntry, Skill, SocialLink
+    entities/          Entity (base), Project, TimelineEntry, Skill, SocialLink
     value-objects/     Slug, DateRange, Url, ProgressPercent, IconSvg,
                        LocalizedText
     enums/             SkillCategory, TimelineKind, Locale
@@ -96,6 +96,22 @@ src/
 
 Four repositories, not six: the join tables are persisted by the owning root's
 repository and never get one of their own.
+
+**Every entity extends `Entity`, and `Entity` holds only an id.** It carries the
+identity and the equality that follows from it: two entities of the same type
+sharing an id are the same entity however far their other fields have drifted,
+which is precisely what distinguishes an entity from a value object. Its
+constructor is `protected`, so each subclass still exposes a `create` of its own
+and no entity can be built unvalidated.
+
+What it deliberately does **not** hold is the rest of the columns almost every
+table shares. `created_at` and `updated_at` are on every table and belong to no
+object here — no rule in this layer reads them, and a domain that declares them
+is a domain shaped by its storage; they stay in the row types in
+`packages/db`. `is_published` and `sort_order` are not universal: `skills` has
+no published flag at all, because a skill is only visible through the project or
+timeline entry that uses it, so a base declaring one would make `Skill` answer a
+question nobody asks of it.
 
 `TimelineEntry` is a single entity with a `kind`, mirroring the table. If
 per-kind invariants appear later, it becomes an abstract root with

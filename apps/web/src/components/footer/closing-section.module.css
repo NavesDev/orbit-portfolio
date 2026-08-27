@@ -1,0 +1,102 @@
+/*
+ * The prototype's `.cta`, minus the links it used to contain.
+ *
+ * Its `height: 100vh` becomes `min-height` less the footer's own height: the
+ * links now sit in a sibling `<footer>`, and a fixed viewport height here
+ * would push them below the fold on every visit.
+ */
+.closing {
+  min-height: calc(100vh - var(--footer-height));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  padding: 0 var(--pad-x);
+  overflow: hidden;
+}
+
+.headline {
+  position: relative;
+  z-index: 2;
+  font-size: clamp(30px, 5vw, 54px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin-bottom: 28px;
+  /* The prototype breaks this line by hand; a measure does it at any width. */
+  max-width: 14ch;
+  text-wrap: balance;
+}
+
+.emphasis {
+  font-family: var(--font-newsreader), serif;
+  font-style: italic;
+  color: var(--blue);
+  font-weight: 400;
+}
+
+.action {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 26px;
+  border-radius: 40px;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  touch-action: manipulation;
+  transition: background-color 0.25s var(--ease);
+}
+
+/*
+ * The prototype moves only the arrow on hover, which leaves the control itself
+ * without feedback — and a keyboard with none at all. The background lifts
+ * towards the blue the rest of the page uses for its interactive state.
+ */
+.action:hover,
+.action:focus-visible {
+  background: var(--blue);
+}
+
+.action:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+
+.arrow {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.3s var(--ease);
+}
+
+.action:hover .arrow {
+  transform: translateX(4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .action,
+  .arrow {
+    transition: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .closing {
+    min-height: calc(90vh - var(--footer-height));
+  }
+
+  .headline {
+    font-size: clamp(26px, 8vw, 36px);
+    margin-bottom: 24px;
+  }
+
+  .action {
+    padding: 12px 22px;
+    font-size: 13px;
+  }
+}
