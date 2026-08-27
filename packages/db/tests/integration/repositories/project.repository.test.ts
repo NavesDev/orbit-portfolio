@@ -99,6 +99,24 @@ describe('PostgresProjectRepository', () => {
     expect(await repository().listFeatured()).toEqual([]);
   });
 
+  it('finds a published project by slug regardless of is_featured (roadmap 4.2)', async () => {
+    await insertProject(pool(), project({ isFeatured: false }));
+
+    const found = await repository().findPublishedBySlug('orbit-portfolio');
+
+    expect(found?.slug.toString()).toBe('orbit-portfolio');
+  });
+
+  it('returns null for an unpublished project by slug', async () => {
+    await insertProject(pool(), project({ isPublished: false }));
+
+    expect(await repository().findPublishedBySlug('orbit-portfolio')).toBeNull();
+  });
+
+  it('returns null for a slug that names no project', async () => {
+    expect(await repository().findPublishedBySlug('no-such-project')).toBeNull();
+  });
+
   it('reads a stored visual_svg back through IconSvg', async () => {
     const icon = IconSvg.create('<svg viewBox="0 0 24 24"><path class="orbit-pulse" d="M0 0"/></svg>');
     await insertProject(pool(), project({ visualSvg: icon }));

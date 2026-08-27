@@ -34,6 +34,10 @@ interface ProjectSkillUsageRow {
  * extra round trips cost nothing worth avoiding, and keeping the query a
  * single, obvious `WHERE project_id = $1` is worth more than folding it into
  * `listFeatured`'s own query.
+ *
+ * `findPublishedBySlug` backs the project detail page (roadmap 4.2) and
+ * checks only `is_published` — a project's own page exists whether or not it
+ * is currently featured on the home page.
  */
 export class PostgresProjectRepository extends BaseRepository implements ProjectRepository {
   constructor(db: Queryable) {
@@ -65,5 +69,18 @@ export class PostgresProjectRepository extends BaseRepository implements Project
       skillName: row.name,
       usageNote: row.usage_note === null ? null : LocalizedText.create(row.usage_note, USAGE_NOTE_MAX_LENGTH),
     }));
+  }
+
+  async findPublishedBySlug(slug: string): Promise<Project | null> {
+    const rows = await this.rows<ProjectRow>(
+      `SELECT ${PROJECT_COLUMNS}
+         FROM projects
+        WHERE slug = $1 AND is_published = true`,
+      [slug],
+    );
+
+    const [row] = rows;
+
+    return row === undefined ? null : projectMapper.toDomain(row);
   }
 }
