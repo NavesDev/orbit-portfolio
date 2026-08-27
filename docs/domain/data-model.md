@@ -235,6 +235,7 @@ the front end, keyed off `category`.
 | `repo_url` | `varchar(2048)` | yes | |
 | `live_url` | `varchar(2048)` | yes | |
 | `progress_percent` | `smallint` | yes | 0–100. Card progress bar. |
+| `visual_svg` | `text` | yes | Sanitized inline SVG, the card and modal's decorative visual (U-5). Same `IconSvg` value object as `social_links.icon_svg`; its whitelist additionally accepts a `class` attribute naming one of four predefined animations. |
 | `started_on` | `date` | yes | |
 | `ended_on` | `date` | yes | Null = in progress |
 | `is_featured` | `boolean` | no | Shown on the home page |
@@ -257,6 +258,19 @@ Indexes and constraints:
 "pt-BR": ["Calendário em tempo real"]}`. They are free labels rendered as chips and never
 queried on their own; normalized tag tables would add two tables, now doubled by
 translation, to serve a display detail.
+
+**Why `visual_svg` lives on the aggregate rather than being derived from
+`category` (U-5).** The prototype's artwork — a node grid, concentric rings, a
+line chart — differs per project in a way `category` cannot predict, unlike the
+skills orbit's ring colours, which are a fixed function of `skill_category`.
+Reusing `IconSvg` rather than introducing a second sanitizer keeps the one
+security boundary (NFR-07) responsible for every piece of markup this database
+ever renders as-is.
+
+**The eyebrow's ordinal is not part of `category` (U-6).** `01 — agendamento`
+is rendered from a project's position in the already-sorted list, computed by
+the front end, never stored — `category` holds only `agendamento`, in both
+locales. Storing the number would duplicate `sort_order` in translatable text.
 
 ---
 
