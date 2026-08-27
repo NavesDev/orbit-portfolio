@@ -1,0 +1,50 @@
+.section {
+  padding: 160px var(--pad-x) 90px;
+}
+
+.head {
+  max-width: 520px;
+  margin-bottom: 90px;
+}
+
+.kicker {
+  font-size: 13px;
+  color: var(--blue);
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+
+.heading {
+  font-size: clamp(26px, 3.2vw, 36px);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.viewAll {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 18px 0;
+  border-top: 0.5px solid var(--line);
+  text-decoration: none;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.viewAll:hover,
+.viewAll:focus-visible {
+  color: var(--blue);
+}
+
+@media (max-width: 760px) {
+  .section {
+    padding: 100px var(--pad-x) 56px;
+  }
+
+  .head {
+    margin-bottom: 56px;
+  }
+}
