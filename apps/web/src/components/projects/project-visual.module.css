@@ -1,0 +1,73 @@
+/**
+ * The four animation names IconSvg's whitelist allows a stored SVG's elements
+ * to name (U-5). `:global` is required: a class set inside
+ * `dangerouslySetInnerHTML`'d markup is never run through this module's own
+ * hashing, so an unwrapped `.orbitPulse` selector would never match it.
+ */
+@keyframes orbit-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes orbit-draw {
+  from {
+    stroke-dashoffset: 240;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes orbit-drift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+:global(.orbit-pulse) {
+  animation: orbit-pulse 2.4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+:global(.orbit-draw) {
+  stroke-dasharray: 240;
+  animation: orbit-draw 1.8s ease-out forwards;
+}
+
+:global(.orbit-drift) {
+  animation: orbit-drift 3.2s ease-in-out infinite;
+}
+
+:global(.orbit-spin) {
+  animation: orbit-spin 12s linear infinite;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(.orbit-pulse),
+  :global(.orbit-draw),
+  :global(.orbit-drift),
+  :global(.orbit-spin) {
+    animation: none;
+  }
+}

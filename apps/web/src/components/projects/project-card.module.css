@@ -1,0 +1,104 @@
+.card {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 64px;
+  align-items: center;
+  padding: 70px 0;
+  border-top: 0.5px solid var(--line);
+}
+
+.visual {
+  aspect-ratio: 4 / 3;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--blue-soft, rgba(37, 106, 191, 0.1));
+  border: 0.5px solid var(--blue-line, rgba(37, 106, 191, 0.35));
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.eyebrow {
+  font-size: 13px;
+  color: var(--blue);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.title {
+  font-size: clamp(22px, 2.4vw, 30px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tags span {
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  border: 0.5px solid var(--line-strong);
+  color: var(--ink-soft);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.detailsButton,
+.repoLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 16px;
+  border-radius: 24px;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+  border: 0.5px solid transparent;
+}
+
+.detailsButton {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.detailsButton:hover,
+.detailsButton:focus-visible {
+  background: var(--blue);
+}
+
+.repoLink {
+  background: none;
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.repoLink:hover,
+.repoLink:focus-visible {
+  border-color: var(--blue-line, rgba(37, 106, 191, 0.35));
+  color: var(--blue);
+}
+
+@media (max-width: 760px) {
+  .card {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 48px 0;
+  }
+
+  .visual {
+    aspect-ratio: 16 / 11;
+  }
+}
