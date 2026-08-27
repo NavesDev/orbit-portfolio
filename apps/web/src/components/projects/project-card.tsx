@@ -4,6 +4,7 @@ import type { ProjectCardView, ProjectDetailView } from '@portfolio/core';
 import { useRef, useState } from 'react';
 
 import type { SiteContent } from '../../content/types';
+import { GithubIcon } from '../ui/github-icon';
 import * as PROJECT_VISUAL_CONSTANTS from './constants/project-visual';
 import { ProgressBar } from './progress-bar';
 import { ProjectModal } from './project-modal';
@@ -81,6 +82,7 @@ export function ProjectCard({
 
           {detail.repoUrl === null ? null : (
             <a className={styles.repoLink} href={detail.repoUrl} target="_blank" rel="noopener">
+              <GithubIcon className={styles.repoIcon} />
               {content.repoCta}
             </a>
           )}

@@ -69,6 +69,11 @@
   border: 0.5px solid transparent;
 }
 
+.repoIcon {
+  width: 14px;
+  height: 14px;
+}
+
 .detailsButton {
   background: var(--ink);
   color: var(--bg);

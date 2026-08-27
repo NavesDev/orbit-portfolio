@@ -119,3 +119,8 @@
 .action:focus-visible {
   background: var(--blue);
 }
+
+.actionIcon {
+  width: 14px;
+  height: 14px;
+}

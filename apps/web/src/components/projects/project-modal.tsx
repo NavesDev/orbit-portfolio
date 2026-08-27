@@ -4,6 +4,7 @@ import type { ProjectDetailView } from '@portfolio/core';
 import { useEffect, type RefObject } from 'react';
 
 import type { SiteContent } from '../../content/types';
+import { GithubIcon } from '../ui/github-icon';
 import styles from './project-modal.module.css';
 
 const ESCAPE_KEY = 'Escape';
@@ -93,6 +94,7 @@ export function ProjectModal({
 
         {detail.repoUrl === null ? null : (
           <a className={styles.action} href={detail.repoUrl} target="_blank" rel="noopener">
+            <GithubIcon className={styles.actionIcon} />
             {content.repoCta}
           </a>
         )}
