@@ -9,10 +9,12 @@ import styles from './projects-section.module.css';
  * The featured-projects section (FR-05–FR-10, roadmap 3.5).
  *
  * A Server Component: `result` arrives already computed by
- * `listFeaturedProjects` in the page's composition root. The "see all
- * projects" link points at `/${locale}/projetos`, a route this sprint does not
- * build — the same relationship `ClosingSection` already has with `mailto:`, a
- * link to a destination a later task builds.
+ * `listFeaturedProjects` in the page's composition root. Each card's "ver
+ * detalhes" now navigates to `/${locale}/projetos/[slug]` (roadmap 4.2). The
+ * "see all projects" link still points at `/${locale}/projetos`, the list
+ * page — that one route remains out of scope, the same relationship
+ * `ClosingSection` already has with `mailto:`, a link to a destination a
+ * later task builds.
  */
 export function ProjectsSection({
   content,
@@ -37,6 +39,7 @@ export function ProjectsSection({
           card={card}
           detail={result.details[card.slug]!}
           content={content}
+          locale={locale}
         />
       ))}
 

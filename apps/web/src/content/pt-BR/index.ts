@@ -33,9 +33,14 @@ export const ptBR: SiteContent = {
     viewAll: 'Ver todos os projetos',
     detailsCta: 'Ver detalhes',
     repoCta: 'Repositório',
-    modalTagsHeading: 'Tags',
-    modalSkillsHeading: 'Habilidades aplicadas',
-    closeModal: 'Fechar',
+    tagsHeading: 'Tags',
+    skillsHeading: 'Habilidades aplicadas',
+    backCta: 'Voltar para o início',
+  },
+  notFound: {
+    heading: 'Página não encontrada',
+    body: 'A página que você está procurando não existe.',
+    backCta: 'Voltar para o início',
   },
   band: {
     label: 'Números',

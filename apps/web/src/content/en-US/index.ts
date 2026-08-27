@@ -32,9 +32,14 @@ export const enUS: SiteContent = {
     viewAll: 'See all projects',
     detailsCta: 'View details',
     repoCta: 'Repository',
-    modalTagsHeading: 'Tags',
-    modalSkillsHeading: 'Applied skills',
-    closeModal: 'Close',
+    tagsHeading: 'Tags',
+    skillsHeading: 'Applied skills',
+    backCta: 'Back to home',
+  },
+  notFound: {
+    heading: 'Page not found',
+    body: 'The page you are looking for does not exist.',
+    backCta: 'Back to home',
   },
   band: {
     label: 'By the numbers',

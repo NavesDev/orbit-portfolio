@@ -1,24 +1,20 @@
-'use client';
-
-import type { ProjectCardView, ProjectDetailView } from '@portfolio/core';
-import { useRef, useState } from 'react';
+import type { ProjectCardView, ProjectDetailView, Locale } from '@portfolio/core';
+import Link from 'next/link';
 
 import type { SiteContent } from '../../content/types';
 import { GithubIcon } from '../ui/github-icon';
 import * as PROJECT_VISUAL_CONSTANTS from './constants/project-visual';
 import { ProgressBar } from './progress-bar';
-import { ProjectModal } from './project-modal';
 import styles from './project-card.module.css';
 import './project-visual.module.css';
 
 /**
  * One project card (FR-05–FR-09).
  *
- * A Client Component, not split further, because its two interactive pieces —
- * the progress bar's once-only animation and the detail modal's open/close and
- * focus-return state — are both listed as Client Component categories
- * (`monorepo.md`: "hero canvas, skills orbit, modals") and share this card as
- * their one caller.
+ * A Server Component: with the detail modal gone (roadmap 4.2 — "ver
+ * detalhes" now navigates to `/[locale]/projetos/[slug]` instead of opening
+ * one), the card itself holds no client state. Only `ProgressBar`, its one
+ * interactive piece, declares `'use client'`.
  *
  * The eyebrow's ordinal is `ordinal`, a prop, not a field on `card` (U-6): it
  * is the project's position among the others on this render, computed by
@@ -30,15 +26,14 @@ export function ProjectCard({
   card,
   detail,
   content,
+  locale,
 }: {
   readonly ordinal: number;
   readonly card: ProjectCardView;
   readonly detail: ProjectDetailView;
   readonly content: SiteContent['projects'];
+  readonly locale: Locale;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-
   const eyebrow = `${ordinal
     .toString()
     .padStart(
@@ -71,14 +66,9 @@ export function ProjectCard({
         )}
 
         <div className={styles.actions}>
-          <button
-            type="button"
-            ref={triggerRef}
-            className={styles.detailsButton}
-            onClick={() => setIsOpen(true)}
-          >
+          <Link href={`/${locale}/projetos/${card.slug}`} className={styles.detailsButton}>
             {content.detailsCta}
-          </button>
+          </Link>
 
           {detail.repoUrl === null ? null : (
             <a className={styles.repoLink} href={detail.repoUrl} target="_blank" rel="noopener">
@@ -88,15 +78,6 @@ export function ProjectCard({
           )}
         </div>
       </div>
-
-      {isOpen ? (
-        <ProjectModal
-          detail={detail}
-          content={content}
-          onClose={() => setIsOpen(false)}
-          returnFocusTo={triggerRef}
-        />
-      ) : null}
     </article>
   );
 }

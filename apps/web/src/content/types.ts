@@ -63,12 +63,14 @@ export interface SiteContent {
     readonly scrollCue: string;
   };
   /**
-   * The featured-projects section (FR-05–FR-10).
+   * The featured-projects section and its detail page (FR-05–FR-10,
+   * roadmap 4.2).
    *
-   * `detailsCta` and `repoCta` are the card's two buttons; `modalTagsHeading`
-   * and `modalSkillsHeading` label the two lists inside the detail modal. The
-   * eyebrow's ordinal (`01 —`) is not copy — it is computed from list
-   * position (U-6) — so nothing here represents it.
+   * `detailsCta` and `repoCta` are the card's two controls; `tagsHeading` and
+   * `skillsHeading` label the two lists the detail page shows below the
+   * description; `backCta` returns from it to the home page. The eyebrow's
+   * ordinal (`01 —`) is not copy — it is computed from list position (U-6) —
+   * so nothing here represents it.
    */
   readonly projects: {
     readonly kicker: string;
@@ -76,9 +78,19 @@ export interface SiteContent {
     readonly viewAll: string;
     readonly detailsCta: string;
     readonly repoCta: string;
-    readonly modalTagsHeading: string;
-    readonly modalSkillsHeading: string;
-    readonly closeModal: string;
+    readonly tagsHeading: string;
+    readonly skillsHeading: string;
+    readonly backCta: string;
+  };
+  /**
+   * The site-wide 404 (roadmap 4.3), rendered inside `[locale]/layout.tsx` —
+   * unlike `app/not-found.tsx`, this one runs with a resolved locale and the
+   * page's own chrome (nav, fonts, styles) already in place.
+   */
+  readonly notFound: {
+    readonly heading: string;
+    readonly body: string;
+    readonly backCta: string;
   };
   readonly band: {
     /** Names the band's landmark; the section has no visible heading. */
