@@ -55,6 +55,25 @@ export const ALLOWED_ATTRIBUTES: readonly string[] = [
   'y2',
   'aria-hidden',
   'focusable',
+  'class',
+];
+
+/**
+ * The only values a `class` attribute may hold — one or more of these,
+ * space-separated (U-5).
+ *
+ * The animation itself — its `@keyframes` — is authored once in `apps/web`,
+ * in a stylesheet that names these same four classes; a stored SVG only ever
+ * *names* one, it never carries the animation's definition. That split is
+ * what keeps `visual_svg` a data column instead of a place CSS could be
+ * smuggled in: this whitelist bounds it to four fixed tokens, not to
+ * "anything that looks like a class name".
+ */
+export const ALLOWED_ANIMATION_CLASSES: readonly string[] = [
+  'orbit-pulse',
+  'orbit-draw',
+  'orbit-drift',
+  'orbit-spin',
 ];
 
 /**

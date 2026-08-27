@@ -3,6 +3,7 @@ import { ICON_SVG_VIOLATIONS, InvalidIconSvgError } from '../errors/invalid-icon
 
 const ALLOWED_TAGS = new Set(ICON_SVG_CONSTANTS.ALLOWED_TAGS);
 const ALLOWED_ATTRIBUTES = new Set(ICON_SVG_CONSTANTS.ALLOWED_ATTRIBUTES);
+const ALLOWED_ANIMATION_CLASSES = new Set(ICON_SVG_CONSTANTS.ALLOWED_ANIMATION_CLASSES);
 
 const TAG_NAME_START = /[a-zA-Z]/;
 const TAG_NAME_BODY = /[a-zA-Z0-9-]/;
@@ -331,9 +332,38 @@ function readAttributeValue(markup: string, from: number, attribute: string): nu
     value = markup.slice(from, index);
   }
 
-  requireAllowedScheme(value, attribute);
+  if (attribute === 'class') {
+    requireAllowedAnimationClasses(value);
+  } else {
+    requireAllowedScheme(value, attribute);
+  }
 
   return index;
+}
+
+/**
+ * A `class` is not a URL — the scheme denylist every other attribute goes
+ * through does not apply to it, and never should. Each space-separated token
+ * has to name one of the four animations the front end actually defines.
+ */
+function requireAllowedAnimationClasses(value: string): void {
+  const tokens = value.trim().split(WHITESPACE_EVERYWHERE).filter((token) => token.length > 0);
+
+  if (tokens.length === 0) {
+    throw new InvalidIconSvgError(
+      ICON_SVG_VIOLATIONS.DISALLOWED_CLASS,
+      'A "class" attribute must not be blank.',
+    );
+  }
+
+  for (const token of tokens) {
+    if (!ALLOWED_ANIMATION_CLASSES.has(token)) {
+      throw new InvalidIconSvgError(
+        ICON_SVG_VIOLATIONS.DISALLOWED_CLASS,
+        `"${token}" is not an allowed animation class.`,
+      );
+    }
+  }
 }
 
 /**
