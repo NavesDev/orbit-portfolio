@@ -110,3 +110,7 @@ export {
   ListFeaturedProjects,
   type ListFeaturedProjectsOutput,
 } from './application/use-cases/projects/list-featured-projects.ts';
+export {
+  GetProjectBySlug,
+  type GetProjectBySlugOutput,
+} from './application/use-cases/projects/get-project-by-slug.ts';

@@ -35,4 +35,12 @@ export class FakeProjectRepository implements ProjectRepository {
   listSkillUsage(projectId: string): Promise<ProjectSkillUsage[]> {
     return Promise.resolve([...(this.skillUsagesByProjectId.get(projectId) ?? [])]);
   }
+
+  findPublishedBySlug(slug: string): Promise<Project | null> {
+    const found = [...this.projects.values()].find(
+      (project) => project.slug.toString() === slug && project.isPublished,
+    );
+
+    return Promise.resolve(found ?? null);
+  }
 }

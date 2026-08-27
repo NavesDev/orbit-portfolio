@@ -2,13 +2,12 @@ import type { Project } from '../../../domain/entities/project.ts';
 import type { Locale } from '../../../domain/enums/locale.ts';
 import type { ProjectCardView } from '../../dto/project-card-view.ts';
 import type { ProjectDetailView } from '../../dto/project-detail-view.ts';
-import type { ProjectSkillView } from '../../dto/project-skill-view.ts';
 import type { ProjectRepository } from '../../ports/project-repository.ts';
-import type { ProjectSkillUsage } from '../../read-models/project-skill-usage.ts';
+import { toCardView, toDetailView } from './project-views.ts';
 
 export interface ListFeaturedProjectsOutput {
   readonly projects: readonly ProjectCardView[];
-  /** The same projects, keyed by `slug`, for the detail modal (FR-06–FR-10). */
+  /** The same projects, keyed by `slug`, for callers that need both at once. */
   readonly details: Readonly<Record<string, ProjectDetailView>>;
 }
 
@@ -18,10 +17,6 @@ export interface ListFeaturedProjectsOutput {
  * `limit` is applied after sorting, not before: `ProjectRepository.listFeatured`
  * returns every featured, published project with no cap, and capping earlier
  * than the sort could drop the very row `sort_order` would have put first.
- *
- * The card and the detail view are produced together, in one pass, because
- * this sprint has exactly one caller for both — the home page. A second use
- * case for the modal's data would have no second call site to justify it.
  */
 export class ListFeaturedProjects {
   constructor(private readonly repository: ProjectRepository) {}
@@ -59,36 +54,4 @@ function byOrder(left: Project, right: Project): number {
   const rightStarted = right.period.startedOn ?? '';
 
   return rightStarted.localeCompare(leftStarted);
-}
-
-function toCardView(project: Project, locale: Locale): ProjectCardView {
-  return {
-    slug: project.slug.toString(),
-    title: project.title.resolve(locale),
-    category: project.category?.resolve(locale) ?? null,
-    tags: project.tags === null ? [] : [...project.tags.resolve(locale)],
-    progressPercent: project.progress.value,
-    visualSvg: project.visualSvg?.toString() ?? null,
-  };
-}
-
-function toDetailView(
-  project: Project,
-  locale: Locale,
-  usages: readonly ProjectSkillUsage[],
-): ProjectDetailView {
-  return {
-    ...toCardView(project, locale),
-    description: project.description?.resolve(locale) ?? null,
-    repoUrl: project.repoUrl?.toString() ?? null,
-    liveUrl: project.liveUrl?.toString() ?? null,
-    skills: usages.map((usage) => toSkillView(usage, locale)),
-  };
-}
-
-function toSkillView(usage: ProjectSkillUsage, locale: Locale): ProjectSkillView {
-  return {
-    name: usage.skillName,
-    usageNote: usage.usageNote?.resolve(locale) ?? null,
-  };
 }
