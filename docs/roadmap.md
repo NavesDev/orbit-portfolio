@@ -149,7 +149,7 @@ chosen so that something is visible early and the hardest piece is not last:
 | 3.2 | Locale negotiation in `proxy.ts` + language switcher | `Accept-Language`, cookie, `en-US` fallback |
 | 3.3 | Hero (server) + canvas field (client) | First `'use client'` boundary |
 | 3.4 | Footer, social links | Smallest end-to-end slice: database → page |
-| 3.5 | Projects section + cards | Data-driven, with modal |
+| 3.5 | Projects section + cards | Data-driven; "ver detalhes" links to 4.2's page, pulled forward (sprint-01.md U-7) |
 | 3.6 | Timeline + spine fill + expand toggle | |
 | 3.7 | Skills orbit + skill modal | Canvas, hit testing, `GetSkillUsage` |
 | 3.8 | Stat band | Live counts through `DeveloperStatsProvider`; a placeholder, not a stand-in, when there are none |
@@ -178,15 +178,19 @@ chosen so that something is visible early and the hardest piece is not last:
 | # | Route | Content |
 | --- | --- | --- |
 | 4.1 | `/[locale]/projetos` | All published projects, `ListProjects(locale)` |
-| 4.2 | `/[locale]/projetos/[slug]` | Deep link to one project — the modal's content as a page |
-| 4.3 | `not-found.tsx` | Unknown slug, in the requested locale |
+| 4.2 | `/[locale]/projetos/[slug]` | ✅ Done in sprint 1, task 5 (U-7) — `GetProjectBySlug(slug, locale)` |
+| 4.3 | `not-found.tsx` | ✅ Done alongside 4.2 — `[locale]/not-found.tsx`, in the requested locale |
+
+Only 4.1 remains: the project list page. Nothing in the UI links to an
+unfeatured project yet, so it has no visitor-facing gap to close until this
+phase actually starts.
 
 ### Exit criteria
 
 - "Ver todos os projetos" navigates to `/projetos`.
-- A project is reachable and shareable by URL, not only through the modal.
-- An unpublished or unknown slug returns 404, not an empty page.
-- The same `slug` resolves in both locales (FR-36).
+- A project is reachable and shareable by URL. ✅ (4.2)
+- An unpublished or unknown slug returns 404, not an empty page. ✅ (4.3)
+- The same `slug` resolves in both locales (FR-36). ✅ (4.2)
 
 ---
 
