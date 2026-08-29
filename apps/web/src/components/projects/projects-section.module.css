@@ -1,5 +1,14 @@
+/*
+ * The top padding answers to the cloud band now, not to the hero. It was
+ * 160px when the section followed the hero directly and had to open the gap
+ * on its own; with the band moved in between, that gap is the band's 92px
+ * plus this, and the two together pushed the first card most of a screen away
+ * from the headline. 90px matches the section's own bottom padding, so what
+ * separates the band from the projects reads the same as what separates the
+ * projects from the stat band.
+ */
 .section {
-  padding: 160px var(--pad-x) 90px;
+  padding: 90px var(--pad-x) 90px;
 }
 
 .head {
@@ -41,7 +50,7 @@
 
 @media (max-width: 760px) {
   .section {
-    padding: 100px var(--pad-x) 56px;
+    padding: 56px var(--pad-x) 56px;
   }
 
   .head {
