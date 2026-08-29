@@ -44,8 +44,16 @@
   }
 }
 
+/*
+ * `transform-box: fill-box` is what makes `transform-origin: center` mean the
+ * element's own centre. An SVG element's default `transform-box` is
+ * `view-box`, so "center" was the centre of the `300×225` viewBox: a scaled
+ * element did not grow in place, it was thrown outward by 30% of its distance
+ * from the middle of the drawing. A dot in the corner of a card left the card.
+ */
 :global(.orbit-pulse) {
   animation: orbit-pulse 2.4s ease-in-out infinite;
+  transform-box: fill-box;
   transform-origin: center;
 }
 
@@ -60,6 +68,7 @@
 
 :global(.orbit-spin) {
   animation: orbit-spin 12s linear infinite;
+  transform-box: fill-box;
   transform-origin: center;
 }
 
