@@ -1,6 +1,18 @@
+/*
+ * The visual's column is capped rather than fractional. As `0.9fr` it grew
+ * with the viewport, and since the visual is a `4:3` box its height grew with
+ * it — at 1920px the column reached ~780px and the card stood ~725px tall, a
+ * single project filling most of a screen. A ceiling on the column is a
+ * ceiling on the card.
+ *
+ * The bound is on the columns, not on `.card` itself: the card's `border-top`
+ * is a rule across the page, the same full-bleed line the section's "view all"
+ * row draws, and capping the element would cut both short of the right margin
+ * while the section around them still spans it.
+ */
 .card {
   display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
+  grid-template-columns: minmax(0, 400px) minmax(0, 1fr);
   gap: 64px;
   align-items: center;
   padding: 70px 0;
@@ -22,10 +34,16 @@
   border: 0.5px solid var(--line-strong);
 }
 
+/*
+ * Capped for the same reason the column is, and at a measure the summary
+ * already respects: without it the text column simply absorbed every pixel
+ * the visual gave back.
+ */
 .meta {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  max-width: 560px;
 }
 
 .eyebrow {
