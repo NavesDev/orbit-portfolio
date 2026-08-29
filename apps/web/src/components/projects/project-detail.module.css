@@ -18,12 +18,19 @@
   color: var(--blue);
 }
 
+/*
+ * Neutral, because each project's visual now paints its own surface in its own
+ * palette (`seed/data.ts`'s `surface`): Navi is champagne on `#131313`, the
+ * dashboard extension is cyan on `#0d0d0f`. A blue tint and a blue hairline
+ * were this site's colours framing someone else's, and the border was the half
+ * that still showed once the SVG covered the background.
+ */
 .visual {
   aspect-ratio: 21 / 9;
   border-radius: 14px;
   overflow: hidden;
-  background: var(--blue-soft, rgba(37, 106, 191, 0.1));
-  border: 0.5px solid var(--blue-line, rgba(37, 106, 191, 0.35));
+  background: var(--bg);
+  border: 0.5px solid var(--line-strong);
   margin-bottom: 32px;
 }
 
