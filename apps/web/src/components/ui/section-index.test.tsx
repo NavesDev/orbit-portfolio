@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('./section-registry', () => ({ SECTION_IDS: [] }));
+vi.mock('next/navigation', () => ({ usePathname: () => '/pt-BR' }));
 
 import { SectionIndex } from './section-index';
 
