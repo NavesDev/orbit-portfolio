@@ -24,7 +24,8 @@ import { createDeveloperStatsProvider } from '../../lib/stats/stats-provider';
  *
  * The timeline and skills sections each arrive in their own sprint-1 task.
  * The cloud band is here because it belongs to the page's chrome, not to a
- * section.
+ * section, and it sits directly under the hero — where `CloudDrift`'s own
+ * doc has always placed it — rather than above the stat band.
  *
  * The footer sits outside `<main>` on purpose: `contentinfo` is a landmark of
  * the page, and a `<footer>` nested in `<main>` is scoped to it instead.
@@ -51,8 +52,8 @@ export default async function HomePage({
     <>
       <main id="content">
         <Hero content={content.hero} available={AVAILABLE_FOR_WORK} />
-        <ProjectsSection content={content.projects} result={projects} locale={locale} />
         <CloudDrift />
+        <ProjectsSection content={content.projects} result={projects} locale={locale} />
         <StatBand content={content.band} figures={figures} locale={locale} />
         <ClosingSection content={content.closing} links={links} />
       </main>
