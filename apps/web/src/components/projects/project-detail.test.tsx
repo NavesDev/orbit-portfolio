@@ -8,6 +8,7 @@ import { ProjectDetail } from './project-detail';
 const DETAIL: ProjectDetailView = {
   slug: 'orbit-portfolio',
   title: 'Orbit Portfolio',
+  summary: '**Bold** text and:',
   category: 'Personal portfolio',
   tags: ['Next.js', 'PostgreSQL'],
   progressPercent: 100,

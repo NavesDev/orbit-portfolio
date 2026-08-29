@@ -20,6 +20,11 @@ import './project-visual.module.css';
  * is the project's position among the others on this render, computed by
  * `ProjectsSection` from array index, so reordering `sort_order` changes it
  * for free.
+ *
+ * `summary` is the opening paragraph of the project's description, resolved
+ * by `toCardView` — plain text by the time it arrives here, so the card
+ * renders it directly rather than reaching for the Markdown renderer the
+ * detail page needs. Absent when the project has no description to open with.
  */
 export function ProjectCard({
   ordinal,
@@ -54,6 +59,8 @@ export function ProjectCard({
       <div className={styles.meta}>
         <p className={styles.eyebrow}>{eyebrow}</p>
         <h3 className={styles.title}>{card.title}</h3>
+
+        {card.summary === null ? null : <p className={styles.summary}>{card.summary}</p>}
 
         <div className={styles.tags}>
           {card.tags.map((tag) => (

@@ -10,6 +10,7 @@ const RESULT: ListFeaturedProjectsOutput = {
     {
       slug: 'first',
       title: 'First Project',
+      summary: 'The first project’s opening line.',
       category: 'Category A',
       tags: ['Next.js'],
       progressPercent: 50,
@@ -18,6 +19,7 @@ const RESULT: ListFeaturedProjectsOutput = {
     {
       slug: 'second',
       title: 'Second Project',
+      summary: null,
       category: 'Category B',
       tags: [],
       progressPercent: null,
@@ -28,6 +30,7 @@ const RESULT: ListFeaturedProjectsOutput = {
     first: {
       slug: 'first',
       title: 'First Project',
+      summary: 'The first project’s opening line.',
       category: 'Category A',
       tags: ['Next.js'],
       progressPercent: 50,
@@ -40,6 +43,7 @@ const RESULT: ListFeaturedProjectsOutput = {
     second: {
       slug: 'second',
       title: 'Second Project',
+      summary: null,
       category: 'Category B',
       tags: [],
       progressPercent: null,

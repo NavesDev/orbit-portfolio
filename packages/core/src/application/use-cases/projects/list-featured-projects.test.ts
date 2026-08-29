@@ -102,6 +102,7 @@ describe('ListFeaturedProjects', () => {
     expect(projects[0]).toEqual({
       slug: 'orbit-portfolio',
       title: 'Orbit Portfolio',
+      summary: 'A bilingual portfolio.',
       category: 'Personal portfolio',
       tags: ['Next.js'],
       progressPercent: 100,
@@ -131,6 +132,7 @@ describe('ListFeaturedProjects', () => {
     expect(details['orbit-portfolio']).toEqual({
       slug: 'orbit-portfolio',
       title: 'Orbit Portfolio',
+      summary: 'A bilingual portfolio.',
       category: 'Personal portfolio',
       tags: ['Next.js'],
       progressPercent: 100,
@@ -160,5 +162,48 @@ describe('ListFeaturedProjects', () => {
 
     expect(projects).toEqual([]);
     expect(details).toEqual({});
+  });
+
+  describe('the card summary', () => {
+    const description = (text: string) => LocalizedText.create({ 'en-US': text }, 8000);
+
+    it('lifts the opening paragraph, leaving the bullets behind', async () => {
+      const { projects } = await useCase([
+        project({
+          description: description(
+            'A bilingual portfolio built on persisted content.\n\n- **Clean architecture** in a monorepo.\n- Hand-written SQL.',
+          ),
+        }),
+      ]).execute('en-US', 10);
+
+      expect(projects[0]?.summary).toBe('A bilingual portfolio built on persisted content.');
+    });
+
+    it('summarises a project with no description to null', async () => {
+      const { projects } = await useCase([project({ description: null })]).execute('en-US', 10);
+
+      expect(projects[0]?.summary).toBeNull();
+    });
+
+    it('summarises to null rather than to markup when the description opens on a list', async () => {
+      const { projects } = await useCase([
+        project({ description: description('- **Clean architecture** in a monorepo.\n- Hand-written SQL.') }),
+      ]).execute('en-US', 10);
+
+      expect(projects[0]?.summary).toBeNull();
+    });
+
+    it('resolves the summary in the reader’s locale', async () => {
+      const { projects } = await useCase([
+        project({
+          description: LocalizedText.create(
+            { 'en-US': 'This site.\n\n- A bullet.', 'pt-BR': 'Este site.\n\n- Um bullet.' },
+            8000,
+          ),
+        }),
+      ]).execute('pt-BR', 10);
+
+      expect(projects[0]?.summary).toBe('Este site.');
+    });
   });
 });

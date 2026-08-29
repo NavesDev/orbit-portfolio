@@ -40,7 +40,7 @@ requirement wins; see [Open against the prototype](#open-against-the-prototype).
 | ID | Requirement |
 | --- | --- |
 | FR-05 | MUST list featured, published projects ordered by `sort_order`, then `started_on` descending. |
-| FR-06 | Each card MUST show title, category, tags and a progress bar reflecting `progress_percent`. |
+| FR-06 | Each card MUST show title, a one-line summary, category, tags and a progress bar reflecting `progress_percent`. The summary is the opening paragraph of `description`, not a column of its own. |
 | FR-07 | The progress bar MUST animate once, when the card enters the viewport. |
 | FR-08 | A card MUST open a detail view showing description, tags and applied skills. |
 | FR-09 | A card MUST link to `repo_url` when present, and omit the control when absent. |

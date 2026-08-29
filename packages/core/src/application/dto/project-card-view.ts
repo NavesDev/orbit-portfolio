@@ -10,6 +10,12 @@
 export interface ProjectCardView {
   readonly slug: string;
   readonly title: string;
+  /**
+   * A single line of prose for the card — the opening paragraph of
+   * `description`, or `null` when there is no description or it opens
+   * straight into a list. Plain text, not Markdown: see `toCardView`.
+   */
+  readonly summary: string | null;
   /** `null` when the project has no category (data-model.md § 3 — nullable). */
   readonly category: string | null;
   readonly tags: readonly string[];

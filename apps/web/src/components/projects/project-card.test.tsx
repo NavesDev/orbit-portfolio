@@ -8,6 +8,7 @@ import { ProjectCard } from './project-card';
 const CARD: ProjectCardView = {
   slug: 'orbit-portfolio',
   title: 'Orbit Portfolio',
+  summary: 'A bilingual portfolio built on persisted content.',
   category: 'Personal portfolio',
   tags: ['Next.js'],
   progressPercent: 100,
@@ -22,11 +23,11 @@ const DETAIL: ProjectDetailView = {
   skills: [],
 };
 
-function renderCard(ordinal = 1, detail = DETAIL) {
+function renderCard(ordinal = 1, detail = DETAIL, card = CARD) {
   return render(
     <ProjectCard
       ordinal={ordinal}
-      card={CARD}
+      card={card}
       detail={detail}
       content={getContent('en-US').projects}
       locale="en-US"
@@ -78,6 +79,22 @@ describe('ProjectCard', () => {
 
     expect(
       screen.queryByRole('link', { name: getContent('en-US').projects.repoCta }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the project’s summary line', () => {
+    renderCard();
+
+    expect(
+      screen.getByText('A bilingual portfolio built on persisted content.'),
+    ).toBeInTheDocument();
+  });
+
+  it('omits the summary line for a project that has none', () => {
+    renderCard(1, DETAIL, { ...CARD, summary: null });
+
+    expect(
+      screen.queryByText('A bilingual portfolio built on persisted content.'),
     ).not.toBeInTheDocument();
   });
 });
