@@ -1,0 +1,147 @@
+/*
+ * The visual's column is capped rather than fractional. As `0.9fr` it grew
+ * with the viewport, and since the visual is a `4:3` box its height grew with
+ * it — at 1920px the column reached ~780px and the card stood ~725px tall, a
+ * single project filling most of a screen. A ceiling on the column is a
+ * ceiling on the card.
+ *
+ * The bound is on the columns, not on `.card` itself: the card's `border-top`
+ * is a rule across the page, the same full-bleed line the section's "view all"
+ * row draws, and capping the element would cut both short of the right margin
+ * while the section around them still spans it.
+ */
+.card {
+  display: grid;
+  grid-template-columns: minmax(0, 400px) minmax(0, 1fr);
+  gap: 64px;
+  align-items: center;
+  padding: 70px 0;
+  border-top: 0.5px solid var(--line);
+}
+
+/*
+ * Neutral, because each project's visual now paints its own surface in its own
+ * palette (`seed/data.ts`'s `surface`): Navi is champagne on `#131313`, the
+ * dashboard extension is cyan on `#0d0d0f`. A blue tint and a blue hairline
+ * were this site's colours framing someone else's, and the border was the half
+ * that still showed once the SVG covered the background.
+ */
+.visual {
+  aspect-ratio: 4 / 3;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--bg);
+  border: 0.5px solid var(--line-strong);
+}
+
+/*
+ * Capped for the same reason the column is, and at a measure the summary
+ * already respects: without it the text column simply absorbed every pixel
+ * the visual gave back.
+ */
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 560px;
+}
+
+.eyebrow {
+  font-size: 13px;
+  color: var(--blue);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.title {
+  font-size: clamp(22px, 2.4vw, 30px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/*
+ * The card's lead line. Same size and colour as the detail page's prose, so a
+ * reader who follows "ver detalhes" meets the same sentence set the same way
+ * rather than a restyled echo of it. `--ink-soft` keeps it under the title in
+ * the hierarchy instead of competing with it.
+ */
+.summary {
+  font-size: 15px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  max-width: 52ch;
+}
+
+.tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tags span {
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  border: 0.5px solid var(--line-strong);
+  color: var(--ink-soft);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.detailsButton,
+.repoLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 16px;
+  border-radius: 24px;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+  border: 0.5px solid transparent;
+}
+
+.repoIcon {
+  width: 14px;
+  height: 14px;
+}
+
+.detailsButton {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.detailsButton:hover,
+.detailsButton:focus-visible {
+  background: var(--blue);
+}
+
+.repoLink {
+  background: none;
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.repoLink:hover,
+.repoLink:focus-visible {
+  border-color: var(--blue-line, rgba(37, 106, 191, 0.35));
+  color: var(--blue);
+}
+
+@media (max-width: 760px) {
+  .card {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 48px 0;
+  }
+
+  .visual {
+    aspect-ratio: 16 / 11;
+  }
+}

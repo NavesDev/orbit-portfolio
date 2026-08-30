@@ -5,9 +5,11 @@ import { StatBand } from '../../components/band/stat-band';
 import { ClosingSection } from '../../components/footer/closing-section';
 import { SocialLinks } from '../../components/footer/social-links';
 import { Hero } from '../../components/hero/hero';
+import { ProjectsSection } from '../../components/projects/projects-section';
 import { CloudDrift } from '../../components/ui/cloud-drift';
 import { getContent } from '../../content/index';
 import { AVAILABLE_FOR_WORK } from '../../content/site';
+import { listFeaturedProjects } from '../../lib/projects/projects-provider';
 import { listSocialLinks } from '../../lib/social/social-links-provider';
 import { resolveStatFigures } from '../../lib/stats/figures';
 import { createDeveloperStatsProvider } from '../../lib/stats/stats-provider';
@@ -20,9 +22,10 @@ import { createDeveloperStatsProvider } from '../../lib/stats/stats-provider';
  * sections themselves read nothing — which is what lets them be tested without
  * a locale, a constant or a date.
  *
- * The projects, timeline and skills sections each arrive in their own sprint-1
- * task. The cloud band is here because it belongs to the page's chrome, not to
- * a section.
+ * The timeline and skills sections each arrive in their own sprint-1 task.
+ * The cloud band is here because it belongs to the page's chrome, not to a
+ * section, and it sits directly under the hero — where `CloudDrift`'s own
+ * doc has always placed it — rather than above the stat band.
  *
  * The footer sits outside `<main>` on purpose: `contentinfo` is a landmark of
  * the page, and a `<footer>` nested in `<main>` is scoped to it instead.
@@ -39,9 +42,10 @@ export default async function HomePage({
   }
 
   const content = getContent(locale);
-  const [figures, links] = await Promise.all([
+  const [figures, links, projects] = await Promise.all([
     resolveStatFigures(new Date(), createDeveloperStatsProvider()),
     listSocialLinks(),
+    listFeaturedProjects(locale),
   ]);
 
   return (
@@ -49,6 +53,7 @@ export default async function HomePage({
       <main id="content">
         <Hero content={content.hero} available={AVAILABLE_FOR_WORK} />
         <CloudDrift />
+        <ProjectsSection content={content.projects} result={projects} locale={locale} />
         <StatBand content={content.band} figures={figures} locale={locale} />
         <ClosingSection content={content.closing} links={links} />
       </main>

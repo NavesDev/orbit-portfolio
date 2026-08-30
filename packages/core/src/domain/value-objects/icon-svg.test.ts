@@ -38,6 +38,36 @@ describe('IconSvg', () => {
     expect(() => IconSvg.create(`<svg viewBox="0 0 24 24">${shapes}</svg>`)).not.toThrow();
   });
 
+  it('accepts a class attribute naming one whitelisted animation', () => {
+    const markup = '<svg viewBox="0 0 24 24"><path class="orbit-pulse" d="M0 0"/></svg>';
+
+    expect(() => IconSvg.create(markup)).not.toThrow();
+  });
+
+  it('accepts a class attribute naming more than one whitelisted animation', () => {
+    const markup = '<svg viewBox="0 0 24 24"><path class="orbit-pulse orbit-drift" d="M0 0"/></svg>';
+
+    expect(() => IconSvg.create(markup)).not.toThrow();
+  });
+
+  it('rejects a class attribute naming an unlisted animation', () => {
+    const markup = '<svg viewBox="0 0 24 24"><path class="spin-forever" d="M0 0"/></svg>';
+
+    expect(violationOf(markup)).toBe(ICON_SVG_VIOLATIONS.DISALLOWED_CLASS);
+  });
+
+  it('rejects a class attribute where one of several tokens is unlisted', () => {
+    const markup = '<svg viewBox="0 0 24 24"><path class="orbit-pulse spin-forever" d="M0 0"/></svg>';
+
+    expect(violationOf(markup)).toBe(ICON_SVG_VIOLATIONS.DISALLOWED_CLASS);
+  });
+
+  it('rejects a blank class attribute', () => {
+    const markup = '<svg viewBox="0 0 24 24"><path class="" d="M0 0"/></svg>';
+
+    expect(violationOf(markup)).toBe(ICON_SVG_VIOLATIONS.DISALLOWED_CLASS);
+  });
+
   /*
    * One test per rejection, as testing.md asks of this value object: it is the
    * NFR-07 boundary, and a single test asserting "invalid markup throws" would

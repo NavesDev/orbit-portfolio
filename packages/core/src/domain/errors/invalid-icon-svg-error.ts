@@ -15,6 +15,7 @@ export const ICON_SVG_VIOLATIONS = {
   NOT_ROOTED_IN_SVG: 'not-rooted-in-svg',
   DISALLOWED_TAG: 'disallowed-tag',
   DISALLOWED_ATTRIBUTE: 'disallowed-attribute',
+  DISALLOWED_CLASS: 'disallowed-class',
   EVENT_HANDLER: 'event-handler',
   DENIED_SCHEME: 'denied-scheme',
   MALFORMED: 'malformed',

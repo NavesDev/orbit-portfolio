@@ -41,4 +41,10 @@ describe('getContent', () => {
     expect(getContent('en-US').languageSwitcher.localeNames['pt-BR']).toBe('Portuguese (PT)');
     expect(getContent('pt-BR').languageSwitcher.localeNames['pt-BR']).toBe('Português (PT)');
   });
+
+  it('carries a heading for the projects section in both locales', () => {
+    for (const locale of LOCALES) {
+      expect(getContent(locale).projects.heading.length).toBeGreaterThan(0);
+    }
+  });
 });

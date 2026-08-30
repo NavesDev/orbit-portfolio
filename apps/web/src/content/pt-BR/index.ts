@@ -27,6 +27,21 @@ export const ptBR: SiteContent = {
     },
     scrollCue: 'Role para explorar',
   },
+  projects: {
+    kicker: 'Projetos selecionados',
+    heading: 'Cada card abaixo representa um problema real resolvido do início ao fim.',
+    viewAll: 'Ver todos os projetos',
+    detailsCta: 'Ver detalhes',
+    repoCta: 'Repositório',
+    tagsHeading: 'Tags',
+    skillsHeading: 'Habilidades aplicadas',
+    backCta: 'Voltar para o início',
+  },
+  notFound: {
+    heading: 'Página não encontrada',
+    body: 'A página que você está procurando não existe.',
+    backCta: 'Voltar para o início',
+  },
   band: {
     label: 'Números',
     statLabels: {

@@ -26,6 +26,21 @@ export const enUS: SiteContent = {
     },
     scrollCue: 'Scroll to explore',
   },
+  projects: {
+    kicker: 'Selected work',
+    heading: 'Each card below is a real problem solved start to finish.',
+    viewAll: 'See all projects',
+    detailsCta: 'View details',
+    repoCta: 'Repository',
+    tagsHeading: 'Tags',
+    skillsHeading: 'Applied skills',
+    backCta: 'Back to home',
+  },
+  notFound: {
+    heading: 'Page not found',
+    body: 'The page you are looking for does not exist.',
+    backCta: 'Back to home',
+  },
   band: {
     label: 'By the numbers',
     statLabels: {

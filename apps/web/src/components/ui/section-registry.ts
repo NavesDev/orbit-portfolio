@@ -15,11 +15,13 @@
  * entry is a one-line change here and nothing else.
  */
 export const HERO_SECTION_ID = 'hero';
+export const PROJECTS_SECTION_ID = 'projects';
 export const BAND_SECTION_ID = 'band';
 export const CLOSING_SECTION_ID = 'closing';
 
 export const SECTION_IDS: readonly string[] = [
   HERO_SECTION_ID,
+  PROJECTS_SECTION_ID,
   BAND_SECTION_ID,
   CLOSING_SECTION_ID,
 ];

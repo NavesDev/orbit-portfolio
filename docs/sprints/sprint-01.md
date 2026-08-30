@@ -19,7 +19,10 @@ that a slice closes end-to-end instead of a whole layer closing at once.
 
 Sprint 1 covers Phase 1, Phase 2 and roadmap items 3.1–3.6, **except** the
 skills orbit and skill-usage modal (3.7). Phase 4 (subpages), Phase 5 (release)
-and Phase 6 (telemetry) are out of this sprint.
+and Phase 6 (telemetry) are out of this sprint — except 4.2 and 4.3, pulled
+into task 5 in place of the modal it originally specified (see U-7). The
+`/projetos` list page (4.1) stays out: nothing links to an unfeatured
+project's page yet, so it has no visitor-facing gap to close.
 
 ## Sprint Objective
 
@@ -168,24 +171,36 @@ no value until the project data behind them renders.
   `ProgressPercent`), the `ProjectRepository` port with its Postgres
   implementation, the `ListFeaturedProjects(locale, limit)` use case returning
   DTOs with the locale already resolved, and the rendered section: cards showing
-  title, category, tags and a progress bar, opening a client-side modal with
-  description, tags and applied skills, and linking to `repo_url` when present.
-  Includes the "see all projects" link to the project list in the current locale
-  — the `/projetos` route itself belongs to a later sprint. Roadmap 3.5; covers
-  FR-05–FR-10, NFR-05, NFR-13.
-- **Expected outcome:** The home page's centrepiece renders real projects in both
-  locales, with the detail interaction working by pointer and keyboard.
+  title, category, tags and a progress bar, and linking to `repo_url` when
+  present. Includes the "see all projects" link to the project list in the
+  current locale — the `/projetos` list route itself still belongs to a later
+  sprint (roadmap 4.1). Roadmap 3.5; covers FR-05–FR-10, NFR-05, NFR-13.
+
+  **Scope changed in #6.** "Ver detalhes" was specified as a client-side modal.
+  It opens `/[locale]/projetos/[slug]` instead — roadmap 4.2, pulled forward
+  into this task rather than left for Phase 4 — because a project a visitor
+  wants to actually read is better served by a page than a dialog: it is
+  shareable by URL, keeps browser back/forward, and needs no focus-return
+  logic of its own. `GetProjectBySlug(slug, locale)` (roadmap's own name for
+  4.2) backs it; `[locale]/not-found.tsx` (roadmap 4.3) 404s an unpublished
+  or nonexistent slug with a localized message rather than the generic root
+  one. See U-7.
+- **Expected outcome:** The home page's centrepiece renders real projects in
+  both locales, and each links to its own page with the description rendered
+  as Markdown, its tags and applied skills, and a link to `repo_url` when
+  present.
 - **Acceptance criteria:**
   - Featured, published projects only, ordered by `sort_order` then
     `started_on` descending (FR-05); unpublished content is unreachable (FR-28).
   - The progress bar animates once, when the card enters the viewport (FR-07).
   - A project without `repo_url` omits the control rather than rendering a dead
-    link (FR-09).
-  - The modal closes on `Escape` and returns focus to the trigger (NFR-05).
+    link (FR-09), on the card and on its detail page.
+  - An unknown or unpublished slug 404s with a localized message rather than
+    an empty or crashing page.
   - Client Components receive resolved `string`s, never `LocalizedText` or raw
     `jsonb` (NFR-13).
   - A field with no `pt-BR` translation renders its `en-US` text, not an empty node.
-  - Unit tests run the use case against in-memory fakes with no database.
+  - Unit tests run both use cases against in-memory fakes with no database.
 
 ### 6. Timeline section with featured/full toggle
 
@@ -257,5 +272,6 @@ on it starts.
 | U-2 | **Four elements of the prototype are covered by no `FR`**: the fixed nav with its section index, the scroll progress bar, the scroll-driven marquee strip, and the closing CTA section that contains the social links. | Tasks 2, 4 | [requirements.md](../requirements.md) enumerates hero, projects, timeline, skills, stat band and footer — the nav, progress bar, strip and CTA copy appear in none of them, while the README treats the prototype as the specification. They are scheduled into tasks 2 and 4 on that basis, but their requirement rows do not exist and their `en-US` copy has never been written. **Resolved in #3:** all three ship, driven by a section registry each later task appends to; the index renders nothing while that registry is empty. Their copy is authored in `content/`. **Revised in #4:** the strip's phrases were dropped for a drawn parallax sky, which removed the only copy the band had. **Closed in #5:** the fourth element, the closing CTA, ships with it — see OQ-04 in [requirements.md](../requirements.md) for what its copy is and why the links sit beside it rather than inside it. |
 | U-3 | Source of the availability boolean in FR-02. | Task 3 | The prototype has it as fixed text ("Disponível para novos projetos"), so it offers no boolean. FR-02 requires the text to reflect one, but no column in [data-model.md](../domain/data-model.md) and no `content/` item in [monorepo.md](../architecture/monorepo.md) holds it. **Resolved in #4:** a constant, `AVAILABLE_FOR_WORK` in `apps/web/src/content/site.ts`, beside the locale folders rather than inside them — a boolean has no translation. Each locale carries both phrases, so flipping it can never strand a language. Not an environment variable and not a column: the page is statically generated, so neither buys a change without a build, and a constant is the only one of the three the build checks. |
 | U-4 | `locale` cookie attributes — lifetime, `SameSite`, `Path`. | Task 2 | [stack.md](../architecture/stack.md) requires only that the choice "outlast one page" and survive closing the tab; the concrete values are unspecified. **Resolved in #3:** one year, `Lax`, `Path=/`, `Secure` outside development, not `HttpOnly`. See `apps/web/src/lib/locale/locale-cookie.ts`. |
-| U-5 | **The per-project decorative visual has no home in the model.** Every card and every project modal in the prototype carries a bespoke SVG — a node grid, concentric rings, a line chart. | Task 5 | No column holds it; [data-model.md](../domain/data-model.md) only acknowledges the absence by listing a media library as a future extension. Because the artwork differs per project, it cannot be derived from `category` the way the orbit's colours are. Either it becomes presentation keyed by `slug`, or it needs a column — a modelling decision no document has taken. |
-| U-6 | The card eyebrow embeds an ordinal — `01 — agendamento`, `02 — automação`. | Task 5 | FR-06 renders `projects.category` as the eyebrow. Storing the number inside it would duplicate `sort_order` in translatable text, so reordering projects would mean editing copy in two locales. Whether the ordinal is derived at render time or is genuinely part of the category is unstated. |
+| U-5 | **The per-project decorative visual has no home in the model.** Every card and every project modal in the prototype carries a bespoke SVG — a node grid, concentric rings, a line chart. | Task 5 | No column holds it; [data-model.md](../domain/data-model.md) only acknowledges the absence by listing a media library as a future extension. Because the artwork differs per project, it cannot be derived from `category` the way the orbit's colours are. Either it becomes presentation keyed by `slug`, or it needs a column — a modelling decision no document has taken. **Resolved in #6:** stored on the aggregate, `projects.visual_svg`, sanitized by the same `IconSvg` value object `social_links.icon_svg` uses. Its whitelist now also accepts a `class` attribute naming one of four predefined animations (`orbit-pulse`, `orbit-draw`, `orbit-drift`, `orbit-spin`), whose `@keyframes` are authored once in `apps/web` — a stored SVG names an animation, it never carries one. |
+| U-6 | The card eyebrow embeds an ordinal — `01 — agendamento`, `02 — automação`. | Task 5 | FR-06 renders `projects.category` as the eyebrow. Storing the number inside it would duplicate `sort_order` in translatable text, so reordering projects would mean editing copy in two locales. Whether the ordinal is derived at render time or is genuinely part of the category is unstated. **Resolved in #6:** derived at render time from position in the already-sorted list. `category` holds only the category text, in both locales, with no leading number. |
+| U-7 | Whether "ver detalhes" opens a modal (as specified in task 5) or a page — roadmap 4.2 already describes the page as future work: "the modal's content as a page". | Task 5 | The task 5 acceptance criteria, written before this uncertainty was raised, named a modal explicitly (NFR-05's "closes on `Escape` and returns focus to the trigger" is a modal-shaped requirement). **Resolved in #6:** a page, `/[locale]/projetos/[slug]` — roadmap 4.2 pulled forward into this task rather than deferred to Phase 4. A project a visitor wants to actually read is better served by a page: shareable by URL, keeps browser back/forward, no focus-return logic to write or to keep correct. `[locale]/not-found.tsx` (4.3) comes with it, so an unknown or unpublished slug still 404s, now with a localized message instead of the generic root one. Discovered along the way: `dynamicParams` set on a layout is inherited by every dynamic segment nested under it and cannot be loosened by a descendant page's own `dynamicParams = true` — `[locale]/layout.tsx`'s `dynamicParams = false`, meant only to 404 an unsupported locale, was silently 404ing every non-pre-rendered slug at the router level before this page's own `notFound()` call ever ran. The layout's runtime `isLocale` check was already the real guard, so the config option was simply removed there. |

@@ -62,6 +62,36 @@ export interface SiteContent {
     /** Beside the animated rule at the foot of the hero. */
     readonly scrollCue: string;
   };
+  /**
+   * The featured-projects section and its detail page (FR-05–FR-10,
+   * roadmap 4.2).
+   *
+   * `detailsCta` and `repoCta` are the card's two controls; `tagsHeading` and
+   * `skillsHeading` label the two lists the detail page shows below the
+   * description; `backCta` returns from it to the home page. The eyebrow's
+   * ordinal (`01 —`) is not copy — it is computed from list position (U-6) —
+   * so nothing here represents it.
+   */
+  readonly projects: {
+    readonly kicker: string;
+    readonly heading: string;
+    readonly viewAll: string;
+    readonly detailsCta: string;
+    readonly repoCta: string;
+    readonly tagsHeading: string;
+    readonly skillsHeading: string;
+    readonly backCta: string;
+  };
+  /**
+   * The site-wide 404 (roadmap 4.3), rendered inside `[locale]/layout.tsx` —
+   * unlike `app/not-found.tsx`, this one runs with a resolved locale and the
+   * page's own chrome (nav, fonts, styles) already in place.
+   */
+  readonly notFound: {
+    readonly heading: string;
+    readonly body: string;
+    readonly backCta: string;
+  };
   readonly band: {
     /** Names the band's landmark; the section has no visible heading. */
     readonly label: string;

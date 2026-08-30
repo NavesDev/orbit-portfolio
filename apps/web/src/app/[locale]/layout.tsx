@@ -19,9 +19,6 @@ import { interTight, newsreader } from '../fonts';
  */
 export const revalidate = 3600;
 
-/** A segment outside `LOCALES` is a 404, not a locale to guess at. */
-export const dynamicParams = false;
-
 /**
  * The design is light-only, and saying so is not decoration: without
  * `colorScheme` a visitor whose OS is dark gets dark native scrollbars and form
@@ -37,6 +34,16 @@ export const metadata: Metadata = {
   title: 'Davi Naves',
 };
 
+/**
+ * Both locales, prerendered — and no `dynamicParams = false` alongside them.
+ * That option is inherited by every dynamic segment nested under this layout,
+ * and in practice the ancestor's `false` wins even when a descendant segment
+ * (`/[locale]/projetos/[slug]`) declares its own `dynamicParams = true` to
+ * render an unlisted slug on demand — the override the docs describe did not
+ * take effect. Leaving this layout's own `dynamicParams` at Next's default
+ * (`true`) is what lets that override work; an unsupported locale is guarded
+ * at runtime by the `isLocale` check in the layout below, which 404s.
+ */
 export function generateStaticParams(): { locale: string }[] {
   return LOCALES.map((locale) => ({ locale }));
 }

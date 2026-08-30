@@ -1,3 +1,4 @@
+import { IconSvg } from '@portfolio/core';
 import { describe, expect, it } from 'vitest';
 import {
   seedContent,
@@ -115,6 +116,13 @@ describe('seed content', () => {
       for (const [, tag] of link.iconSvg.matchAll(/<\/?([a-zA-Z][a-zA-Z0-9]*)/g)) {
         expect(tag!, `${link.platform} icon uses <${tag}>`).toMatch(allowed);
       }
+    }
+  });
+
+  it('authors a project visualSvg that satisfies the IconSvg invariant (U-5)', () => {
+    for (const project of seedContent.projects) {
+      if (project.visualSvg === null) continue;
+      expect(() => IconSvg.create(project.visualSvg)).not.toThrow();
     }
   });
 

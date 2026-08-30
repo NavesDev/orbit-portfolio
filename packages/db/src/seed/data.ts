@@ -32,6 +32,7 @@ export interface SeedProject {
   category: Localized;
   description: Localized;
   tags: LocalizedList;
+  visualSvg: string | null;
   repoUrl: string | null;
   liveUrl: string | null;
   progressPercent: number;
@@ -84,6 +85,31 @@ function icon(body: string): string {
     ' fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"' +
     ` stroke-linejoin="round">${body}</svg>`
   );
+}
+
+/**
+ * A project's decorative visual (U-5): fixed colours rather than
+ * `currentColor` — this is a standalone illustration, not an icon inheriting
+ * a link's hover state — sized to the card's `4:3` box. Elements may carry a
+ * `class` naming one of `IconSvg`'s four whitelisted animations; the
+ * `@keyframes` themselves live in `apps/web`.
+ */
+function projectVisual(body: string): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 225">${body}</svg>`;
+}
+
+/**
+ * The visual's own background, in the project's own surface colour — each
+ * repository brings its palette with it rather than borrowing this site's.
+ *
+ * Drawn far outside the `300×225` viewBox on purpose. An SVG clips to its
+ * viewport, not to its viewBox, so one oversized rectangle covers both boxes
+ * the visual is placed in — the card's `4:3` and the detail page's `21:9`,
+ * where the viewBox is letterboxed and a rectangle cut to its bounds would
+ * leave bands of the container showing down either side.
+ */
+function surface(colour: string): string {
+  return `<rect x="-300" y="-300" width="900" height="825" fill="${colour}"/>`;
 }
 
 export const seedContent: SeedContent = {
@@ -147,6 +173,20 @@ export const seedContent: SeedContent = {
         'pt-BR': ['Next.js', 'TypeScript', 'PostgreSQL', 'Arquitetura limpa', 'Bilíngue'],
         'en-US': ['Next.js', 'TypeScript', 'PostgreSQL', 'Clean architecture', 'Bilingual'],
       },
+      // This site's own palette: paper `--bg` under `--blue` line work. A planet
+      // on its ring for the name, scattered through the hero's particle field.
+      visualSvg: projectVisual(
+        surface('rgb(250,250,248)') +
+          '<circle cx="52" cy="52" r="2" fill="rgb(37,106,191)" opacity="0.22"/>' +
+          '<circle cx="96" cy="34" r="1.5" fill="rgb(37,106,191)" opacity="0.16"/>' +
+          '<circle cx="246" cy="176" r="2" fill="rgb(37,106,191)" opacity="0.2"/>' +
+          '<circle cx="68" cy="188" r="1.5" fill="rgb(37,106,191)" opacity="0.16"/>' +
+          '<circle cx="262" cy="58" r="1.5" fill="rgb(37,106,191)" opacity="0.14"/>' +
+          '<path d="M60,112 A90,26 0 1,0 240,112 A90,26 0 1,0 60,112" fill="none"' +
+          ' stroke="rgb(37,106,191)" stroke-width="1.5" opacity="0.45"/>' +
+          '<circle cx="150" cy="112" r="34" fill="none" stroke="rgb(37,106,191)" stroke-width="2"/>' +
+          '<circle class="orbit-pulse" cx="228" cy="98" r="5" fill="rgb(37,106,191)"/>',
+      ),
       repoUrl: 'https://github.com/NavesDev/orbit-portfolio',
       liveUrl: null,
       progressPercent: 100,
@@ -250,6 +290,22 @@ export const seedContent: SeedContent = {
         'pt-BR': ['Ruby on Rails', 'Python', 'RAG', 'Finanças pessoais', 'Monorepo'],
         'en-US': ['Ruby on Rails', 'Python', 'RAG', 'Personal finance', 'Monorepo'],
       },
+      // The repository's own identity, not an invented one: `DESIGN.md` names
+      // the system "Quiet Luxury Financial AI" — champagne line work on
+      // `#131313`, never blue. An N in one unbroken stroke — down, across,
+      // up — with the arrow crossing it and breaking out past the top right,
+      // which is `apps/mobile/assets/navi-mark.png` reduced to what survives
+      // at card size. Drawn as two mirrored blades it read as an M: two peaks
+      // and a valley between them are not the letter the project is named for.
+      visualSvg: projectVisual(
+        surface('#131313') +
+          '<path d="M104,158 L104,74 L196,158 L196,74" fill="none" stroke="#d4c5b9"' +
+          ' stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
+          '<line class="orbit-drift" x1="122" y1="152" x2="206" y2="64" stroke="#f1e1d4"' +
+          ' stroke-width="2.5" stroke-linecap="round"/>' +
+          '<polyline class="orbit-drift" points="182,62 208,62 208,88" fill="none"' +
+          ' stroke="#f1e1d4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>',
+      ),
       repoUrl: 'https://github.com/NavesDev/Navi',
       liveUrl: null,
       progressPercent: 70,
@@ -323,6 +379,41 @@ export const seedContent: SeedContent = {
         'pt-BR': ['TypeScript', 'React', 'Produtividade', 'Interface'],
         'en-US': ['TypeScript', 'React', 'Productivity', 'Interface'],
       },
+      // The extension's actual new-tab screen, not a gauge: the `zinc` theme it
+      // ships with (`src/themes/index.ts`) — `#0d0d0f` under `#1c1c21` cards
+      // on `#2a2a32` hairlines, cyan `#22d3ee` accent — laid out as the
+      // README's screenshot has it. Clock, search field, quick links, then the
+      // widget grid.
+      //
+      // Deliberately still. A new tab is a screen at rest, and the one moving
+      // part here was a pulsing dot on a widget header — motion that stood for
+      // nothing the extension does.
+      visualSvg: projectVisual(
+        surface('#0d0d0f') +
+          '<circle cx="150" cy="42" r="16" fill="none" stroke="#22d3ee" stroke-width="2"/>' +
+          '<line x1="150" y1="42" x2="150" y2="32" stroke="#22d3ee" stroke-width="2"' +
+          ' stroke-linecap="round"/>' +
+          '<line x1="150" y1="42" x2="158" y2="46" stroke="#22d3ee" stroke-width="2"' +
+          ' stroke-linecap="round"/>' +
+          '<rect x="88" y="70" width="124" height="18" rx="9" fill="#1c1c21" stroke="#2a2a32"/>' +
+          '<circle cx="100" cy="79" r="3.5" fill="none" stroke="#8c8c9e" stroke-width="1.5"/>' +
+          '<rect x="112" y="96" width="34" height="12" rx="6" fill="#1c1c21" stroke="#2a2a32"/>' +
+          '<rect x="152" y="96" width="34" height="12" rx="6" fill="#1c1c21" stroke="#2a2a32"/>' +
+          '<rect x="42" y="120" width="102" height="70" rx="8" fill="#1c1c21" stroke="#2a2a32"/>' +
+          '<circle cx="56" cy="134" r="4" fill="#22d3ee"/>' +
+          '<rect x="66" y="132" width="34" height="4" rx="2" fill="#8c8c9e" opacity="0.5"/>' +
+          '<rect x="56" y="150" width="74" height="4" rx="2" fill="#8c8c9e" opacity="0.3"/>' +
+          '<rect x="56" y="162" width="62" height="4" rx="2" fill="#8c8c9e" opacity="0.3"/>' +
+          '<rect x="56" y="174" width="48" height="4" rx="2" fill="#8c8c9e" opacity="0.3"/>' +
+          '<rect x="156" y="120" width="102" height="32" rx="8" fill="#1c1c21" stroke="#2a2a32"/>' +
+          '<circle cx="170" cy="132" r="4" fill="#818cf8"/>' +
+          '<rect x="180" y="130" width="30" height="4" rx="2" fill="#8c8c9e" opacity="0.5"/>' +
+          '<rect x="170" y="142" width="62" height="4" rx="2" fill="#8c8c9e" opacity="0.3"/>' +
+          '<rect x="156" y="158" width="102" height="32" rx="8" fill="#1c1c21" stroke="#2a2a32"/>' +
+          '<circle cx="170" cy="170" r="4" fill="#22d3ee"/>' +
+          '<rect x="180" y="168" width="30" height="4" rx="2" fill="#8c8c9e" opacity="0.5"/>' +
+          '<rect x="170" y="180" width="54" height="4" rx="2" fill="#8c8c9e" opacity="0.3"/>',
+      ),
       repoUrl: 'https://github.com/NavesDev/Personal-Dashboard',
       liveUrl: null,
       progressPercent: 80,

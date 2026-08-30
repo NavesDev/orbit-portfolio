@@ -17,7 +17,8 @@
     "@portfolio/infra": "workspace:*",
     "next": "^16.3.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-markdown": "^9.0.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",

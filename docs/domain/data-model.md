@@ -230,11 +230,12 @@ the front end, keyed off `category`.
 | `slug` | `varchar(120)` | no | Unique, untranslated. URL and deep-link target. |
 | `title` | `jsonb` | no | Localized, ≤ 160 per locale |
 | `category` | `jsonb` | yes | Localized, ≤ 40. Card eyebrow. |
-| `description` | `jsonb` | yes | Localized, ≤ 8000. Markdown. |
+| `description` | `jsonb` | yes | Localized, ≤ 8000. Markdown; see the lead-paragraph rule below. |
 | `tags` | `jsonb` | yes | Localized array of strings, ≤ 8 items of ≤ 60 |
 | `repo_url` | `varchar(2048)` | yes | |
 | `live_url` | `varchar(2048)` | yes | |
 | `progress_percent` | `smallint` | yes | 0–100. Card progress bar. |
+| `visual_svg` | `text` | yes | Sanitized inline SVG, the card and modal's decorative visual (U-5). Same `IconSvg` value object as `social_links.icon_svg`; its whitelist additionally accepts a `class` attribute naming one of four predefined animations. |
 | `started_on` | `date` | yes | |
 | `ended_on` | `date` | yes | Null = in progress |
 | `is_featured` | `boolean` | no | Shown on the home page |
@@ -253,10 +254,30 @@ Indexes and constraints:
 - `ck_projects__description`: `description IS NULL OR is_localized(description, 8000)`
 - `ck_projects__tags`: `tags IS NULL OR is_localized_array(tags, 60, 8)`
 
+`description` opens on a lead paragraph, then a blank line, then the bullets.
+That lead paragraph has no inline markup: no `**bold**`, no backticks, no
+links. The card's one-line summary is lifted from it verbatim (FR-06), and a
+card is not a Markdown renderer, so markup written there is shown to the reader
+as literal asterisks. Emphasis belongs in the bullets, which only the detail
+page renders.
+
 `tags` holds one array per locale — `{"en-US": ["Real-time calendar"],
 "pt-BR": ["Calendário em tempo real"]}`. They are free labels rendered as chips and never
 queried on their own; normalized tag tables would add two tables, now doubled by
 translation, to serve a display detail.
+
+**Why `visual_svg` lives on the aggregate rather than being derived from
+`category` (U-5).** The prototype's artwork — a node grid, concentric rings, a
+line chart — differs per project in a way `category` cannot predict, unlike the
+skills orbit's ring colours, which are a fixed function of `skill_category`.
+Reusing `IconSvg` rather than introducing a second sanitizer keeps the one
+security boundary (NFR-07) responsible for every piece of markup this database
+ever renders as-is.
+
+**The eyebrow's ordinal is not part of `category` (U-6).** `01 — agendamento`
+is rendered from a project's position in the already-sorted list, computed by
+the front end, never stored — `category` holds only `agendamento`, in both
+locales. Storing the number would duplicate `sort_order` in translatable text.
 
 ---
 

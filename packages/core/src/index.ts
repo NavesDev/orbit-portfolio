@@ -65,3 +65,52 @@ export {
   ListSocialLinks,
   type ListSocialLinksOutput,
 } from './application/use-cases/social/list-social-links.ts';
+export {
+  InvalidSlugError,
+  SLUG_VIOLATIONS,
+  type SlugViolation,
+} from './domain/errors/invalid-slug-error.ts';
+export { Slug } from './domain/value-objects/slug.ts';
+export {
+  InvalidUrlError,
+  URL_VIOLATIONS,
+  type UrlViolation,
+} from './domain/errors/invalid-url-error.ts';
+export { Url } from './domain/value-objects/url.ts';
+export {
+  DATE_RANGE_VIOLATIONS,
+  InvalidDateRangeError,
+  type DateRangeViolation,
+} from './domain/errors/invalid-date-range-error.ts';
+export { DateRange, type DateRangeProperties } from './domain/value-objects/date-range.ts';
+export {
+  InvalidProgressPercentError,
+  PROGRESS_PERCENT_VIOLATIONS,
+  type ProgressPercentViolation,
+} from './domain/errors/invalid-progress-percent-error.ts';
+export { ProgressPercent } from './domain/value-objects/progress-percent.ts';
+export {
+  InvalidLocalizedTagListError,
+  LOCALIZED_TAG_LIST_VIOLATIONS,
+  type LocalizedTagListViolation,
+} from './domain/errors/invalid-localized-tag-list-error.ts';
+export { LocalizedTagList } from './domain/value-objects/localized-tag-list.ts';
+export {
+  InvalidProjectError,
+  PROJECT_VIOLATIONS,
+  type ProjectViolation,
+} from './domain/errors/invalid-project-error.ts';
+export { Project, type ProjectProperties } from './domain/entities/project.ts';
+export type { ProjectSkillUsage } from './application/read-models/project-skill-usage.ts';
+export type { ProjectRepository } from './application/ports/project-repository.ts';
+export type { ProjectCardView } from './application/dto/project-card-view.ts';
+export type { ProjectSkillView } from './application/dto/project-skill-view.ts';
+export type { ProjectDetailView } from './application/dto/project-detail-view.ts';
+export {
+  ListFeaturedProjects,
+  type ListFeaturedProjectsOutput,
+} from './application/use-cases/projects/list-featured-projects.ts';
+export {
+  GetProjectBySlug,
+  type GetProjectBySlugOutput,
+} from './application/use-cases/projects/get-project-by-slug.ts';
