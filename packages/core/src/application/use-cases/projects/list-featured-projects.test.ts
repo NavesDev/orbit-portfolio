@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { Project, type ProjectProperties } from '../../../domain/entities/project.ts';
 import { DateRange } from '../../../domain/value-objects/date-range.ts';
@@ -107,6 +107,7 @@ describe('ListFeaturedProjects', () => {
       tags: ['Next.js'],
       progressPercent: 100,
       visualSvg: null,
+      repoUrl: 'https://github.com/NavesDev/orbit-portfolio',
     });
   });
 
@@ -117,51 +118,31 @@ describe('ListFeaturedProjects', () => {
     expect(projects[0]?.visualSvg).toBe(icon.toString());
   });
 
-  it('keys the detail view by slug and includes applied skills with usage notes', async () => {
-    const shown = project();
-    const usages: ProjectSkillUsage[] = [
-      {
-        skillName: 'Next.js',
-        usageNote: LocalizedText.create({ 'en-US': 'App Router throughout.' }, 240),
-      },
-      { skillName: 'PostgreSQL', usageNote: null },
-    ];
+  it('carries repoUrl on the card itself, so FR-09 needs no detail view', async () => {
+    const { projects } = await useCase([project()]).execute('en-US', 10);
 
-    const { details } = await useCase([shown], new Map([[shown.id, usages]])).execute('en-US', 10);
-
-    expect(details['orbit-portfolio']).toEqual({
-      slug: 'orbit-portfolio',
-      title: 'Orbit Portfolio',
-      summary: 'A bilingual portfolio.',
-      category: 'Personal portfolio',
-      tags: ['Next.js'],
-      progressPercent: 100,
-      visualSvg: null,
-      description: 'A bilingual portfolio.',
-      repoUrl: 'https://github.com/NavesDev/orbit-portfolio',
-      liveUrl: null,
-      skills: [
-        { name: 'Next.js', usageNote: 'App Router throughout.' },
-        { name: 'PostgreSQL', usageNote: null },
-      ],
-    });
+    expect(projects[0]?.repoUrl).toBe('https://github.com/NavesDev/orbit-portfolio');
   });
 
-  it('omits repoUrl and liveUrl from the detail view when the project has none', async () => {
-    const { details } = await useCase([project({ repoUrl: null, liveUrl: null })]).execute(
-      'en-US',
-      10,
-    );
+  it('leaves repoUrl null when the project has none (FR-09)', async () => {
+    const { projects } = await useCase([project({ repoUrl: null })]).execute('en-US', 10);
 
-    expect(details['orbit-portfolio']?.repoUrl).toBeNull();
-    expect(details['orbit-portfolio']?.liveUrl).toBeNull();
+    expect(projects[0]?.repoUrl).toBeNull();
+  });
+
+  it('never reads skill usage: the section renders cards, not details', async () => {
+    const repository = new FakeProjectRepository([project()]);
+    const listSkillUsage = vi.spyOn(repository, 'listSkillUsage');
+
+    await new ListFeaturedProjects(repository).execute('en-US', 10);
+
+    expect(listSkillUsage).not.toHaveBeenCalled();
   });
 
   it('returns nothing when there are no featured, published projects', async () => {
-    const { projects, details } = await useCase([]).execute('en-US', 10);
+    const { projects } = await useCase([]).execute('en-US', 10);
 
     expect(projects).toEqual([]);
-    expect(details).toEqual({});
   });
 
   describe('the card summary', () => {

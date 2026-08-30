@@ -15,6 +15,7 @@ const RESULT: ListFeaturedProjectsOutput = {
       tags: ['Next.js'],
       progressPercent: 50,
       visualSvg: null,
+      repoUrl: null,
     },
     {
       slug: 'second',
@@ -24,36 +25,9 @@ const RESULT: ListFeaturedProjectsOutput = {
       tags: [],
       progressPercent: null,
       visualSvg: null,
+      repoUrl: null,
     },
   ],
-  details: {
-    first: {
-      slug: 'first',
-      title: 'First Project',
-      summary: 'The first project’s opening line.',
-      category: 'Category A',
-      tags: ['Next.js'],
-      progressPercent: 50,
-      visualSvg: null,
-      description: null,
-      repoUrl: null,
-      liveUrl: null,
-      skills: [],
-    },
-    second: {
-      slug: 'second',
-      title: 'Second Project',
-      summary: null,
-      category: 'Category B',
-      tags: [],
-      progressPercent: null,
-      visualSvg: null,
-      description: null,
-      repoUrl: null,
-      liveUrl: null,
-      skills: [],
-    },
-  },
 };
 
 describe('ProjectsSection', () => {
@@ -77,7 +51,7 @@ describe('ProjectsSection', () => {
     render(
       <ProjectsSection
         content={getContent('en-US').projects}
-        result={{ projects: [], details: {} }}
+        result={{ projects: [] }}
         locale="en-US"
       />,
     );

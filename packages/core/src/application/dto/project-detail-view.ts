@@ -7,12 +7,11 @@ import type { ProjectSkillView } from './project-skill-view.ts';
  *
  * Extends `ProjectCardView` rather than duplicating its fields: the detail
  * page is reached from a card and shows everything the card shows plus more,
- * never less.
+ * never less. `repoUrl` is therefore inherited, not redeclared — the card
+ * links to it too (FR-09).
  */
 export interface ProjectDetailView extends ProjectCardView {
   readonly description: string | null;
-  /** Omitted from the page's controls when `null` (FR-09). */
-  readonly repoUrl: string | null;
   readonly liveUrl: string | null;
   readonly skills: readonly ProjectSkillView[];
 }

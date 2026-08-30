@@ -37,7 +37,6 @@ export function ProjectsSection({
           key={card.slug}
           ordinal={index + 1}
           card={card}
-          detail={result.details[card.slug]!}
           content={content}
           locale={locale}
         />

@@ -21,6 +21,7 @@ export function toCardView(project: Project, locale: Locale): ProjectCardView {
     tags: project.tags === null ? [] : [...project.tags.resolve(locale)],
     progressPercent: project.progress.value,
     visualSvg: project.visualSvg?.toString() ?? null,
+    repoUrl: project.repoUrl?.toString() ?? null,
   };
 }
 
@@ -32,7 +33,6 @@ export function toDetailView(
   return {
     ...toCardView(project, locale),
     description: project.description?.resolve(locale) ?? null,
-    repoUrl: project.repoUrl?.toString() ?? null,
     liveUrl: project.liveUrl?.toString() ?? null,
     skills: usages.map((usage) => toSkillView(usage, locale)),
   };

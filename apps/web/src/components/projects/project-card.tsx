@@ -1,4 +1,4 @@
-import type { ProjectCardView, ProjectDetailView, Locale } from '@portfolio/core';
+import type { ProjectCardView, Locale } from '@portfolio/core';
 import Link from 'next/link';
 
 import type { SiteContent } from '../../content/types';
@@ -25,17 +25,19 @@ import './project-visual.module.css';
  * by `toCardView` — plain text by the time it arrives here, so the card
  * renders it directly rather than reaching for the Markdown renderer the
  * detail page needs. Absent when the project has no description to open with.
+ *
+ * `card` is the whole of the card's data: every field rendered below comes
+ * from it, `repoUrl` included, so nothing here reaches into the fuller
+ * `ProjectDetailView` the project's own page is built from.
  */
 export function ProjectCard({
   ordinal,
   card,
-  detail,
   content,
   locale,
 }: {
   readonly ordinal: number;
   readonly card: ProjectCardView;
-  readonly detail: ProjectDetailView;
   readonly content: SiteContent['projects'];
   readonly locale: Locale;
 }) {
@@ -77,8 +79,8 @@ export function ProjectCard({
             {content.detailsCta}
           </Link>
 
-          {detail.repoUrl === null ? null : (
-            <a className={styles.repoLink} href={detail.repoUrl} target="_blank" rel="noopener">
+          {card.repoUrl === null ? null : (
+            <a className={styles.repoLink} href={card.repoUrl} target="_blank" rel="noopener">
               <GithubIcon className={styles.repoIcon} />
               {content.repoCta}
             </a>

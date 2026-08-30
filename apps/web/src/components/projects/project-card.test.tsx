@@ -1,4 +1,4 @@
-import type { ProjectCardView, ProjectDetailView } from '@portfolio/core';
+import type { ProjectCardView } from '@portfolio/core';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
@@ -13,25 +13,12 @@ const CARD: ProjectCardView = {
   tags: ['Next.js'],
   progressPercent: 100,
   visualSvg: null,
-};
-
-const DETAIL: ProjectDetailView = {
-  ...CARD,
-  description: 'A bilingual portfolio.',
   repoUrl: 'https://github.com/NavesDev/orbit-portfolio',
-  liveUrl: null,
-  skills: [],
 };
 
-function renderCard(ordinal = 1, detail = DETAIL, card = CARD) {
+function renderCard(ordinal = 1, card = CARD) {
   return render(
-    <ProjectCard
-      ordinal={ordinal}
-      card={card}
-      detail={detail}
-      content={getContent('en-US').projects}
-      locale="en-US"
-    />,
+    <ProjectCard ordinal={ordinal} card={card} content={getContent('en-US').projects} locale="en-US" />,
   );
 }
 
@@ -69,13 +56,13 @@ describe('ProjectCard', () => {
 
     expect(screen.getByRole('link', { name: getContent('en-US').projects.repoCta })).toHaveAttribute(
       'href',
-      DETAIL.repoUrl,
+      CARD.repoUrl,
     );
   });
 
   /* FR-09 */
   it('omits the repository control when repoUrl is absent', () => {
-    renderCard(1, { ...DETAIL, repoUrl: null });
+    renderCard(1, { ...CARD, repoUrl: null });
 
     expect(
       screen.queryByRole('link', { name: getContent('en-US').projects.repoCta }),
@@ -91,7 +78,7 @@ describe('ProjectCard', () => {
   });
 
   it('omits the summary line for a project that has none', () => {
-    renderCard(1, DETAIL, { ...CARD, summary: null });
+    renderCard(1, { ...CARD, summary: null });
 
     expect(
       screen.queryByText('A bilingual portfolio built on persisted content.'),

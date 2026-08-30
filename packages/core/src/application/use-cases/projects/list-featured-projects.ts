@@ -1,18 +1,21 @@
 import type { Project } from '../../../domain/entities/project.ts';
 import type { Locale } from '../../../domain/enums/locale.ts';
 import type { ProjectCardView } from '../../dto/project-card-view.ts';
-import type { ProjectDetailView } from '../../dto/project-detail-view.ts';
 import type { ProjectRepository } from '../../ports/project-repository.ts';
-import { toCardView, toDetailView } from './project-views.ts';
+import { toCardView } from './project-views.ts';
 
 export interface ListFeaturedProjectsOutput {
   readonly projects: readonly ProjectCardView[];
-  /** The same projects, keyed by `slug`, for callers that need both at once. */
-  readonly details: Readonly<Record<string, ProjectDetailView>>;
 }
 
 /**
  * The featured-projects section's data (FR-05–FR-10, NFR-13).
+ *
+ * Cards only, never details: everything the section renders fits
+ * `ProjectCardView`, and a project's full detail is a different page reached
+ * by a different query (`GetProjectBySlug`). Returning both here would mean a
+ * `listSkillUsage` round trip per featured project to build a view no caller
+ * reads.
  *
  * `limit` is applied after sorting, not before: `ProjectRepository.listFeatured`
  * returns every featured, published project with no cap, and capping earlier
@@ -24,18 +27,7 @@ export class ListFeaturedProjects {
   async execute(locale: Locale, limit: number): Promise<ListFeaturedProjectsOutput> {
     const featured = [...(await this.repository.listFeatured())].sort(byOrder).slice(0, limit);
 
-    const projects: ProjectCardView[] = [];
-    const details: Record<string, ProjectDetailView> = {};
-
-    for (const project of featured) {
-      const usages = await this.repository.listSkillUsage(project.id);
-      const card = toCardView(project, locale);
-
-      projects.push(card);
-      details[card.slug] = toDetailView(project, locale, usages);
-    }
-
-    return { projects, details };
+    return { projects: featured.map((project) => toCardView(project, locale)) };
   }
 }
 
