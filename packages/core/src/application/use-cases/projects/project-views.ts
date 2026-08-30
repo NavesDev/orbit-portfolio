@@ -58,6 +58,12 @@ function toSkillView(usage: ProjectSkillUsage, locale: Locale): ProjectSkillView
  * a card is not a Markdown renderer, and inline markup written there would
  * reach a reader as asterisks. A description that opens on a list has no lead
  * prose at all, so it summarises to `null` rather than to markup.
+ *
+ * Nothing here strips inline markup, and deliberately so: stripping it would
+ * make a lead paragraph that renders one way on the detail page render
+ * another way on the card. The rule the authoring side holds up instead is
+ * that a lead paragraph carries no inline markup at all — `data-model.md` § 3
+ * records it against the `description` column.
  */
 function toSummary(description: string | null): string | null {
   if (description === null) {

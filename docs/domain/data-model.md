@@ -230,7 +230,7 @@ the front end, keyed off `category`.
 | `slug` | `varchar(120)` | no | Unique, untranslated. URL and deep-link target. |
 | `title` | `jsonb` | no | Localized, ≤ 160 per locale |
 | `category` | `jsonb` | yes | Localized, ≤ 40. Card eyebrow. |
-| `description` | `jsonb` | yes | Localized, ≤ 8000. Markdown. |
+| `description` | `jsonb` | yes | Localized, ≤ 8000. Markdown; see the lead-paragraph rule below. |
 | `tags` | `jsonb` | yes | Localized array of strings, ≤ 8 items of ≤ 60 |
 | `repo_url` | `varchar(2048)` | yes | |
 | `live_url` | `varchar(2048)` | yes | |
@@ -253,6 +253,13 @@ Indexes and constraints:
 - `ck_projects__category`: `category IS NULL OR is_localized(category, 40)`
 - `ck_projects__description`: `description IS NULL OR is_localized(description, 8000)`
 - `ck_projects__tags`: `tags IS NULL OR is_localized_array(tags, 60, 8)`
+
+`description` opens on a lead paragraph, then a blank line, then the bullets.
+That lead paragraph has no inline markup: no `**bold**`, no backticks, no
+links. The card's one-line summary is lifted from it verbatim (FR-06), and a
+card is not a Markdown renderer, so markup written there is shown to the reader
+as literal asterisks. Emphasis belongs in the bullets, which only the detail
+page renders.
 
 `tags` holds one array per locale — `{"en-US": ["Real-time calendar"],
 "pt-BR": ["Calendário em tempo real"]}`. They are free labels rendered as chips and never
