@@ -51,6 +51,7 @@ export const enUS: SiteContent = {
     },
     detailsCta: 'View details',
     showMore: 'Show more of the trajectory',
+    showMoreError: 'The rest of the trajectory could not be loaded. Try again.',
     closeModal: 'Close',
     credentialCta: 'Verify credential',
     skillsHeading: 'Skills',

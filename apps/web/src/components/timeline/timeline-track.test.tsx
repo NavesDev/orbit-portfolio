@@ -1,7 +1,7 @@
 import type { GetTimelineOutput, TimelineEntryView } from '@portfolio/core';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ptBR } from '../../content/pt-BR/index';
 import { TimelineTrack } from './timeline-track';
@@ -75,6 +75,63 @@ describe('TimelineTrack', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Ver mais da trajetória' }));
 
     expect(screen.queryByRole('button', { name: 'Ver mais da trajetória' })).not.toBeInTheDocument();
+  });
+
+  /*
+   * The action is the only call that leaves the browser, and an unhandled
+   * rejection is invisible: the transition settles, the button re-enables and
+   * the visitor is left clicking a control that does nothing. `console.error`
+   * is stubbed rather than left to run — an expected failure should not print
+   * a stack over the suite's output, and asserting on it is what proves the
+   * failure reaches someone other than the visitor.
+   */
+  describe('when the next page never arrives', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('says so, and points the control at the message', async () => {
+      vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      const loadMore = vi.fn().mockRejectedValue(new Error('offline'));
+      render(
+        <TimelineTrack
+          initial={page(['a', 'b'], 3)}
+          content={content}
+          locale="pt-BR"
+          loadMore={loadMore}
+        />,
+      );
+
+      const button = screen.getByRole('button', { name: 'Ver mais da trajetória' });
+      await userEvent.click(button);
+
+      const alert = screen.getByRole('alert');
+      expect(alert).toHaveTextContent(content.showMoreError);
+      expect(button).toHaveAttribute('aria-describedby', alert.id);
+      expect(console.error).toHaveBeenCalled();
+    });
+
+    it('keeps the control, and clears the message when the retry succeeds', async () => {
+      vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      const loadMore = vi
+        .fn()
+        .mockRejectedValueOnce(new Error('offline'))
+        .mockResolvedValue(page(['c'], 3));
+      render(
+        <TimelineTrack
+          initial={page(['a', 'b'], 3)}
+          content={content}
+          locale="pt-BR"
+          loadMore={loadMore}
+        />,
+      );
+
+      await userEvent.click(screen.getByRole('button', { name: 'Ver mais da trajetória' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Ver mais da trajetória' }));
+
+      expect(headings()).toEqual(['a', 'b', 'c']);
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
   });
 
   describe('the detail modal (NFR-05)', () => {

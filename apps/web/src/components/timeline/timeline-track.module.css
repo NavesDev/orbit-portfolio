@@ -85,6 +85,17 @@
   opacity: 0.6;
 }
 
+/*
+ * The message sits under the control it describes rather than replacing it:
+ * the retry is the same button, so it has to stay where the visitor left it.
+ */
+.error {
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
 @media (max-width: 760px) {
   .wrap {
     padding-left: 44px;
@@ -103,6 +114,10 @@
 
   .showMore {
     margin-left: 0;
+  }
+
+  .error {
+    text-align: left;
   }
 }
 

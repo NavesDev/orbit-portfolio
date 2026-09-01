@@ -99,7 +99,9 @@ export interface SiteContent {
    *
    * `showMore` reveals the next page of entries; there is no "show less",
    * because collapsing a list a visitor deliberately opened takes away what
-   * they just asked for.
+   * they just asked for. `showMoreError` is what that control says when the
+   * page never arrives — the request is the one part of this section that
+   * leaves the browser, so it is the one part that can fail after render.
    */
   readonly timeline: {
     readonly kicker: string;
@@ -108,6 +110,7 @@ export interface SiteContent {
     readonly ongoing: Readonly<Record<TimelineKind, string>>;
     readonly detailsCta: string;
     readonly showMore: string;
+    readonly showMoreError: string;
     readonly closeModal: string;
     readonly credentialCta: string;
     readonly skillsHeading: string;

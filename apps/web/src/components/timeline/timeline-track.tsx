@@ -44,6 +44,7 @@ export function TimelineTrack({
   const [entries, setEntries] = useState<readonly TimelineEntryView[]>(initial.entries);
   const [total, setTotal] = useState(initial.total);
   const [openEntry, setOpenEntry] = useState<TimelineEntryView | null>(null);
+  const [hasFailed, setHasFailed] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const listRef = useRef<HTMLOListElement | null>(null);
@@ -87,12 +88,28 @@ export function TimelineTrack({
     setOpenEntry(entry);
   }, []);
 
+  /*
+   * The action is the only thing in this section that leaves the browser, so
+   * it is the only thing that can fail once the page is on screen — a dropped
+   * connection, or the action's own validation rejecting arguments that were
+   * not the ones this component sent. An unhandled rejection here is invisible
+   * twice over: the transition settles, the button re-enables, and the visitor
+   * is left clicking a control that does nothing. The message says so, and the
+   * failure is logged so it is not only the visitor who knows.
+   */
   function showMore(): void {
-    startTransition(async () => {
-      const next = await loadMore(locale, entries.length);
+    setHasFailed(false);
 
-      setEntries((loaded) => [...loaded, ...next.entries]);
-      setTotal(next.total);
+    startTransition(async () => {
+      try {
+        const next = await loadMore(locale, entries.length);
+
+        setEntries((loaded) => [...loaded, ...next.entries]);
+        setTotal(next.total);
+      } catch (cause) {
+        console.error('The timeline could not load its next page.', cause);
+        setHasFailed(true);
+      }
     });
   }
 
@@ -120,15 +137,24 @@ export function TimelineTrack({
       </div>
 
       {hasMore ? (
-        <button
-          type="button"
-          className={styles.showMore}
-          onClick={showMore}
-          disabled={isPending}
-          aria-busy={isPending}
-        >
-          {content.showMore}
-        </button>
+        <>
+          <button
+            type="button"
+            className={styles.showMore}
+            onClick={showMore}
+            disabled={isPending}
+            aria-busy={isPending}
+            aria-describedby={hasFailed ? TRACK_CONSTANTS.ERROR_ID : undefined}
+          >
+            {content.showMore}
+          </button>
+
+          {hasFailed ? (
+            <p className={styles.error} id={TRACK_CONSTANTS.ERROR_ID} role="alert">
+              {content.showMoreError}
+            </p>
+          ) : null}
+        </>
       ) : null}
 
       {openEntry === null ? null : (

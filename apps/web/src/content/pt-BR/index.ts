@@ -52,6 +52,7 @@ export const ptBR: SiteContent = {
     },
     detailsCta: 'Ver detalhes',
     showMore: 'Ver mais da trajetória',
+    showMoreError: 'Não foi possível carregar o resto da trajetória. Tente novamente.',
     closeModal: 'Fechar',
     credentialCta: 'Verificar credencial',
     skillsHeading: 'Habilidades',

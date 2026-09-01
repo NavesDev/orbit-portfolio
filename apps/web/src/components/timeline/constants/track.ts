@@ -9,3 +9,9 @@ export const HALF = 2;
 
 export const EMPTY_SPINE = 0;
 export const NOTHING_PASSED = 0;
+
+/**
+ * Ties the failure message to the control it belongs to, so the button
+ * describes itself as broken instead of leaving the message floating.
+ */
+export const ERROR_ID = 'timeline-show-more-error';
