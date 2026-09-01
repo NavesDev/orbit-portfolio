@@ -12,4 +12,5 @@
 export { BaseRepository, type Queryable } from './repositories/base.repository.ts';
 export { PostgresSocialLinkRepository } from './repositories/postgres-social-link.repository.ts';
 export { PostgresProjectRepository } from './repositories/postgres-project.repository.ts';
+export { PostgresTimelineRepository } from './repositories/postgres-timeline.repository.ts';
 export { getPool, closePool } from './client.ts';
