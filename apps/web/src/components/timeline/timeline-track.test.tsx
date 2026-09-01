@@ -93,8 +93,26 @@ describe('TimelineTrack', () => {
       await userEvent.click(trigger);
       await userEvent.click(screen.getByRole('button', { name: 'Fechar' }));
 
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(document.querySelector('dialog')).toBeNull();
       expect(trigger).toHaveFocus();
+    });
+
+    /*
+     * The regression this exists for: routing the close through React's own
+     * `onClose` prop left the state set, so the dialog stayed mounted and shut
+     * and the second entry rendered into a dialog nobody reopened. Asserting
+     * on the `dialog` *role* missed it entirely — a closed dialog does not
+     * expose one — which is why this queries the element and opens twice.
+     */
+    it('opens again after being closed, and shows the second entry', async () => {
+      render(<TimelineTrack initial={page(['a', 'b'], 2)} content={content} locale="pt-BR" />);
+
+      await userEvent.click(screen.getByRole('button', { name: 'Ver detalhes: a' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Fechar' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Ver detalhes: b' }));
+
+      expect(screen.getByRole('dialog', { name: 'b' })).toBeInTheDocument();
+      expect(document.querySelectorAll('dialog')).toHaveLength(1);
     });
   });
 });
