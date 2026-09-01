@@ -203,6 +203,6 @@ describe('PostgresTimelineRepository', () => {
   });
 });
 
-function dates(startedOn: string | null): DateRange {
+function dates(startedOn: string): DateRange {
   return DateRange.create({ startedOn, endedOn: null });
 }
