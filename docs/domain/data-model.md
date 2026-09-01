@@ -297,7 +297,7 @@ which is the whole of what the timeline renders.
 | `credential_url` | `varchar(2048)` | yes | Verification link. Only meaningful when `kind = 'certification'`. |
 | `started_on` | `date` | no | Start date, or issue date for certifications |
 | `ended_on` | `date` | yes | End date, or expiry. Null = current / never expires. |
-| `is_featured` | `boolean` | no | Shown before "ver trajetória completa" |
+| `is_featured` | `boolean` | no | Editorial flag. **No reader today** — FR-14 became pagination in #7, so nothing on the page filters by it. |
 | `is_published` | `boolean` | no | Default `false` |
 | `sort_order` | `integer` | no | Default `0` |
 | `created_at` / `updated_at` | `timestamptz` | no | |

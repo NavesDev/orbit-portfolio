@@ -202,35 +202,42 @@ no value until the project data behind them renders.
   - A field with no `pt-BR` translation renders its `en-US` text, not an empty node.
   - Unit tests run both use cases against in-memory fakes with no database.
 
-### 6. Timeline section with featured/full toggle
+### 6. Timeline section, paged
 
 - **Description:** The `TimelineEntry` entity discriminated by `kind`, its
   repository port and Postgres implementation, the
-  `GetTimeline(locale, { featuredOnly })` use case, the `Clock` port that makes
-  "ongoing" testable, and the rendered timeline: entries in `started_on`
-  descending order showing kind, period, title, organization and skills, with
-  featured entries shown by default and the rest revealed on demand. An entry
-  with no `ended_on` is worded per `kind` and per locale. The scroll-driven
-  spine fill ships too — the prototype implements it, so FR-15 is a port.
+  `GetTimeline(locale, { limit, offset })` use case, and the rendered timeline:
+  entries in `started_on` descending order showing kind, period, title,
+  organization and skills, four at a time behind a "show more" control, each
+  opening its Markdown `description` in a dialog. An entry with no `ended_on`
+  is worded per `kind` and per locale. The scroll-driven spine fill ships too —
+  the prototype implements it, so FR-15 is a port.
 
   **The prototype's ordering is not authoritative here.** It renders oldest
-  first, which puts the featured entries at the bottom and makes the expand
-  control reveal items *above* it. FR-11 is the requirement and it is right: the
-  most recent experience comes first. The consequence is that the alternating
-  left/right layout, which the prototype drives off `:nth-child(odd/even)`, has
-  to be re-derived from the reversed order, and the expand control now reveals
-  items *below* the featured ones. That is a rewrite of the section's layout
-  logic, not a copy — budget for it. Roadmap 3.6; covers FR-11–FR-15.
+  first. FR-11 is the requirement and it is right: the most recent experience
+  comes first. The consequence is that the alternating left/right layout, which
+  the prototype drives off `:nth-child(odd/even)`, has to be re-derived — and
+  under pagination it cannot live in CSS at all, since parity is a fact about
+  position in a list that grows. That is a rewrite of the section's layout
+  logic, not a copy.
+
+  **Scope changed in #7.** The featured/full toggle became pagination, the
+  `Clock` port was deferred, and the entry description — real authored content
+  that no requirement rendered — now opens in a dialog. See U-8. Roadmap 3.6;
+  covers FR-11–FR-15.
 - **Expected outcome:** The visitor's trajectory renders from the database in
   both locales, completing the home page except for the skills section.
 - **Acceptance criteria:**
   - Published entries only, ordered by `started_on` descending (FR-11).
-  - Each entry shows `kind`, period, title, organization and its skills (FR-12).
+  - Each entry shows `kind`, period, title, organization and its skills (FR-12),
+    and opens its description and credential link in a dialog that closes on
+    `Escape` and returns focus to its trigger (NFR-05).
   - An ongoing professional or academic entry renders "atual" / "present"; a
     certification with no `ended_on` renders "não expira" / "no expiry" (FR-13)
     — one component test per wording, per locale.
-  - The most recent entry is the first one rendered, and the featured entries
-    appear before the expand control, with the rest revealed below it (FR-14).
+  - The most recent entry is the first one rendered; four entries show at a
+    time and "show more" appends the next four until none remain, at which
+    point the control is gone (FR-14).
   - `DateRange` rejects `ended_on` before `started_on`, unit-tested.
 
 ## Sprint Definition of Done
@@ -275,3 +282,4 @@ on it starts.
 | U-5 | **The per-project decorative visual has no home in the model.** Every card and every project modal in the prototype carries a bespoke SVG — a node grid, concentric rings, a line chart. | Task 5 | No column holds it; [data-model.md](../domain/data-model.md) only acknowledges the absence by listing a media library as a future extension. Because the artwork differs per project, it cannot be derived from `category` the way the orbit's colours are. Either it becomes presentation keyed by `slug`, or it needs a column — a modelling decision no document has taken. **Resolved in #6:** stored on the aggregate, `projects.visual_svg`, sanitized by the same `IconSvg` value object `social_links.icon_svg` uses. Its whitelist now also accepts a `class` attribute naming one of four predefined animations (`orbit-pulse`, `orbit-draw`, `orbit-drift`, `orbit-spin`), whose `@keyframes` are authored once in `apps/web` — a stored SVG names an animation, it never carries one. |
 | U-6 | The card eyebrow embeds an ordinal — `01 — agendamento`, `02 — automação`. | Task 5 | FR-06 renders `projects.category` as the eyebrow. Storing the number inside it would duplicate `sort_order` in translatable text, so reordering projects would mean editing copy in two locales. Whether the ordinal is derived at render time or is genuinely part of the category is unstated. **Resolved in #6:** derived at render time from position in the already-sorted list. `category` holds only the category text, in both locales, with no leading number. |
 | U-7 | Whether "ver detalhes" opens a modal (as specified in task 5) or a page — roadmap 4.2 already describes the page as future work: "the modal's content as a page". | Task 5 | The task 5 acceptance criteria, written before this uncertainty was raised, named a modal explicitly (NFR-05's "closes on `Escape` and returns focus to the trigger" is a modal-shaped requirement). **Resolved in #6:** a page, `/[locale]/projetos/[slug]` — roadmap 4.2 pulled forward into this task rather than deferred to Phase 4. A project a visitor wants to actually read is better served by a page: shareable by URL, keeps browser back/forward, no focus-return logic to write or to keep correct. `[locale]/not-found.tsx` (4.3) comes with it, so an unknown or unpublished slug still 404s, now with a localized message instead of the generic root one. Discovered along the way: `dynamicParams` set on a layout is inherited by every dynamic segment nested under it and cannot be loosened by a descendant page's own `dynamicParams = true` — `[locale]/layout.tsx`'s `dynamicParams = false`, meant only to 404 an unsupported locale, was silently 404ing every non-pre-rendered slug at the router level before this page's own `notFound()` call ever ran. The layout's runtime `isLocale` check was already the real guard, so the config option was simply removed there. |
+| U-8 | **Four gaps in task 6 that neither the documents nor the prototype could close**: whether the `Clock` port ships with no caller, how FR-11's ordering and FR-14's featured/full split behave when they disagree, whether `timeline_entries.description` is rendered at all, and how a statically generated page asks for more content without the `/api/*` endpoint `monorepo.md` rule 2 forbids. | Task 6 | **Answered by the author in #7**, each with a document changed in the same pull request. **`Clock`:** deferred — FR-13's "ongoing" is a null column, not a comparison with today, so the port would have shipped with nothing calling it; `clean-architecture.md` § 5 now records it as designed and not built. **Ordering:** the conflict is removed rather than resolved — FR-14 becomes pagination, four at a time, and `is_featured` stops deciding what the section shows. It keeps its column and loses its only reader, which `data-model.md` § 4 now says. **Description:** rendered, in a dialog rather than in a card — the cards are a scannable summary and the spine's alternating layout depends on their being roughly the same height. A dialog and not a page, which is where this differs from U-7: a project has a `slug` worth putting in the address bar and a timeline entry has none. The control appears on every card, including entries with no description, which departs from FR-09's rule for a missing `repo_url`; the author chose consistency between cards, and a detail view with no description still has four facts to show. **Paging:** a Server Action, which is not an HTTP surface anyone else can reach, so rule 2 stands unchanged; `stack.md` gains a row for it. |

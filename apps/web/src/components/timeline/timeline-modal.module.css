@@ -1,0 +1,134 @@
+/*
+ * `margin: auto` is what centres a modal dialog, and it has to be restored
+ * here: `globals.css` resets `margin` to 0 on every element, which beats the
+ * user-agent rule the centring depends on. Without it the dialog opens flush
+ * against the top-left corner.
+ */
+.dialog {
+  margin: auto;
+  width: min(640px, calc(100vw - var(--pad-x) * 2));
+  max-height: 82vh;
+  padding: 0;
+  border: 0.5px solid var(--line);
+  border-radius: 16px;
+  background: var(--bg);
+  color: var(--ink);
+  overflow: auto;
+}
+
+.dialog::backdrop {
+  background: rgba(25, 25, 24, 0.4);
+}
+
+.body {
+  padding: 32px;
+}
+
+.header {
+  margin-bottom: 22px;
+}
+
+.period {
+  font-size: 11px;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 8px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.25;
+  margin-bottom: 6px;
+}
+
+.organization {
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.description {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+
+.description :global(p) {
+  margin-bottom: 12px;
+}
+
+.description :global(ul) {
+  margin: 0 0 12px 18px;
+}
+
+.description :global(li) {
+  margin-bottom: 6px;
+}
+
+.description :global(strong) {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.section {
+  margin-top: 26px;
+}
+
+.sectionHeading {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+  margin-bottom: 10px;
+}
+
+.skills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.skills li {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--blue-soft);
+  color: var(--blue);
+}
+
+.credential {
+  display: inline-block;
+  margin-top: 24px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--blue);
+}
+
+.close {
+  display: block;
+  margin-top: 28px;
+  padding: 10px 18px;
+  border-radius: 22px;
+  border: 0.5px solid var(--line-strong);
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.close:hover,
+.close:focus-visible {
+  border-color: var(--blue-line);
+  background: var(--blue-soft);
+}
+
+@media (max-width: 760px) {
+  .body {
+    padding: 24px;
+  }
+}

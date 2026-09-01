@@ -1,0 +1,133 @@
+.wrap {
+  position: relative;
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+/*
+ * The spine is positioned against the list, not against the whole section, and
+ * that containing block is the whole point: "show more" sits below the last
+ * card, and a rule stretched over the wrapper drew straight through the
+ * button. It ends on the last entry, which is the last thing it measures.
+ */
+.track {
+  position: relative;
+}
+
+.spine {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--line);
+}
+
+/*
+ * Scaled, not resized. The prototype animates the fill's `height`, which asks
+ * the browser for a layout on every scroll frame; `transform` runs on the
+ * compositor and the element's box never changes. Same rule on screen, a frame
+ * budget that does not grow with the section.
+ */
+.fill {
+  display: block;
+  width: 100%;
+  block-size: 100%;
+  background: var(--blue);
+  transform-origin: top;
+  transform: scaleY(0);
+  transition: transform 0.05s linear;
+}
+
+.items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+ * The gap after the last card belongs between the list and the button, not
+ * inside the list — the spine's bottom is the list's bottom, so a trailing
+ * margin would hang the rule below the final node.
+ */
+.items > li:last-child {
+  margin-bottom: 0;
+}
+
+.showMore {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 56px auto 0;
+  padding: 11px 20px;
+  border-radius: 24px;
+  border: 0.5px solid var(--line-strong);
+  background: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  font-family: inherit;
+  transition:
+    border-color 0.25s var(--ease),
+    background 0.25s var(--ease);
+}
+
+.showMore:hover,
+.showMore:focus-visible {
+  border-color: var(--blue-line);
+  background: var(--blue-soft);
+}
+
+.showMore:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+/*
+ * The message sits under the control it describes rather than replacing it:
+ * the retry is the same button, so it has to stay where the visitor left it.
+ */
+.error {
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 760px) {
+  .wrap {
+    padding-left: 44px;
+  }
+
+  /*
+   * Measured from the list, so it follows the node rather than the section.
+   * The prototype's 12px counted from the padded wrapper; the spine now sits
+   * inside the list, whose left edge is that padding. -22px is the node's own
+   * offset plus half its width, which is what puts the rule through the middle
+   * of the dot instead of 34px to the right of it.
+   */
+  .spine {
+    left: -22px;
+  }
+
+  .showMore {
+    margin-left: 0;
+  }
+
+  .error {
+    text-align: left;
+  }
+}
+
+/*
+ * The spine's fill is scroll-driven, so it animates whether or not the visitor
+ * asked for motion. Honouring the preference means showing it complete rather
+ * than showing it grow.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    transition: none;
+  }
+}

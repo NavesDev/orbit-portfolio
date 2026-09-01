@@ -12,3 +12,12 @@ export const TAG_MAX_LENGTH = 60;
 export const TAGS_MAX_ITEMS = 8;
 export const USAGE_NOTE_MAX_LENGTH = 240;
 export const DESCRIPTION_MAX_LENGTH = 8000;
+
+/**
+ * `timeline_entries.organization` is `varchar(160)`, not a localized `jsonb`
+ * column — an employer, an institution and an issuer are proper nouns and are
+ * never translated (data-model.md § 4). The budget still belongs here rather
+ * than inline in the entity: it is the same number the column declares, and
+ * one file holding every budget is what makes the two easy to keep equal.
+ */
+export const ORGANIZATION_MAX_LENGTH = 160;

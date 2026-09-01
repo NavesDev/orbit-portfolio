@@ -36,6 +36,26 @@ export const enUS: SiteContent = {
     skillsHeading: 'Applied skills',
     backCta: 'Back to home',
   },
+  timeline: {
+    kicker: 'Trajectory',
+    heading: 'Education and experience, on the same timeline.',
+    kindLabels: {
+      professional: 'Professional',
+      academic: 'Academic',
+      certification: 'Certification',
+    },
+    ongoing: {
+      professional: 'present',
+      academic: 'present',
+      certification: 'no expiry',
+    },
+    detailsCta: 'View details',
+    showMore: 'Show more of the trajectory',
+    showMoreError: 'The rest of the trajectory could not be loaded. Try again.',
+    closeModal: 'Close',
+    credentialCta: 'Verify credential',
+    skillsHeading: 'Skills',
+  },
   notFound: {
     heading: 'Page not found',
     body: 'The page you are looking for does not exist.',

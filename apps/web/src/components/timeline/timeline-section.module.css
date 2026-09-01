@@ -1,0 +1,36 @@
+/*
+ * The prototype's own paddings. Its 110px head margin is kept: the spine
+ * starts at the first card, so the gap between the heading and the first node
+ * is the only thing separating a title from a vertical rule.
+ */
+.section {
+  padding: 90px var(--pad-x) 160px;
+}
+
+.head {
+  max-width: 520px;
+  margin-bottom: 110px;
+}
+
+.kicker {
+  font-size: 13px;
+  color: var(--blue);
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+
+.heading {
+  font-size: clamp(26px, 3.2vw, 36px);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+@media (max-width: 760px) {
+  .section {
+    padding: 56px var(--pad-x) 100px;
+  }
+
+  .head {
+    margin-bottom: 64px;
+  }
+}

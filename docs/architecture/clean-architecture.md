@@ -124,11 +124,26 @@ way.
 | Port | Operations |
 | --- | --- |
 | `ProjectRepository` | `findBySlug`, `listPublished`, `listFeatured(limit)`, `save`, `delete` |
-| `TimelineRepository` | `listPublished(kind?)`, `listFeatured`, `save`, `delete` |
+| `TimelineRepository` | `listPublished(limit, offset)` → `{ entries, total }`, `listSkillNames(entryId)` |
 | `SkillRepository` | `listAll`, `findUsage(skillId)`, `save`, `delete` |
 | `SocialLinkRepository` | `listPublished`, `save`, `delete` |
-| `Clock` | `today()` — makes "ongoing" and "expired" testable |
+| `Clock` | `today()` — deferred, no caller yet. See below. |
 | `DeveloperStatsProvider` | `fetchStats()` — public commit and pull-request counts for FR-21 |
+
+**`TimelineRepository` promises an order, and it is the only repository that
+does.** Everywhere else the use case sorts, so a fake and the real
+implementation cannot drift apart. Pagination makes that impossible here: a use
+case handed one page would sort whatever rows arrived rather than the ones that
+should have. The order — `started_on` descending, nulls last, then `sort_order`,
+then `id` — moves into the contract, and `FakeTimelineRepository` implements the
+same rule the SQL does.
+
+**`Clock` is designed and not built.** A rule that reads the current date needs
+a port so a test can set that date instead of waiting for it. No such rule
+exists yet: FR-13's "ongoing" is an open period, a null column, and
+`GetDeveloperStats` takes its date as an argument. It lands with the first rule
+that reads a date it did not receive — an expired certification would be one —
+rather than shipping as a port with no caller.
 
 `findUsage` returns a `SkillUsage[]` read model, not entities. Reads and writes
 have different shapes; forcing both through one interface is what turns a

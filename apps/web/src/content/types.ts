@@ -1,4 +1,4 @@
-import type { Locale } from '@portfolio/core';
+import type { Locale, TimelineKind } from '@portfolio/core';
 
 import type { StatId } from './site';
 
@@ -81,6 +81,39 @@ export interface SiteContent {
     readonly tagsHeading: string;
     readonly skillsHeading: string;
     readonly backCta: string;
+  };
+  /**
+   * The timeline section (FR-11–FR-15, roadmap 3.6).
+   *
+   * `kindLabels` names each kind on a card's chip; `ongoing` is FR-13's
+   * wording for an entry whose period has no end — "atual" for a role or a
+   * degree, "não expira" for a certification. Both are
+   * `Record<TimelineKind, string>` rather than lists, so a fourth kind added
+   * to the enum is a type error in both locales instead of a blank chip in
+   * one.
+   *
+   * The wording lives here and not in the use case for the reason
+   * `TimelineEntryView` records: it is copy, and copy that sits outside
+   * `content/` escapes the check that a missing translation is a compile
+   * error.
+   *
+   * `showMore` reveals the next page of entries; there is no "show less",
+   * because collapsing a list a visitor deliberately opened takes away what
+   * they just asked for. `showMoreError` is what that control says when the
+   * page never arrives — the request is the one part of this section that
+   * leaves the browser, so it is the one part that can fail after render.
+   */
+  readonly timeline: {
+    readonly kicker: string;
+    readonly heading: string;
+    readonly kindLabels: Readonly<Record<TimelineKind, string>>;
+    readonly ongoing: Readonly<Record<TimelineKind, string>>;
+    readonly detailsCta: string;
+    readonly showMore: string;
+    readonly showMoreError: string;
+    readonly closeModal: string;
+    readonly credentialCta: string;
+    readonly skillsHeading: string;
   };
   /**
    * The site-wide 404 (roadmap 4.3), rendered inside `[locale]/layout.tsx` —

@@ -51,9 +51,9 @@ requirement wins; see [Open against the prototype](#open-against-the-prototype).
 | ID | Requirement |
 | --- | --- |
 | FR-11 | MUST list published timeline entries ordered by `started_on` descending. |
-| FR-12 | Each entry MUST show its `kind`, period, title, organization and skills. |
+| FR-12 | Each entry MUST show its `kind`, period, title, organization and skills, and MUST offer its `description` and `credential_url` in a dialog. |
 | FR-13 | An entry with no `ended_on` MUST render as ongoing, worded per `kind` and per locale — "atual" / "present" for professional and academic, "não expira" / "no expiry" for certification. |
-| FR-14 | MUST show featured entries by default and reveal the rest on demand. |
+| FR-14 | MUST render published entries a page at a time, revealing the next page on demand until none remain. |
 | FR-15 | SHOULD fill a vertical spine proportionally to scroll position and highlight the entries already passed. |
 
 ### Skills
@@ -129,14 +129,16 @@ each needs a decision before it earns an ID.
 | OQ-04 | A closing CTA section — headline plus a call to action — which is also what physically contains the social links of FR-23. | FR-23 and FR-24 specify the links but nothing specifies the section around them. Its copy needs a home in `content/` and a `pt-BR` translation. **Answered in #5:** ships. The copy is the prototype's — `Vamos construir algo bem feito.` and `Iniciar conversa` — authored in `content/`, with the `en-US` translation new. It does **not** contain the links: they are a sibling `<footer>`, because a `<footer>` nested in a `<section>` is not the page's `contentinfo` landmark. The button's destination is the published `mailto:` row rather than copy, so the prototype's dead `href="#"` becomes a link that changes when the row does — and is omitted entirely when no e-mail link is published. |
 | OQ-05 | Each project card and project detail page carries a bespoke decorative SVG. | No column holds it and it cannot be derived from `category`. Presentation keyed by `slug`, or a new column? See the extension points in [domain/data-model.md](domain/data-model.md#extension-points). **Answered in #6:** a column, `projects.visual_svg`, sanitized by the same `IconSvg` value object `social_links.icon_svg` uses — see sprint-01.md U-5. |
 | OQ-06 | The card eyebrow embeds an ordinal — `01 — agendamento`. | FR-06 renders `projects.category` there. Is the ordinal derived from `sort_order` at render time, or genuinely part of the category text? Storing it duplicates the ordering in translatable copy. **Answered in #6:** derived at render time from list position — see sprint-01.md U-6. |
+| OQ-08 | FR-14 showed featured entries and revealed the rest behind one control, and nothing rendered `timeline_entries.description`. | The toggle was designed against a prototype with five hardcoded entries, where "featured" was a hand-picked short list; a trajectory that grows needs a control whose cost is bounded by a page rather than by how many rows carry a flag. **Answered in #7:** four entries at a time behind "show more", and the description opens in a dialog rather than sitting in a card — see sprint-01.md U-8. `is_featured` keeps its column and loses its only reader. |
 | OQ-07 | The availability badge (FR-02) is fixed text. | FR-02 requires it to reflect a boolean. Where does that boolean live — a `content/` constant, or something else? **Answered in #4:** a `content/` constant, `AVAILABLE_FOR_WORK`, outside the locale folders. Both phrases exist in both locales at all times. |
 
 Two places where the prototype is wrong and the requirement stands:
 
 - **Ordering.** The prototype renders the timeline oldest-first. FR-11 requires
   `started_on` descending and is correct: the most recent experience comes
-  first. The prototype's alternating layout and its expand control both assume
-  the old order and are re-derived, not copied.
+  first. The prototype's alternating layout assumes the old order and is
+  re-derived, not copied — and its expand control is gone entirely, replaced by
+  the pagination FR-14 now specifies.
 - **Animation lifetime.** Neither canvas in the prototype cancels its
   `requestAnimationFrame` loop. FR-04 exists to correct that.
 

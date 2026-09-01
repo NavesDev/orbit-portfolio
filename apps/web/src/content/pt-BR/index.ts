@@ -37,6 +37,26 @@ export const ptBR: SiteContent = {
     skillsHeading: 'Habilidades aplicadas',
     backCta: 'Voltar para o início',
   },
+  timeline: {
+    kicker: 'Trajetória',
+    heading: 'Formação e experiência, na mesma linha do tempo.',
+    kindLabels: {
+      professional: 'Profissional',
+      academic: 'Acadêmico',
+      certification: 'Certificação',
+    },
+    ongoing: {
+      professional: 'atual',
+      academic: 'atual',
+      certification: 'não expira',
+    },
+    detailsCta: 'Ver detalhes',
+    showMore: 'Ver mais da trajetória',
+    showMoreError: 'Não foi possível carregar o resto da trajetória. Tente novamente.',
+    closeModal: 'Fechar',
+    credentialCta: 'Verificar credencial',
+    skillsHeading: 'Habilidades',
+  },
   notFound: {
     heading: 'Página não encontrada',
     body: 'A página que você está procurando não existe.',
