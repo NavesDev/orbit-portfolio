@@ -1,0 +1,90 @@
+.wrap {
+  position: relative;
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+/*
+ * The spine runs the height of the list, not of the wrapper: the "show more"
+ * control sits below the last card, and a rule running past it would point at
+ * a button rather than end on an entry.
+ */
+.spine {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--line);
+}
+
+.fill {
+  display: block;
+  width: 100%;
+  background: var(--blue);
+  block-size: 0;
+  transition: block-size 0.05s linear;
+}
+
+.items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.showMore {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px auto 0;
+  padding: 11px 20px;
+  border-radius: 24px;
+  border: 0.5px solid var(--line-strong);
+  background: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  font-family: inherit;
+  transition:
+    border-color 0.25s var(--ease),
+    background 0.25s var(--ease);
+}
+
+.showMore:hover,
+.showMore:focus-visible {
+  border-color: var(--blue-line);
+  background: var(--blue-soft);
+}
+
+.showMore:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+@media (max-width: 760px) {
+  .wrap {
+    padding-left: 44px;
+  }
+
+  .spine {
+    left: 12px;
+    transform: none;
+  }
+
+  .showMore {
+    margin-left: 0;
+  }
+}
+
+/*
+ * The spine's fill is scroll-driven, so it animates whether or not the visitor
+ * asked for motion. Honouring the preference means showing it complete rather
+ * than showing it grow.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    transition: none;
+  }
+}

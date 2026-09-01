@@ -49,3 +49,27 @@ vi.mock('next/font/google', () => ({
   Inter_Tight: () => ({ variable: 'font-sans', className: 'font-sans' }),
   Newsreader: () => ({ variable: 'font-serif', className: 'font-serif' }),
 }));
+
+/**
+ * jsdom 25 ships `<dialog>` as an element but not as a dialog: `showModal` and
+ * `close` are simply absent, so a component that opens one throws here while
+ * working in every browser.
+ *
+ * This is the smallest stub that keeps the observable contract — `open`
+ * reflects the state, and `close()` fires the `close` event React's `onClose`
+ * listens for. What it deliberately does *not* emulate is the focus trap, the
+ * inert backdrop or Escape-to-close: those are the browser's, and a fake of
+ * them would let a test assert behaviour this code does not implement. What
+ * the component owns and a test can therefore check is that it opens the
+ * dialog, that closing clears the state, and that focus returns to the trigger.
+ */
+if (typeof HTMLDialogElement !== 'undefined' && HTMLDialogElement.prototype.showModal === undefined) {
+  HTMLDialogElement.prototype.showModal = function showModal(this: HTMLDialogElement) {
+    this.open = true;
+  };
+
+  HTMLDialogElement.prototype.close = function close(this: HTMLDialogElement) {
+    this.open = false;
+    this.dispatchEvent(new Event('close'));
+  };
+}
