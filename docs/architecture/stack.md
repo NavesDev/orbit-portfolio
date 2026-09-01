@@ -23,7 +23,18 @@ ordinary React. What it adds is what this project needs:
 | Detecting the visitor's language | Middleware, before the page renders |
 | Reading Postgres without exposing an API | Server Components |
 | Public endpoints for other projects (Phase 6) | Route Handlers under `src/app/api/` |
+| The page asking for more of its own content | Server Actions — see below |
 | Deploy | First-party on Vercel, no configuration |
+
+**Server Actions, not endpoints, when the site reads its own content on
+demand.** A statically generated page that pages through a list has to ask the
+server for the next page, and `monorepo.md` § "The HTTP surface" rule 2 rules
+out a route under `/api/v1` to serve it: `/api/*` exists for other projects, not
+for this one to call itself. An action is not an HTTP surface anyone else can reach — no
+public path, no version segment, no CORS entry, no rate-limit rule — and it
+leaves the page's first render prerendered, with only the action running per
+request. It is still an untrusted entry point and validates its arguments like
+one. The timeline's "show more" is the first use.
 
 Plain React (Vite) would leave routing, server rendering and the HTTP surface to
 assemble by hand — and the endpoints would need a separate server, which is the
