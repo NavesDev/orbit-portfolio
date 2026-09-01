@@ -19,12 +19,20 @@
   background: var(--line);
 }
 
+/*
+ * Scaled, not resized. The prototype animates the fill's `height`, which asks
+ * the browser for a layout on every scroll frame; `transform` runs on the
+ * compositor and the element's box never changes. Same rule on screen, a frame
+ * budget that does not grow with the section.
+ */
 .fill {
   display: block;
   width: 100%;
+  block-size: 100%;
   background: var(--blue);
-  block-size: 0;
-  transition: block-size 0.05s linear;
+  transform-origin: top;
+  transform: scaleY(0);
+  transition: transform 0.05s linear;
 }
 
 .items {

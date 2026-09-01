@@ -141,9 +141,17 @@
   color: var(--blue);
 }
 
+/*
+ * Padded to a real tap target. As bare underlined text it stood about 15px
+ * tall, which is under half the 24px minimum and a miss on a touch screen. The
+ * negative inline margin keeps the text itself aligned with the card's edge,
+ * so the target grew without the layout moving.
+ */
 .details {
-  margin-top: 14px;
-  padding: 0;
+  margin-top: 10px;
+  margin-inline: -8px;
+  padding: 8px;
+  min-height: 24px;
   border: none;
   background: none;
   cursor: pointer;

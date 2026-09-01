@@ -101,7 +101,7 @@ export function TimelineTrack({
   return (
     <div className={styles.wrap}>
       <div className={styles.spine} aria-hidden="true">
-        <span className={styles.fill} style={{ blockSize: `${fill * TRACK_CONSTANTS.AS_PERCENT}%` }} />
+        <span className={styles.fill} style={{ transform: `scaleY(${fill})` }} />
       </div>
 
       <ol className={styles.items} ref={listRef}>
@@ -118,7 +118,13 @@ export function TimelineTrack({
       </ol>
 
       {hasMore ? (
-        <button type="button" className={styles.showMore} onClick={showMore} disabled={isPending}>
+        <button
+          type="button"
+          className={styles.showMore}
+          onClick={showMore}
+          disabled={isPending}
+          aria-busy={isPending}
+        >
           {content.showMore}
         </button>
       ) : null}
