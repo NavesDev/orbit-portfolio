@@ -28,9 +28,13 @@ export function computeSpineFill(
 }
 
 /**
- * Whether a node's centre has been scrolled past, which is what lights its
- * card and its dot.
+ * Whether the filled rule has reached a node, which is what lights its card and
+ * its dot.
+ *
+ * The same midline `computeSpineFill` uses, deliberately: the fill's leading
+ * edge lands exactly there, so this answers "has the blue line got here yet"
+ * and not an approximation of it.
  */
 export function isNodePassed(nodeCenter: number, viewportHeight: number): boolean {
-  return nodeCenter < viewportHeight * SPINE_CONSTANTS.MIDLINE_RATIO + SPINE_CONSTANTS.PASSED_LEAD;
+  return nodeCenter <= viewportHeight * SPINE_CONSTANTS.MIDLINE_RATIO;
 }

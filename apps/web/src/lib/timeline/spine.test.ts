@@ -35,7 +35,29 @@ describe('isNodePassed', () => {
     expect(isNodePassed(200, VIEWPORT)).toBe(true);
   });
 
-  it('leads the midline slightly, so a card lights before it is centred', () => {
-    expect(isNodePassed(VIEWPORT / 2 + 20, VIEWPORT)).toBe(true);
+  it('is still false for a node just short of the midline', () => {
+    expect(isNodePassed(VIEWPORT / 2 + 1, VIEWPORT)).toBe(false);
+  });
+});
+
+/*
+ * The two functions answer one question between them, so they are tested
+ * together: a card that lights before the rule reaches its dot is the defect
+ * this describes, and neither function shows it alone.
+ */
+describe('the fill and the nodes agree on where the rule is', () => {
+  const WRAP_TOP = -300;
+  const WRAP_HEIGHT = 1000;
+
+  function fillEdge(): number {
+    return WRAP_TOP + computeSpineFill(WRAP_TOP, WRAP_HEIGHT, VIEWPORT) * WRAP_HEIGHT;
+  }
+
+  it('lights a node exactly at the fill’s leading edge', () => {
+    expect(isNodePassed(fillEdge(), VIEWPORT)).toBe(true);
+  });
+
+  it('leaves a node one pixel below that edge unlit', () => {
+    expect(isNodePassed(fillEdge() + 1, VIEWPORT)).toBe(false);
   });
 });
