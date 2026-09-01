@@ -5,10 +5,15 @@
 }
 
 /*
- * The spine runs the height of the list, not of the wrapper: the "show more"
- * control sits below the last card, and a rule running past it would point at
- * a button rather than end on an entry.
+ * The spine is positioned against the list, not against the whole section, and
+ * that containing block is the whole point: "show more" sits below the last
+ * card, and a rule stretched over the wrapper drew straight through the
+ * button. It ends on the last entry, which is the last thing it measures.
  */
+.track {
+  position: relative;
+}
+
 .spine {
   position: absolute;
   left: 50%;
@@ -41,11 +46,20 @@
   padding: 0;
 }
 
+/*
+ * The gap after the last card belongs between the list and the button, not
+ * inside the list — the spine's bottom is the list's bottom, so a trailing
+ * margin would hang the rule below the final node.
+ */
+.items > li:last-child {
+  margin-bottom: 0;
+}
+
 .showMore {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 8px auto 0;
+  margin: 56px auto 0;
   padding: 11px 20px;
   border-radius: 24px;
   border: 0.5px solid var(--line-strong);
@@ -76,9 +90,15 @@
     padding-left: 44px;
   }
 
+  /*
+   * Measured from the list, so it follows the node rather than the section.
+   * The prototype's 12px counted from the padded wrapper; the spine now sits
+   * inside the list, whose left edge is that padding. -22px is the node's own
+   * offset plus half its width, which is what puts the rule through the middle
+   * of the dot instead of 34px to the right of it.
+   */
   .spine {
-    left: 12px;
-    transform: none;
+    left: -22px;
   }
 
   .showMore {

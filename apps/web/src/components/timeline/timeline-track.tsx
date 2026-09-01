@@ -100,11 +100,12 @@ export function TimelineTrack({
 
   return (
     <div className={styles.wrap}>
-      <div className={styles.spine} aria-hidden="true">
-        <span className={styles.fill} style={{ transform: `scaleY(${fill})` }} />
-      </div>
+      <div className={styles.track}>
+        <div className={styles.spine} aria-hidden="true">
+          <span className={styles.fill} style={{ transform: `scaleY(${fill})` }} />
+        </div>
 
-      <ol className={styles.items} ref={listRef}>
+        <ol className={styles.items} ref={listRef}>
         {entries.map((entry, index) => (
           <TimelineItem
             key={entry.id}
@@ -114,8 +115,9 @@ export function TimelineTrack({
             content={content}
             onOpenDetails={openDetails}
           />
-        ))}
-      </ol>
+          ))}
+        </ol>
+      </div>
 
       {hasMore ? (
         <button
