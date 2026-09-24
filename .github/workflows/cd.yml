@@ -1,0 +1,62 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+
+# Two merges in quick succession queue instead of racing on the same database.
+# Cancelling is deliberately off: a half-cancelled migration run is the exact
+# failure this job exists to prevent.
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+# The test suite is not re-run here. `ci.yml` is the gate on the pull request
+# and `main` receives only merges of green, up-to-date pull requests; running it
+# again spends minutes re-proving what the merge already required.
+jobs:
+  migrate:
+    name: Migrate production
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply migrations
+        run: pnpm db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+    # A migration that fails leaves this job skipped and the previous build
+    # serving: the schema is never ahead of the code, the code never ahead of
+    # the schema.
+    needs: migrate
+
+    steps:
+      # The hook URL is a secret, so it is passed through the environment rather
+      # than written into the command line, where `set -x` or a shell trace
+      # would print it. The hook answers as soon as the build is queued — this
+      # step proves the deployment started, not that it succeeded (sprint-02
+      # U-1).
+      - name: Trigger the Vercel deployment
+        run: curl --fail --silent --show-error -X POST "$VERCEL_DEPLOY_HOOK_URL"
+        env:
+          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
