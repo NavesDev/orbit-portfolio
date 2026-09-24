@@ -18,6 +18,7 @@ requirement wins — see
 | [requirements.md](requirements.md) | What v1 must do, what it explicitly will not, and what is still open against the prototype |
 | [roadmap.md](roadmap.md) | Phases, deliverables, exit criteria, current status |
 | [sprints/sprint-01.md](sprints/sprint-01.md) | Sprint 1 — bilingual home page on persisted content |
+| [sprints/sprint-02.md](sprints/sprint-02.md) | Sprint 2 — continuous delivery and the first release |
 | [testing.md](testing.md) | Test levels, tooling, database setup, CI |
 | [domain/data-model.md](domain/data-model.md) | Entities, tables, columns, enums, conventions |
 | [architecture/clean-architecture.md](architecture/clean-architecture.md) | Layer boundaries, aggregates, ports |
